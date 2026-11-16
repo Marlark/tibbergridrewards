@@ -1,0 +1,377 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "se.ted.tibbergridrewards",
+  "version": "0.1.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Tibber Grid Rewards",
+    "sv": "Tibber Grid Rewards"
+  },
+  "description": {
+    "en": "Follow your Tibber Grid Rewards in Homey",
+    "sv": "Följ dina Tibber Grid Rewards i Homey"
+  },
+  "category": [
+    "energy"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Ted"
+  },
+  "brandColor": "#0F2742",
+  "flow": {
+    "triggers": [
+      {
+        "id": "state_changed",
+        "title": {
+          "en": "Grid Rewards status changed",
+          "sv": "Grid Rewards-status ändrades"
+        },
+        "tokens": [
+          {
+            "name": "state",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "sv": "Status"
+            },
+            "example": "delivering"
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "title": {
+              "en": "Reason",
+              "sv": "Orsak"
+            },
+            "example": "frequencyRegulation"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
+      },
+      {
+        "id": "session_started",
+        "title": {
+          "en": "A Grid Rewards session started",
+          "sv": "En Grid Rewards-session startade"
+        },
+        "tokens": [
+          {
+            "name": "reason",
+            "type": "string",
+            "title": {
+              "en": "Reason",
+              "sv": "Orsak"
+            },
+            "example": "frequencyRegulation"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
+      },
+      {
+        "id": "session_ended",
+        "title": {
+          "en": "A Grid Rewards session ended",
+          "sv": "En Grid Rewards-session slutade"
+        },
+        "tokens": [
+          {
+            "name": "reward",
+            "type": "number",
+            "title": {
+              "en": "Reward (kr)",
+              "sv": "Ersättning (kr)"
+            },
+            "example": 1.25
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "title": {
+              "en": "Duration (min)",
+              "sv": "Längd (min)"
+            },
+            "example": 15
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "is_delivering",
+        "title": {
+          "en": "A Grid Rewards session !{{is|is not}} active",
+          "sv": "En Grid Rewards-session !{{pågår|pågår inte}}"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "Grid Rewards",
+        "sv": "Grid Rewards"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "grid_reward_state",
+        "grid_reward_active",
+        "grid_reward_reason",
+        "grid_reward_session",
+        "grid_reward_today",
+        "grid_reward_month",
+        "grid_reward_all_time"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "images": {
+        "small": "/drivers/grid-reward/assets/images/small.png",
+        "large": "/drivers/grid-reward/assets/images/large.png",
+        "xlarge": "/drivers/grid-reward/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "login_credentials",
+          "template": "login_credentials",
+          "options": {
+            "usernameLabel": {
+              "en": "Tibber e-mail",
+              "sv": "Tibber-mejl"
+            },
+            "usernamePlaceholder": {
+              "en": "name@example.com"
+            }
+          }
+        },
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "repair": [
+        {
+          "id": "login_credentials",
+          "template": "login_credentials",
+          "options": {
+            "usernameLabel": {
+              "en": "Tibber e-mail",
+              "sv": "Tibber-mejl"
+            },
+            "usernamePlaceholder": {
+              "en": "name@example.com"
+            }
+          }
+        }
+      ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Developer",
+            "sv": "Utvecklare"
+          },
+          "children": [
+            {
+              "id": "record_raw",
+              "type": "checkbox",
+              "value": false,
+              "label": {
+                "en": "Record raw data",
+                "sv": "Spela in rådata"
+              },
+              "hint": {
+                "en": "Writes every update from Tibber to the app log (lines starting with [REC]). Use during `homey app run` and extract with tools/extract-recording.js.",
+                "sv": "Skriver varje uppdatering från Tibber till apploggen (rader som börjar med [REC]). Använd under `homey app run` och plocka ut med tools/extract-recording.js."
+              }
+            }
+          ]
+        }
+      ],
+      "id": "grid-reward"
+    }
+  ],
+  "capabilities": {
+    "grid_reward_active": {
+      "type": "boolean",
+      "title": {
+        "en": "Session active",
+        "sv": "Session pågår"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "insightsTitleTrue": {
+        "en": "Grid Rewards session started",
+        "sv": "Grid Rewards-session startade"
+      },
+      "insightsTitleFalse": {
+        "en": "Grid Rewards session ended",
+        "sv": "Grid Rewards-session slutade"
+      },
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_all_time": {
+      "type": "number",
+      "title": {
+        "en": "Reward all time",
+        "sv": "Ersättning totalt"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_month": {
+      "type": "number",
+      "title": {
+        "en": "Reward this month",
+        "sv": "Ersättning denna månad"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_reason": {
+      "type": "string",
+      "title": {
+        "en": "Reason",
+        "sv": "Orsak"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_session": {
+      "type": "number",
+      "title": {
+        "en": "Current session",
+        "sv": "Pågående session"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_state": {
+      "type": "enum",
+      "title": {
+        "en": "Grid Rewards status",
+        "sv": "Grid Rewards-status"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/reward.svg",
+      "values": [
+        {
+          "id": "available",
+          "title": {
+            "en": "Available",
+            "sv": "Tillgänglig"
+          }
+        },
+        {
+          "id": "unavailable",
+          "title": {
+            "en": "Unavailable",
+            "sv": "Ej tillgänglig"
+          }
+        },
+        {
+          "id": "delivering",
+          "title": {
+            "en": "Delivering",
+            "sv": "Levererar"
+          }
+        },
+        {
+          "id": "unknown",
+          "title": {
+            "en": "Unknown",
+            "sv": "Okänd"
+          }
+        }
+      ]
+    },
+    "grid_reward_today": {
+      "type": "number",
+      "title": {
+        "en": "Reward today",
+        "sv": "Ersättning idag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    }
+  }
+}

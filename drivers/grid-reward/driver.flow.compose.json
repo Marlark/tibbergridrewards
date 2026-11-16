@@ -1,0 +1,85 @@
+{
+  "triggers": [
+    {
+      "id": "state_changed",
+      "title": {
+        "en": "Grid Rewards status changed",
+        "sv": "Grid Rewards-status ändrades"
+      },
+      "tokens": [
+        {
+          "name": "state",
+          "type": "string",
+          "title": {
+            "en": "Status",
+            "sv": "Status"
+          },
+          "example": "delivering"
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "title": {
+            "en": "Reason",
+            "sv": "Orsak"
+          },
+          "example": "frequencyRegulation"
+        }
+      ]
+    },
+    {
+      "id": "session_started",
+      "title": {
+        "en": "A Grid Rewards session started",
+        "sv": "En Grid Rewards-session startade"
+      },
+      "tokens": [
+        {
+          "name": "reason",
+          "type": "string",
+          "title": {
+            "en": "Reason",
+            "sv": "Orsak"
+          },
+          "example": "frequencyRegulation"
+        }
+      ]
+    },
+    {
+      "id": "session_ended",
+      "title": {
+        "en": "A Grid Rewards session ended",
+        "sv": "En Grid Rewards-session slutade"
+      },
+      "tokens": [
+        {
+          "name": "reward",
+          "type": "number",
+          "title": {
+            "en": "Reward (kr)",
+            "sv": "Ersättning (kr)"
+          },
+          "example": 1.25
+        },
+        {
+          "name": "minutes",
+          "type": "number",
+          "title": {
+            "en": "Duration (min)",
+            "sv": "Längd (min)"
+          },
+          "example": 15
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "is_delivering",
+      "title": {
+        "en": "A Grid Rewards session !{{is|is not}} active",
+        "sv": "En Grid Rewards-session !{{pågår|pågår inte}}"
+      }
+    }
+  ]
+}

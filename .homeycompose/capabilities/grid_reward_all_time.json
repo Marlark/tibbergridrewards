@@ -1,0 +1,16 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Reward all time",
+    "sv": "Ersättning totalt"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

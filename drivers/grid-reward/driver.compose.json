@@ -1,0 +1,92 @@
+{
+  "name": {
+    "en": "Grid Rewards",
+    "sv": "Grid Rewards"
+  },
+  "class": "sensor",
+  "capabilities": [
+    "grid_reward_state",
+    "grid_reward_active",
+    "grid_reward_reason",
+    "grid_reward_session",
+    "grid_reward_today",
+    "grid_reward_month",
+    "grid_reward_all_time"
+  ],
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "cloud"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "login_credentials",
+      "template": "login_credentials",
+      "options": {
+        "usernameLabel": {
+          "en": "Tibber e-mail",
+          "sv": "Tibber-mejl"
+        },
+        "usernamePlaceholder": {
+          "en": "name@example.com"
+        }
+      }
+    },
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ],
+  "repair": [
+    {
+      "id": "login_credentials",
+      "template": "login_credentials",
+      "options": {
+        "usernameLabel": {
+          "en": "Tibber e-mail",
+          "sv": "Tibber-mejl"
+        },
+        "usernamePlaceholder": {
+          "en": "name@example.com"
+        }
+      }
+    }
+  ],
+  "settings": [
+    {
+      "type": "group",
+      "label": {
+        "en": "Developer",
+        "sv": "Utvecklare"
+      },
+      "children": [
+        {
+          "id": "record_raw",
+          "type": "checkbox",
+          "value": false,
+          "label": {
+            "en": "Record raw data",
+            "sv": "Spela in rådata"
+          },
+          "hint": {
+            "en": "Writes every update from Tibber to the app log (lines starting with [REC]). Use during `homey app run` and extract with tools/extract-recording.js.",
+            "sv": "Skriver varje uppdatering från Tibber till apploggen (rader som börjar med [REC]). Använd under `homey app run` och plocka ut med tools/extract-recording.js."
+          }
+        }
+      ]
+    }
+  ]
+}

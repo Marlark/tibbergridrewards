@@ -1,0 +1,20 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Session active",
+    "sv": "Session pågår"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "insights": true,
+  "insightsTitleTrue": {
+    "en": "Grid Rewards session started",
+    "sv": "Grid Rewards-session startade"
+  },
+  "insightsTitleFalse": {
+    "en": "Grid Rewards session ended",
+    "sv": "Grid Rewards-session slutade"
+  },
+  "icon": "/assets/reward.svg"
+}

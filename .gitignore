@@ -1,0 +1,5 @@
+node_modules/
+.homeybuild/
+
+# Homey logs from `homey app run | tee run.log`
+*.log

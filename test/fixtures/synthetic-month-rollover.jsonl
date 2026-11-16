@@ -1,0 +1,9 @@
+{"t":1796068800000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardAvailable","kind":"vehicle"},"rewardCurrency":"SEK","rewardCurrentMonth":118.2,"rewardAllTime":1018.2}}
+{"t":1796070600000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardDelivering","reason":"frequencyRegulation"},"rewardCurrency":"SEK","rewardCurrentMonth":118.2,"rewardAllTime":1018.2}}
+{"t":1796071500000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardDelivering","reason":"frequencyRegulation"},"rewardCurrency":"SEK","rewardCurrentMonth":119,"rewardAllTime":1019}}
+{"t":1796072400000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardAvailable","kind":"vehicle"},"rewardCurrency":"SEK","rewardCurrentMonth":119.4,"rewardAllTime":1019.4}}
+{"t":1796079000000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardDelivering","reason":"frequencyRegulation"},"rewardCurrency":"SEK","rewardCurrentMonth":119.4,"rewardAllTime":1019.4}}
+{"t":1796079900000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardDelivering","reason":"frequencyRegulation"},"rewardCurrency":"SEK","rewardCurrentMonth":0.3,"rewardAllTime":900.3}}
+{"t":1796080800000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardAvailable","kind":"vehicle"},"rewardCurrency":"SEK","rewardCurrentMonth":0.5,"rewardAllTime":900.5}}
+{"t":1796112000000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardUnavailable","reasons":["vehicleNotPluggedIn"]},"rewardCurrency":"SEK","rewardCurrentMonth":0.5,"rewardAllTime":900.5}}
+{"t":1796115600000,"tz":"Europe/Stockholm","status":{"homeId":"home-1","state":{"__typename":"GridRewardAvailable","kind":"vehicle"},"rewardCurrency":"SEK","rewardCurrentMonth":0.45,"rewardAllTime":900.45}}

@@ -1,0 +1,41 @@
+{
+  "type": "enum",
+  "title": {
+    "en": "Grid Rewards status",
+    "sv": "Grid Rewards-status"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/reward.svg",
+  "values": [
+    {
+      "id": "available",
+      "title": {
+        "en": "Available",
+        "sv": "Tillgänglig"
+      }
+    },
+    {
+      "id": "unavailable",
+      "title": {
+        "en": "Unavailable",
+        "sv": "Ej tillgänglig"
+      }
+    },
+    {
+      "id": "delivering",
+      "title": {
+        "en": "Delivering",
+        "sv": "Levererar"
+      }
+    },
+    {
+      "id": "unknown",
+      "title": {
+        "en": "Unknown",
+        "sv": "Okänd"
+      }
+    }
+  ]
+}

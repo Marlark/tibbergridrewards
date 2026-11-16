@@ -1,0 +1,6 @@
+{
+  "error": {
+    "auth": "Tibber login failed – repair the device with new credentials",
+    "home_missing": "This Tibber account has no access to the home this device belongs to"
+  }
+}

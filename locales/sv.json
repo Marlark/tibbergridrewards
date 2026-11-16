@@ -1,0 +1,6 @@
+{
+  "error": {
+    "auth": "Inloggningen mot Tibber misslyckades – reparera enheten med nya uppgifter",
+    "home_missing": "Tibber-kontot har inte åtkomst till hemmet som enheten hör till"
+  }
+}

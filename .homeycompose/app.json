@@ -1,0 +1,30 @@
+{
+  "id": "se.ted.tibbergridrewards",
+  "version": "0.1.0",
+  "compatibility": ">=5.0.0",
+  "sdk": 3,
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Tibber Grid Rewards",
+    "sv": "Tibber Grid Rewards"
+  },
+  "description": {
+    "en": "Follow your Tibber Grid Rewards in Homey",
+    "sv": "Följ dina Tibber Grid Rewards i Homey"
+  },
+  "category": [
+    "energy"
+  ],
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Ted"
+  },
+  "brandColor": "#0F2742"
+}
