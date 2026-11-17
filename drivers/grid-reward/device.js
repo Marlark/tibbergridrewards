@@ -7,6 +7,7 @@ const {
   parseStatus, parseFlex, applyUpdate, settle, rollDayEvents, statsOf, localDayKey, SETTLE_MS,
 } = require('../../lib/RewardTracker');
 const { reasonText } = require('../../lib/reasons');
+const { localeFor } = require('../../lib/i18n');
 const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
 
 // Capabilities shown in money; their unit follows Tibber's rewardCurrency.
@@ -316,7 +317,7 @@ class GridRewardDevice extends Homey.Device {
 
   _formatTime(ms) {
     if (!ms) return '–';
-    const lang = this.homey.i18n.getLanguage() === 'sv' ? 'sv-SE' : 'en-GB';
+    const lang = localeFor(this.homey.i18n.getLanguage());
     return new Intl.DateTimeFormat(lang, {
       timeZone: this.homey.clock.getTimezone(), dateStyle: 'short', timeStyle: 'medium',
     }).format(new Date(ms));

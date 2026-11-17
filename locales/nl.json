@@ -1,0 +1,69 @@
+{
+  "error": {
+    "auth": "Inloggen bij Tibber mislukt – herstel het apparaat met nieuwe inloggegevens",
+    "home_missing": "Dit Tibber-account heeft geen toegang tot de woning waar dit apparaat bij hoort",
+    "api_changed": "Tibber heeft zijn API gewijzigd – de app moet worden bijgewerkt. Elk uur nieuwe poging.",
+    "no_home_device": "Voeg eerst een Grid Rewards-apparaat voor je woning toe – auto en batterij worden daarvia gelezen",
+    "no_flex_devices": "Nog geen auto of batterij gevonden. Het apparaat van je woning toont ze na de eerste update van Tibber.",
+    "flex_missing": "Tibber meldt dit apparaat niet meer",
+    "battery_failed": "Kon de batterijgegevens niet van Tibber lezen"
+  },
+  "notification": {
+    "api_changed": "Tibber Grid Rewards: Tibber heeft zijn API gewijzigd en de app kan geen gegevens meer lezen. Controleer of er een app-update is."
+  },
+  "reason": {
+    "available": "Beschikbaar",
+    "excess": "Stroomoverschot in het net",
+    "shortage": "Stroomtekort in het net",
+    "other": "Andere netdienst",
+    "noVehiclesPluggedIn": "Geen auto aangesloten"
+  },
+  "battery": {
+    "charge": "Laden",
+    "discharge": "Ontladen",
+    "next": "__action__ om __time__ (__power__ kW)",
+    "next_tomorrow": "__action__ morgen om __time__ (__power__ kW)",
+    "none": "Niets gepland"
+  },
+  "battery_activity": {
+    "ChargingForGridRewards": "Laadt voor Grid Rewards",
+    "IdleWithUpcomingLowPrice": "Inactief – wacht op lagere stroomprijs"
+  },
+  "widget": {
+    "state": {
+      "available": "Beschikbaar",
+      "unavailable": "Niet beschikbaar",
+      "delivering": "Levert",
+      "unknown": "Onbekend"
+    },
+    "today": "Vandaag",
+    "month": "Deze maand",
+    "session": "Huidige sessie",
+    "last_session": "Laatste sessie",
+    "sessions": "sessies",
+    "battery": "Batterij",
+    "saved_today": "vandaag bespaard",
+    "unavailable": "Geen verbinding met Tibber"
+  },
+  "conn": {
+    "connecting": "Verbinden…",
+    "connected": "Verbonden",
+    "reconnecting": "Opnieuw verbinden…",
+    "auth": "Inloggen mislukt – herstel het apparaat",
+    "api": "Tibber heeft zijn API gewijzigd – elk uur nieuwe poging"
+  },
+  "history": {
+    "title": "Grid Rewards-geschiedenis",
+    "empty": "Nog geen afgeronde sessies.",
+    "per_day": "Per dag",
+    "sessions": "Sessies",
+    "when": "Wanneer",
+    "reward": "Vergoeding",
+    "duration": "Duur",
+    "reason": "Reden",
+    "total": "Totaal",
+    "min": "min",
+    "sessions_count": "sessies",
+    "no_home": "Voeg een Grid Rewards-apparaat voor je woning toe om de geschiedenis te zien."
+  }
+}

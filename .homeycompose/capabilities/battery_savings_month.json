@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Battery savings this month",
-    "sv": "Batteribesparing denna månad"
+    "sv": "Batteribesparing denna månad",
+    "no": "Batteribesparelse denne måneden",
+    "da": "Batteribesparelse denne måned",
+    "de": "Batterieersparnis diesen Monat",
+    "nl": "Batterijbesparing deze maand"
   },
   "getable": true,
   "setable": false,

@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Current session",
-    "sv": "Pågående session"
+    "sv": "Pågående session",
+    "no": "Pågående økt",
+    "da": "Igangværende session",
+    "de": "Laufende Session",
+    "nl": "Huidige sessie"
   },
   "getable": true,
   "setable": false,

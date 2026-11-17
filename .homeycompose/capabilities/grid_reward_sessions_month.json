@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Sessions this month",
-    "sv": "Sessioner denna månad"
+    "sv": "Sessioner denna månad",
+    "no": "Økter denne måneden",
+    "da": "Sessioner denne måned",
+    "de": "Sessions diesen Monat",
+    "nl": "Sessies deze maand"
   },
   "getable": true,
   "setable": false,

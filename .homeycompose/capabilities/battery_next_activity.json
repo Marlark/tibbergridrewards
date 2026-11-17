@@ -1,8 +1,12 @@
 {
   "type": "string",
   "title": {
-    "en": "Next planned",
-    "sv": "Nästa planerade"
+    "en": "Next planned activity",
+    "sv": "Nästa planerade aktivitet",
+    "no": "Neste planlagte aktivitet",
+    "da": "Næste planlagte aktivitet",
+    "de": "Nächste geplante Aktivität",
+    "nl": "Volgende geplande activiteit"
   },
   "getable": true,
   "setable": false,

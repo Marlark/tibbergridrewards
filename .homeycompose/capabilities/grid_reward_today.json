@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Reward today",
-    "sv": "Ersättning idag"
+    "sv": "Ersättning idag",
+    "no": "Godtgjørelse i dag",
+    "da": "Godtgørelse i dag",
+    "de": "Vergütung heute",
+    "nl": "Vergoeding vandaag"
   },
   "getable": true,
   "setable": false,

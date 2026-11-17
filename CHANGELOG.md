@@ -39,4 +39,4 @@ First version.
 - Fewer writes to Homey: values and stored state are only written when they change. On a real day the home device went from 1 502 to 404 capability writes and from 209 to 95 store writes.
 - Tests for the device and driver with a stub of the `homey` module, and GitHub Actions CI running the tests and `homey app validate`.
 - Original icon and images.
-- English and Swedish translations.
+- Translations: English, Swedish, Norwegian, Danish, German and Dutch. Dates and times follow Homey's language.

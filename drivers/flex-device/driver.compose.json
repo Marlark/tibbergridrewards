@@ -1,7 +1,11 @@
 {
   "name": {
     "en": "Car / battery (Grid Rewards)",
-    "sv": "Bil / batteri (Grid Rewards)"
+    "sv": "Bil / batteri (Grid Rewards)",
+    "no": "Bil / batteri (Grid Rewards)",
+    "da": "Bil / batteri (Grid Rewards)",
+    "de": "Auto / Batterie (Grid Rewards)",
+    "nl": "Auto / batterij (Grid Rewards)"
   },
   "class": "sensor",
   "capabilities": [

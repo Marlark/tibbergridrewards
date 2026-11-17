@@ -12,7 +12,11 @@
   },
   "description": {
     "en": "Follow your Tibber Grid Rewards in Homey",
-    "sv": "Följ dina Tibber Grid Rewards i Homey"
+    "sv": "Följ dina Tibber Grid Rewards i Homey",
+    "no": "Følg dine Tibber Grid Rewards i Homey",
+    "da": "Følg dine Tibber Grid Rewards i Homey",
+    "de": "Verfolge deine Tibber Grid Rewards in Homey",
+    "nl": "Volg je Tibber Grid Rewards in Homey"
   },
   "category": [
     "energy"

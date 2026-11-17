@@ -2,6 +2,7 @@
 
 const Homey = require('homey');
 const { reasonText } = require('../../lib/reasons');
+const { localeFor } = require('../../lib/i18n');
 const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
 const { TibberApiChangedError } = require('../../lib/TibberAppClient');
 const { localDayKey } = require('../../lib/RewardTracker');
@@ -171,7 +172,7 @@ class FlexDevice extends Homey.Device {
     if (!next) return this.homey.__('battery.none');
     const tz = this.homey.clock.getTimezone();
     const when = new Date(next.time);
-    const lang = this.homey.i18n.getLanguage() === 'sv' ? 'sv-SE' : 'en-GB';
+    const lang = localeFor(this.homey.i18n.getLanguage());
     const time = new Intl.DateTimeFormat(lang, { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(when);
     const tomorrow = localDayKey(when, tz) !== localDayKey(new Date(), tz);
     const power = (next.powerW / 1000).toLocaleString(lang, { maximumFractionDigits: 1 });

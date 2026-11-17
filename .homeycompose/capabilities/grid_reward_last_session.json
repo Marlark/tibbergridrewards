@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Last session",
-    "sv": "Senaste session"
+    "sv": "Senaste session",
+    "no": "Siste økt",
+    "da": "Seneste session",
+    "de": "Letzte Session",
+    "nl": "Laatste sessie"
   },
   "getable": true,
   "setable": false,

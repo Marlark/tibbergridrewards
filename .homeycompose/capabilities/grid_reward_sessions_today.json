@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Sessions today",
-    "sv": "Sessioner idag"
+    "sv": "Sessioner idag",
+    "no": "Økter i dag",
+    "da": "Sessioner i dag",
+    "de": "Sessions heute",
+    "nl": "Sessies vandaag"
   },
   "getable": true,
   "setable": false,

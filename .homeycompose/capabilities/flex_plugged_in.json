@@ -2,7 +2,11 @@
   "type": "boolean",
   "title": {
     "en": "Plugged in",
-    "sv": "Inkopplad"
+    "sv": "Inkopplad",
+    "no": "Tilkoblet",
+    "da": "Tilsluttet",
+    "de": "Angeschlossen",
+    "nl": "Aangesloten"
   },
   "getable": true,
   "setable": false,
@@ -11,10 +15,18 @@
   "icon": "/assets/plug.svg",
   "insightsTitleTrue": {
     "en": "Plugged in",
-    "sv": "Kopplades in"
+    "sv": "Kopplades in",
+    "no": "Tilkoblet",
+    "da": "Tilsluttet",
+    "de": "Angeschlossen",
+    "nl": "Aangesloten"
   },
   "insightsTitleFalse": {
     "en": "Unplugged",
-    "sv": "Kopplades ur"
+    "sv": "Kopplades ur",
+    "no": "Koblet fra",
+    "da": "Frakoblet",
+    "de": "Abgesteckt",
+    "nl": "Losgekoppeld"
   }
 }

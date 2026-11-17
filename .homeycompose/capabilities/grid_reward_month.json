@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Reward this month",
-    "sv": "Ersättning denna månad"
+    "sv": "Ersättning denna månad",
+    "no": "Godtgjørelse denne måneden",
+    "da": "Godtgørelse denne måned",
+    "de": "Vergütung diesen Monat",
+    "nl": "Vergoeding deze maand"
   },
   "getable": true,
   "setable": false,

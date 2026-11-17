@@ -1,8 +1,12 @@
 {
   "type": "number",
   "title": {
-    "en": "Reward all time",
-    "sv": "Ersättning totalt"
+    "en": "Total reward",
+    "sv": "Ersättning totalt",
+    "no": "Godtgjørelse totalt",
+    "da": "Godtgørelse i alt",
+    "de": "Vergütung gesamt",
+    "nl": "Totale vergoeding"
   },
   "getable": true,
   "setable": false,

@@ -15,18 +15,19 @@
     "available": "Available",
     "excess": "Excess power in the grid",
     "shortage": "Power shortage in the grid",
-    "other": "Other grid need",
+    "other": "Other grid service",
     "noVehiclesPluggedIn": "No car plugged in"
   },
   "battery": {
-    "charge": "Charges",
-    "discharge": "Discharges",
+    "charge": "Charge",
+    "discharge": "Discharge",
     "next": "__action__ at __time__ (__power__ kW)",
     "next_tomorrow": "__action__ tomorrow at __time__ (__power__ kW)",
     "none": "Nothing planned"
   },
   "battery_activity": {
-    "ChargingForGridRewards": "Charging for Grid Rewards"
+    "ChargingForGridRewards": "Charging for Grid Rewards",
+    "IdleWithUpcomingLowPrice": "Idle – waiting for a lower price"
   },
   "widget": {
     "state": {

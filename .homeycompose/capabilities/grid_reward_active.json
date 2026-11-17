@@ -2,7 +2,11 @@
   "type": "boolean",
   "title": {
     "en": "Session active",
-    "sv": "Session pågår"
+    "sv": "Session pågår",
+    "no": "Økt pågår",
+    "da": "Session i gang",
+    "de": "Session läuft",
+    "nl": "Sessie actief"
   },
   "getable": true,
   "setable": false,
@@ -10,11 +14,19 @@
   "insights": true,
   "insightsTitleTrue": {
     "en": "Grid Rewards session started",
-    "sv": "Grid Rewards-session startade"
+    "sv": "Grid Rewards-session startade",
+    "no": "Grid Rewards-økt startet",
+    "da": "Grid Rewards-session startede",
+    "de": "Grid-Rewards-Session gestartet",
+    "nl": "Grid Rewards-sessie gestart"
   },
   "insightsTitleFalse": {
     "en": "Grid Rewards session ended",
-    "sv": "Grid Rewards-session slutade"
+    "sv": "Grid Rewards-session slutade",
+    "no": "Grid Rewards-økt avsluttet",
+    "da": "Grid Rewards-session sluttede",
+    "de": "Grid-Rewards-Session beendet",
+    "nl": "Grid Rewards-sessie beëindigd"
   },
   "icon": "/assets/reward.svg"
 }

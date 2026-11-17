@@ -4,7 +4,11 @@
       "id": "flex_state_changed",
       "title": {
         "en": "Grid Rewards status changed",
-        "sv": "Grid Rewards-status ändrades"
+        "sv": "Grid Rewards-status ändrades",
+        "no": "Grid Rewards-status endret seg",
+        "da": "Grid Rewards-status ændrede sig",
+        "de": "Grid-Rewards-Status hat sich geändert",
+        "nl": "Grid Rewards-status is gewijzigd"
       },
       "tokens": [
         {
@@ -12,7 +16,8 @@
           "type": "string",
           "title": {
             "en": "Status",
-            "sv": "Status"
+            "sv": "Status",
+            "nl": "Status"
           },
           "example": "unavailable"
         },
@@ -21,16 +26,31 @@
           "type": "string",
           "title": {
             "en": "Reason",
-            "sv": "Orsak"
+            "sv": "Orsak",
+            "no": "Årsak",
+            "da": "Årsag",
+            "de": "Grund",
+            "nl": "Reden"
           },
-          "example": "Ingen bil inkopplad"
+          "example": {
+            "en": "No car plugged in",
+            "sv": "Ingen bil inkopplad",
+            "no": "Ingen bil tilkoblet",
+            "da": "Ingen bil tilsluttet",
+            "de": "Kein Auto angeschlossen",
+            "nl": "Geen auto aangesloten"
+          }
         },
         {
           "name": "reason_code",
           "type": "string",
           "title": {
             "en": "Reason code",
-            "sv": "Orsakskod"
+            "sv": "Orsakskod",
+            "no": "Årsakskode",
+            "da": "Årsagskode",
+            "de": "Grundcode",
+            "nl": "Redencode"
           },
           "example": "noVehiclesPluggedIn"
         }
@@ -40,7 +60,11 @@
       "id": "flex_plugged_in_changed",
       "title": {
         "en": "The car was plugged in or unplugged",
-        "sv": "Bilen kopplades in eller ur"
+        "sv": "Bilen kopplades in eller ur",
+        "no": "Bilen ble koblet til eller fra",
+        "da": "Bilen blev tilsluttet eller frakoblet",
+        "de": "Das Auto wurde angeschlossen oder abgesteckt",
+        "nl": "De auto is aangesloten of losgekoppeld"
       },
       "tokens": [
         {
@@ -48,7 +72,11 @@
           "type": "boolean",
           "title": {
             "en": "Plugged in",
-            "sv": "Inkopplad"
+            "sv": "Inkopplad",
+            "no": "Tilkoblet",
+            "da": "Tilsluttet",
+            "de": "Angeschlossen",
+            "nl": "Aangesloten"
           },
           "example": true
         }
@@ -58,11 +86,19 @@
       "id": "battery_activity_changed",
       "title": {
         "en": "The battery activity changed",
-        "sv": "Batteriets aktivitet ändrades"
+        "sv": "Batteriets aktivitet ändrades",
+        "no": "Batteriets aktivitet endret seg",
+        "da": "Batteriets aktivitet ændrede sig",
+        "de": "Die Batterieaktivität hat sich geändert",
+        "nl": "De batterijactiviteit is gewijzigd"
       },
       "hint": {
         "en": "Battery only. Checked every 5 minutes.",
-        "sv": "Bara för batteri. Kontrolleras var 5:e minut."
+        "sv": "Bara för batteri. Kontrolleras var 5:e minut.",
+        "no": "Kun for batteri. Sjekkes hvert 5. minutt.",
+        "da": "Kun for batteri. Tjekkes hvert 5. minut.",
+        "de": "Nur für Batterien. Wird alle 5 Minuten geprüft.",
+        "nl": "Alleen voor batterijen. Wordt elke 5 minuten gecontroleerd."
       },
       "tokens": [
         {
@@ -70,16 +106,31 @@
           "type": "string",
           "title": {
             "en": "Activity",
-            "sv": "Aktivitet"
+            "sv": "Aktivitet",
+            "no": "Aktivitet",
+            "da": "Aktivitet",
+            "de": "Aktivität",
+            "nl": "Activiteit"
           },
-          "example": "Laddar för Grid Rewards"
+          "example": {
+            "en": "Charging for Grid Rewards",
+            "sv": "Laddar för Grid Rewards",
+            "no": "Lader for Grid Rewards",
+            "da": "Oplader for Grid Rewards",
+            "de": "Lädt für Grid Rewards",
+            "nl": "Laadt voor Grid Rewards"
+          }
         },
         {
           "name": "activity_code",
           "type": "string",
           "title": {
             "en": "Activity code",
-            "sv": "Aktivitetskod"
+            "sv": "Aktivitetskod",
+            "no": "Aktivitetskode",
+            "da": "Aktivitetskode",
+            "de": "Aktivitätscode",
+            "nl": "Activiteitscode"
           },
           "example": "ChargingForGridRewards"
         }
@@ -89,15 +140,27 @@
       "id": "flex_unavailable_for",
       "title": {
         "en": "Unavailable for a long time",
-        "sv": "Ej tillgänglig länge"
+        "sv": "Inte tillgängligt på länge",
+        "no": "Utilgjengelig lenge",
+        "da": "Utilgængelig længe",
+        "de": "Länger nicht verfügbar",
+        "nl": "Lange tijd niet beschikbaar"
       },
       "titleFormatted": {
         "en": "Grid Rewards has been unavailable for [[hours]] hours",
-        "sv": "Grid Rewards har varit ej tillgängligt i [[hours]] timmar"
+        "sv": "Grid Rewards har inte varit tillgängligt på [[hours]] timmar",
+        "no": "Grid Rewards har vært utilgjengelig i [[hours]] timer",
+        "da": "Grid Rewards har været utilgængelig i [[hours]] timer",
+        "de": "Grid Rewards ist seit [[hours]] Stunden nicht verfügbar",
+        "nl": "Grid Rewards is al [[hours]] uur niet beschikbaar"
       },
       "hint": {
-        "en": "Runs once per unavailable period, when the time passes. Missed time while the app was stopped is not counted twice.",
-        "sv": "Körs en gång per period när tiden passeras. Tid då appen var stoppad räknas inte dubbelt."
+        "en": "Runs once per unavailable period, when the time has passed. If the time passed while the app was stopped, the flow does not run afterwards.",
+        "sv": "Körs en gång per period, när tiden har passerats. Har tiden passerats medan appen var stoppad körs flödet inte i efterhand.",
+        "no": "Kjøres én gang per periode, når tiden er passert. Hvis tiden passerte mens appen var stoppet, kjøres flowen ikke i etterkant.",
+        "da": "Køres én gang pr. periode, når tiden er gået. Hvis tiden gik, mens appen var stoppet, køres flowet ikke bagefter.",
+        "de": "Läuft einmal pro Zeitraum, sobald die Zeit vergangen ist. Ist die Zeit verstrichen, während die App gestoppt war, läuft der Flow nicht nachträglich.",
+        "nl": "Draait één keer per periode, zodra de tijd voorbij is. Is de tijd verstreken terwijl de app gestopt was, dan draait de flow niet achteraf."
       },
       "args": [
         {
@@ -105,7 +168,11 @@
           "name": "hours",
           "title": {
             "en": "Hours",
-            "sv": "Timmar"
+            "sv": "Timmar",
+            "no": "Timer",
+            "da": "Timer",
+            "de": "Stunden",
+            "nl": "Uren"
           },
           "min": 0.25,
           "max": 168,
@@ -122,7 +189,11 @@
           "type": "number",
           "title": {
             "en": "Hours unavailable",
-            "sv": "Timmar ej tillgängligt"
+            "sv": "Antal timmar",
+            "no": "Antall timer",
+            "da": "Antal timer",
+            "de": "Anzahl Stunden",
+            "nl": "Aantal uren"
           },
           "example": 3
         },
@@ -131,16 +202,31 @@
           "type": "string",
           "title": {
             "en": "Reason",
-            "sv": "Orsak"
+            "sv": "Orsak",
+            "no": "Årsak",
+            "da": "Årsag",
+            "de": "Grund",
+            "nl": "Reden"
           },
-          "example": "Ingen bil inkopplad"
+          "example": {
+            "en": "No car plugged in",
+            "sv": "Ingen bil inkopplad",
+            "no": "Ingen bil tilkoblet",
+            "da": "Ingen bil tilsluttet",
+            "de": "Kein Auto angeschlossen",
+            "nl": "Geen auto aangesloten"
+          }
         },
         {
           "name": "reason_code",
           "type": "string",
           "title": {
             "en": "Reason code",
-            "sv": "Orsakskod"
+            "sv": "Orsakskod",
+            "no": "Årsakskode",
+            "da": "Årsagskode",
+            "de": "Grundcode",
+            "nl": "Redencode"
           },
           "example": "noVehiclesPluggedIn"
         }
@@ -152,29 +238,49 @@
       "id": "flex_plugged_in",
       "title": {
         "en": "The car !{{is|is not}} plugged in",
-        "sv": "Bilen !{{är|är inte}} inkopplad"
+        "sv": "Bilen !{{är|är inte}} inkopplad",
+        "no": "Bilen !{{er|er ikke}} tilkoblet",
+        "da": "Bilen !{{er|er ikke}} tilsluttet",
+        "de": "Das Auto !{{ist|ist nicht}} angeschlossen",
+        "nl": "De auto !{{is|is niet}} aangesloten"
       }
     },
     {
       "id": "flex_available",
       "title": {
         "en": "Grid Rewards !{{is|is not}} available",
-        "sv": "Grid Rewards !{{är|är inte}} tillgängligt"
+        "sv": "Grid Rewards !{{är|är inte}} tillgängligt",
+        "no": "Grid Rewards !{{er|er ikke}} tilgjengelig",
+        "da": "Grid Rewards !{{er|er ikke}} tilgængelig",
+        "de": "Grid Rewards !{{ist|ist nicht}} verfügbar",
+        "nl": "Grid Rewards !{{is|is niet}} beschikbaar"
       },
       "hint": {
         "en": "Available or delivering",
-        "sv": "Tillgänglig eller levererar"
+        "sv": "Tillgänglig eller levererar",
+        "no": "Tilgjengelig eller leverer",
+        "da": "Tilgængelig eller leverer",
+        "de": "Verfügbar oder liefert",
+        "nl": "Beschikbaar of levert"
       }
     },
     {
       "id": "flex_state_is",
       "title": {
         "en": "Grid Rewards status !{{is|is not}} …",
-        "sv": "Grid Rewards-status !{{är|är inte}} …"
+        "sv": "Grid Rewards-status !{{är|är inte}} …",
+        "no": "Grid Rewards-status !{{er|er ikke}} …",
+        "da": "Grid Rewards-status !{{er|er ikke}} …",
+        "de": "Grid-Rewards-Status !{{ist|ist nicht}} …",
+        "nl": "Grid Rewards-status !{{is|is niet}} …"
       },
       "titleFormatted": {
         "en": "Grid Rewards status !{{is|is not}} [[state]]",
-        "sv": "Grid Rewards-status !{{är|är inte}} [[state]]"
+        "sv": "Grid Rewards-status !{{är|är inte}} [[state]]",
+        "no": "Grid Rewards-status !{{er|er ikke}} [[state]]",
+        "da": "Grid Rewards-status !{{er|er ikke}} [[state]]",
+        "de": "Grid-Rewards-Status !{{ist|ist nicht}} [[state]]",
+        "nl": "Grid Rewards-status !{{is|is niet}} [[state]]"
       },
       "args": [
         {
@@ -182,35 +288,52 @@
           "name": "state",
           "title": {
             "en": "Status",
-            "sv": "Status"
+            "sv": "Status",
+            "nl": "Status"
           },
           "values": [
             {
               "id": "available",
               "title": {
                 "en": "Available",
-                "sv": "Tillgänglig"
+                "sv": "Tillgänglig",
+                "no": "Tilgjengelig",
+                "da": "Tilgængelig",
+                "de": "Verfügbar",
+                "nl": "Beschikbaar"
               }
             },
             {
               "id": "unavailable",
               "title": {
                 "en": "Unavailable",
-                "sv": "Ej tillgänglig"
+                "sv": "Ej tillgänglig",
+                "no": "Utilgjengelig",
+                "da": "Utilgængelig",
+                "de": "Nicht verfügbar",
+                "nl": "Niet beschikbaar"
               }
             },
             {
               "id": "delivering",
               "title": {
                 "en": "Delivering",
-                "sv": "Levererar"
+                "sv": "Levererar",
+                "no": "Leverer",
+                "da": "Leverer",
+                "de": "Liefert",
+                "nl": "Levert"
               }
             },
             {
               "id": "unknown",
               "title": {
                 "en": "Unknown",
-                "sv": "Okänd"
+                "sv": "Okänd",
+                "no": "Ukjent",
+                "da": "Ukendt",
+                "de": "Unbekannt",
+                "nl": "Onbekend"
               }
             }
           ]

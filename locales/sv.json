@@ -9,7 +9,7 @@
     "battery_failed": "Kunde inte läsa batteriets uppgifter från Tibber"
   },
   "notification": {
-    "api_changed": "Tibber Grid Rewards: Tibber har ändrat sitt API och appen kan inte längre läsa data. Kolla om det finns en uppdatering av appen."
+    "api_changed": "Tibber Grid Rewards: Tibber har ändrat sitt API och appen kan inte längre läsa data. Kontrollera om det finns en uppdatering av appen."
   },
   "reason": {
     "available": "Tillgänglig",
@@ -19,14 +19,15 @@
     "noVehiclesPluggedIn": "Ingen bil inkopplad"
   },
   "battery": {
-    "charge": "Laddar",
-    "discharge": "Laddar ur",
-    "next": "__action__ kl __time__ (__power__ kW)",
-    "next_tomorrow": "__action__ i morgon kl __time__ (__power__ kW)",
+    "charge": "Laddning",
+    "discharge": "Urladdning",
+    "next": "__action__ kl. __time__ (__power__ kW)",
+    "next_tomorrow": "__action__ imorgon kl. __time__ (__power__ kW)",
     "none": "Inget planerat"
   },
   "battery_activity": {
-    "ChargingForGridRewards": "Laddar för Grid Rewards"
+    "ChargingForGridRewards": "Laddar för Grid Rewards",
+    "IdleWithUpcomingLowPrice": "Vilar – väntar på lägre elpris"
   },
   "widget": {
     "state": {

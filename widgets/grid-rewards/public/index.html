@@ -85,16 +85,36 @@
           deviceId = (ids && ids[0]) || '';
         } catch (err) { /* older Homey: fall back to the first home device */ }
 
+        // Auto height: measure the content (not the body, which Homey stretches to
+        // the widget's current height) plus the body's padding.
+        const root = document.getElementById('root');
+        const measure = () => {
+          const cs = getComputedStyle(document.body);
+          return Math.ceil(root.getBoundingClientRect().height
+            + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom));
+        };
         let ready = false;
+        let shown = 0;
+        const resize = () => {
+          const h = measure();
+          if (!ready || h === shown) return;
+          shown = h;
+          Promise.resolve(Homey.setHeight(h)).catch(() => {});
+        };
+
         const load = () => Homey.api('GET', `/?deviceId=${encodeURIComponent(deviceId)}`)
           .then((d) => render(d))
           .catch((err) => render({ error: err && err.message ? err.message : String(err) }))
           .finally(() => {
             if (!ready) {
               ready = true;
-              Homey.ready();
+              shown = measure();
+              Homey.ready({ height: shown });
             }
           });
+
+        // Content changes (battery line appears, error text, font loading): follow it.
+        if (window.ResizeObserver) new ResizeObserver(resize).observe(root);
 
         load();
         setInterval(load, INTERVAL_MS);

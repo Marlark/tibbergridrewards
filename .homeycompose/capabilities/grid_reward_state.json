@@ -2,7 +2,11 @@
   "type": "enum",
   "title": {
     "en": "Grid Rewards status",
-    "sv": "Grid Rewards-status"
+    "sv": "Grid Rewards-status",
+    "no": "Grid Rewards-status",
+    "da": "Grid Rewards-status",
+    "de": "Grid-Rewards-Status",
+    "nl": "Grid Rewards-status"
   },
   "getable": true,
   "setable": false,
@@ -13,28 +17,44 @@
       "id": "available",
       "title": {
         "en": "Available",
-        "sv": "Tillgänglig"
+        "sv": "Tillgänglig",
+        "no": "Tilgjengelig",
+        "da": "Tilgængelig",
+        "de": "Verfügbar",
+        "nl": "Beschikbaar"
       }
     },
     {
       "id": "unavailable",
       "title": {
         "en": "Unavailable",
-        "sv": "Ej tillgänglig"
+        "sv": "Ej tillgänglig",
+        "no": "Utilgjengelig",
+        "da": "Utilgængelig",
+        "de": "Nicht verfügbar",
+        "nl": "Niet beschikbaar"
       }
     },
     {
       "id": "delivering",
       "title": {
         "en": "Delivering",
-        "sv": "Levererar"
+        "sv": "Levererar",
+        "no": "Leverer",
+        "da": "Leverer",
+        "de": "Liefert",
+        "nl": "Levert"
       }
     },
     {
       "id": "unknown",
       "title": {
         "en": "Unknown",
-        "sv": "Okänd"
+        "sv": "Okänd",
+        "no": "Ukjent",
+        "da": "Ukendt",
+        "de": "Unbekannt",
+        "nl": "Onbekend"
       }
     }
   ]

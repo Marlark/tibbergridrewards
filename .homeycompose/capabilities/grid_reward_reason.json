@@ -2,7 +2,11 @@
   "type": "string",
   "title": {
     "en": "Reason",
-    "sv": "Orsak"
+    "sv": "Orsak",
+    "no": "Årsak",
+    "da": "Årsag",
+    "de": "Grund",
+    "nl": "Reden"
   },
   "getable": true,
   "setable": false,

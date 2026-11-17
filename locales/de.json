@@ -1,0 +1,69 @@
+{
+  "error": {
+    "auth": "Anmeldung bei Tibber fehlgeschlagen – repariere das Gerät mit neuen Zugangsdaten",
+    "home_missing": "Dieses Tibber-Konto hat keinen Zugriff auf das Zuhause, zu dem dieses Gerät gehört",
+    "api_changed": "Tibber hat seine API geändert – die App braucht ein Update. Neuer Versuch jede Stunde.",
+    "no_home_device": "Füge zuerst ein Grid-Rewards-Gerät für dein Zuhause hinzu – Auto und Batterie werden darüber gelesen",
+    "no_flex_devices": "Noch kein Auto und keine Batterie gefunden. Das Gerät deines Zuhauses zeigt sie nach der ersten Aktualisierung von Tibber.",
+    "flex_missing": "Tibber meldet dieses Gerät nicht mehr",
+    "battery_failed": "Batteriedetails konnten nicht von Tibber gelesen werden"
+  },
+  "notification": {
+    "api_changed": "Tibber Grid Rewards: Tibber hat seine API geändert und die App kann keine Daten mehr lesen. Prüfe, ob es ein App-Update gibt."
+  },
+  "reason": {
+    "available": "Verfügbar",
+    "excess": "Stromüberschuss im Netz",
+    "shortage": "Strommangel im Netz",
+    "other": "Andere Netzdienstleistung",
+    "noVehiclesPluggedIn": "Kein Auto angeschlossen"
+  },
+  "battery": {
+    "charge": "Laden",
+    "discharge": "Entladen",
+    "next": "__action__ um __time__ Uhr (__power__ kW)",
+    "next_tomorrow": "__action__ morgen um __time__ Uhr (__power__ kW)",
+    "none": "Nichts geplant"
+  },
+  "battery_activity": {
+    "ChargingForGridRewards": "Lädt für Grid Rewards",
+    "IdleWithUpcomingLowPrice": "Im Leerlauf – wartet auf niedrigeren Strompreis"
+  },
+  "widget": {
+    "state": {
+      "available": "Verfügbar",
+      "unavailable": "Nicht verfügbar",
+      "delivering": "Liefert",
+      "unknown": "Unbekannt"
+    },
+    "today": "Heute",
+    "month": "Diesen Monat",
+    "session": "Laufende Session",
+    "last_session": "Letzte Session",
+    "sessions": "Sessions",
+    "battery": "Batterie",
+    "saved_today": "heute gespart",
+    "unavailable": "Keine Verbindung zu Tibber"
+  },
+  "conn": {
+    "connecting": "Verbinde…",
+    "connected": "Verbunden",
+    "reconnecting": "Verbinde erneut…",
+    "auth": "Anmeldung fehlgeschlagen – repariere das Gerät",
+    "api": "Tibber hat seine API geändert – neuer Versuch jede Stunde"
+  },
+  "history": {
+    "title": "Grid-Rewards-Verlauf",
+    "empty": "Noch keine abgeschlossenen Sessions.",
+    "per_day": "Pro Tag",
+    "sessions": "Sessions",
+    "when": "Wann",
+    "reward": "Vergütung",
+    "duration": "Dauer",
+    "reason": "Grund",
+    "total": "Gesamt",
+    "min": "min",
+    "sessions_count": "Sessions",
+    "no_home": "Füge ein Grid-Rewards-Gerät für dein Zuhause hinzu, um den Verlauf zu sehen."
+  }
+}

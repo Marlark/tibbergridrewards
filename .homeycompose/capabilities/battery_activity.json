@@ -2,7 +2,11 @@
   "type": "string",
   "title": {
     "en": "Battery activity",
-    "sv": "Batteriets aktivitet"
+    "sv": "Batteriets aktivitet",
+    "no": "Batteriets aktivitet",
+    "da": "Batteriets aktivitet",
+    "de": "Batterieaktivität",
+    "nl": "Batterijactiviteit"
   },
   "getable": true,
   "setable": false,

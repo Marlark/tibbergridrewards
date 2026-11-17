@@ -179,7 +179,7 @@ test('app API: history per home, per day, translated reasons', async (t) => {
 
 test('perDay groups by local day of the end time', () => {
   const s = (iso, reward) => ({ endedAt: Date.parse(iso), reward, minutes: 10 });
-  assert.deepStrictEqual(appApi.perDay([s('2026-11-16T22:30:00Z', 1), s('2026-11-16T23:30:00Z', 2)], 'Europe/Stockholm')
+  assert.deepStrictEqual(require('../lib/history').perDay([s('2026-11-16T22:30:00Z', 1), s('2026-11-16T23:30:00Z', 2)], 'Europe/Stockholm')
     .map((d) => [d.date, d.reward]), [['2026-11-17', 2], ['2026-11-16', 1]]);
 });
 

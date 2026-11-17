@@ -48,7 +48,9 @@ Because the values are logged to Insights, daily energy reports can read the Gri
 
 **Car / battery devices** have `grid_reward_state`, `grid_reward_reason`, `flex_smart_enabled` (smart charging / smart mode on) and, for cars, `flex_plugged_in`. **Batteries** also poll Tibber every 5 minutes for `battery_savings_today` / `_week` / `_month` (kr, Insights), `battery_activity` (what the battery is doing now) and `battery_next_activity` (next planned charge/discharge). The query is the same as in the HA integration. A failed poll shows a warning on the battery but does not make it unavailable.
 
-**Reasons** are translated (English and Swedish). Codes seen in real data: `available`, `excess`, `shortage`, `other` and, for the car, `noVehiclesPluggedIn`. Unknown codes are shown as they are; add them under `reason` in `locales/*.json`. When the home is unavailable, the reasons of its unavailable car/battery are shown on the home too (e.g. *No car plugged in*).
+**Languages:** English, Swedish, Norwegian, Danish, German and Dutch (Tibber's markets). The Norwegian, Danish, German and Dutch texts were machine-assisted and should be reviewed by native speakers before publishing. `test/i18n.test.js` checks that every text exists in every language and that placeholders survive.
+
+**Reasons** are translated. Codes seen in real data: `available`, `excess`, `shortage`, `other` and, for the car, `noVehiclesPluggedIn`. Unknown codes are shown as they are; add them under `reason` in `locales/*.json`. When the home is unavailable, the reasons of its unavailable car/battery are shown on the home too (e.g. *No car plugged in*).
 
 **Currency** follows Tibber's `rewardCurrency`: SEK, NOK and DKK are shown as *kr*, EUR as *€* (capabilities, battery savings, widget and history).
 

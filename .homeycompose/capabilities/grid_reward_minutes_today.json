@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Delivery time today",
-    "sv": "Leveranstid idag"
+    "sv": "Leveranstid idag",
+    "no": "Leveringstid i dag",
+    "da": "Leveringstid i dag",
+    "de": "Lieferzeit heute",
+    "nl": "Levertijd vandaag"
   },
   "getable": true,
   "setable": false,

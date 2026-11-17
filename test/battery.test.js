@@ -117,7 +117,7 @@ test('battery device polls every 5 min and fills its values', async (t) => {
   assert.strictEqual(device.getCapabilityValue('battery_savings_today'), 3.21);
   assert.strictEqual(device.getCapabilityValue('battery_savings_month'), 48.75);
   assert.strictEqual(device.getCapabilityValue('battery_activity'), 'Charging for Grid Rewards');
-  assert.strictEqual(device.getCapabilityValue('battery_next_activity'), 'Discharges at 14:30 (2.5 kW)');
+  assert.strictEqual(device.getCapabilityValue('battery_next_activity'), 'Discharge at 14:30 (2.5 kW)');
 });
 
 test('activity change triggers a flow; unknown activity is readable', async (t) => {

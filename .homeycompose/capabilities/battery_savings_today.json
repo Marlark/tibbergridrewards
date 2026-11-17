@@ -2,7 +2,11 @@
   "type": "number",
   "title": {
     "en": "Battery savings today",
-    "sv": "Batteribesparing idag"
+    "sv": "Batteribesparing idag",
+    "no": "Batteribesparelse i dag",
+    "da": "Batteribesparelse i dag",
+    "de": "Batterieersparnis heute",
+    "nl": "Batterijbesparing vandaag"
   },
   "getable": true,
   "setable": false,

@@ -4,7 +4,11 @@
       "id": "state_changed",
       "title": {
         "en": "Grid Rewards status changed",
-        "sv": "Grid Rewards-status ändrades"
+        "sv": "Grid Rewards-status ändrades",
+        "no": "Grid Rewards-status endret seg",
+        "da": "Grid Rewards-status ændrede sig",
+        "de": "Grid-Rewards-Status hat sich geändert",
+        "nl": "Grid Rewards-status is gewijzigd"
       },
       "tokens": [
         {
@@ -12,7 +16,8 @@
           "type": "string",
           "title": {
             "en": "Status",
-            "sv": "Status"
+            "sv": "Status",
+            "nl": "Status"
           },
           "example": "delivering"
         },
@@ -21,16 +26,31 @@
           "type": "string",
           "title": {
             "en": "Reason",
-            "sv": "Orsak"
+            "sv": "Orsak",
+            "no": "Årsak",
+            "da": "Årsag",
+            "de": "Grund",
+            "nl": "Reden"
           },
-          "example": "Överskott av el i nätet"
+          "example": {
+            "en": "Excess power in the grid",
+            "sv": "Överskott av el i nätet",
+            "no": "Overskudd av strøm i nettet",
+            "da": "Overskud af strøm i nettet",
+            "de": "Stromüberschuss im Netz",
+            "nl": "Stroomoverschot in het net"
+          }
         },
         {
           "name": "reason_code",
           "type": "string",
           "title": {
             "en": "Reason code",
-            "sv": "Orsakskod"
+            "sv": "Orsakskod",
+            "no": "Årsakskode",
+            "da": "Årsagskode",
+            "de": "Grundcode",
+            "nl": "Redencode"
           },
           "example": "excess"
         }
@@ -40,7 +60,11 @@
       "id": "session_started",
       "title": {
         "en": "A Grid Rewards session started",
-        "sv": "En Grid Rewards-session startade"
+        "sv": "En Grid Rewards-session startade",
+        "no": "En Grid Rewards-økt startet",
+        "da": "En Grid Rewards-session startede",
+        "de": "Eine Grid-Rewards-Session hat begonnen",
+        "nl": "Een Grid Rewards-sessie is gestart"
       },
       "tokens": [
         {
@@ -48,16 +72,31 @@
           "type": "string",
           "title": {
             "en": "Reason",
-            "sv": "Orsak"
+            "sv": "Orsak",
+            "no": "Årsak",
+            "da": "Årsag",
+            "de": "Grund",
+            "nl": "Reden"
           },
-          "example": "Överskott av el i nätet"
+          "example": {
+            "en": "Excess power in the grid",
+            "sv": "Överskott av el i nätet",
+            "no": "Overskudd av strøm i nettet",
+            "da": "Overskud af strøm i nettet",
+            "de": "Stromüberschuss im Netz",
+            "nl": "Stroomoverschot in het net"
+          }
         },
         {
           "name": "reason_code",
           "type": "string",
           "title": {
             "en": "Reason code",
-            "sv": "Orsakskod"
+            "sv": "Orsakskod",
+            "no": "Årsakskode",
+            "da": "Årsagskode",
+            "de": "Grundcode",
+            "nl": "Redencode"
           },
           "example": "excess"
         }
@@ -67,15 +106,23 @@
       "id": "session_ended",
       "title": {
         "en": "A Grid Rewards session ended",
-        "sv": "En Grid Rewards-session slutade"
+        "sv": "En Grid Rewards-session slutade",
+        "no": "En Grid Rewards-økt ble avsluttet",
+        "da": "En Grid Rewards-session sluttede",
+        "de": "Eine Grid-Rewards-Session wurde beendet",
+        "nl": "Een Grid Rewards-sessie is beëindigd"
       },
       "tokens": [
         {
           "name": "reward",
           "type": "number",
           "title": {
-            "en": "Reward (kr)",
-            "sv": "Ersättning (kr)"
+            "en": "Reward",
+            "sv": "Ersättning",
+            "no": "Godtgjørelse",
+            "da": "Godtgørelse",
+            "de": "Vergütung",
+            "nl": "Vergoeding"
           },
           "example": 1.25
         },
@@ -84,7 +131,11 @@
           "type": "number",
           "title": {
             "en": "Duration (min)",
-            "sv": "Längd (min)"
+            "sv": "Längd (min)",
+            "no": "Varighet (min)",
+            "da": "Varighed (min)",
+            "de": "Dauer (min)",
+            "nl": "Duur (min)"
           },
           "example": 15
         }
@@ -94,19 +145,31 @@
       "id": "daily_summary",
       "title": {
         "en": "Daily Grid Rewards summary",
-        "sv": "Dagens Grid Rewards-sammanfattning"
+        "sv": "Dagens Grid Rewards-sammanfattning",
+        "no": "Dagens Grid Rewards-oppsummering",
+        "da": "Dagens Grid Rewards-opsummering",
+        "de": "Tägliche Grid-Rewards-Zusammenfassung",
+        "nl": "Dagelijkse Grid Rewards-samenvatting"
       },
       "hint": {
         "en": "Runs at midnight with the totals for the day that ended. A session is counted on the day it ends.",
-        "sv": "Körs vid midnatt med summan för dagen som tog slut. En session räknas till dagen den slutar."
+        "sv": "Körs vid midnatt med summan för dagen som tog slut. En session räknas till dagen den slutar.",
+        "no": "Kjøres ved midnatt med summen for dagen som ble avsluttet. En økt telles på dagen den slutter.",
+        "da": "Køres ved midnat med summen for den dag, der sluttede. En session tælles på den dag, den slutter.",
+        "de": "Läuft um Mitternacht mit den Summen des vergangenen Tages. Eine Session zählt zu dem Tag, an dem sie endet.",
+        "nl": "Draait om middernacht met de totalen van de afgelopen dag. Een sessie telt mee op de dag dat ze eindigt."
       },
       "tokens": [
         {
           "name": "reward",
           "type": "number",
           "title": {
-            "en": "Reward (kr)",
-            "sv": "Ersättning (kr)"
+            "en": "Reward",
+            "sv": "Ersättning",
+            "no": "Godtgjørelse",
+            "da": "Godtgørelse",
+            "de": "Vergütung",
+            "nl": "Vergoeding"
           },
           "example": 16.64
         },
@@ -115,7 +178,11 @@
           "type": "number",
           "title": {
             "en": "Sessions",
-            "sv": "Sessioner"
+            "sv": "Sessioner",
+            "no": "Økter",
+            "da": "Sessioner",
+            "de": "Sessions",
+            "nl": "Sessies"
           },
           "example": 9
         },
@@ -124,7 +191,11 @@
           "type": "number",
           "title": {
             "en": "Delivery time (min)",
-            "sv": "Leveranstid (min)"
+            "sv": "Leveranstid (min)",
+            "no": "Leveringstid (min)",
+            "da": "Leveringstid (min)",
+            "de": "Lieferzeit (min)",
+            "nl": "Levertijd (min)"
           },
           "example": 438
         },
@@ -133,7 +204,11 @@
           "type": "string",
           "title": {
             "en": "Date",
-            "sv": "Datum"
+            "sv": "Datum",
+            "no": "Dato",
+            "da": "Dato",
+            "de": "Datum",
+            "nl": "Datum"
           },
           "example": "2026-11-17"
         }
@@ -143,15 +218,27 @@
       "id": "unavailable_for",
       "title": {
         "en": "Unavailable for a long time",
-        "sv": "Ej tillgänglig länge"
+        "sv": "Inte tillgängligt på länge",
+        "no": "Utilgjengelig lenge",
+        "da": "Utilgængelig længe",
+        "de": "Länger nicht verfügbar",
+        "nl": "Lange tijd niet beschikbaar"
       },
       "titleFormatted": {
         "en": "Grid Rewards has been unavailable for [[hours]] hours",
-        "sv": "Grid Rewards har varit ej tillgängligt i [[hours]] timmar"
+        "sv": "Grid Rewards har inte varit tillgängligt på [[hours]] timmar",
+        "no": "Grid Rewards har vært utilgjengelig i [[hours]] timer",
+        "da": "Grid Rewards har været utilgængelig i [[hours]] timer",
+        "de": "Grid Rewards ist seit [[hours]] Stunden nicht verfügbar",
+        "nl": "Grid Rewards is al [[hours]] uur niet beschikbaar"
       },
       "hint": {
-        "en": "Runs once per unavailable period, when the time passes. Missed time while the app was stopped is not counted twice.",
-        "sv": "Körs en gång per period när tiden passeras. Tid då appen var stoppad räknas inte dubbelt."
+        "en": "Runs once per unavailable period, when the time has passed. If the time passed while the app was stopped, the flow does not run afterwards.",
+        "sv": "Körs en gång per period, när tiden har passerats. Har tiden passerats medan appen var stoppad körs flödet inte i efterhand.",
+        "no": "Kjøres én gang per periode, når tiden er passert. Hvis tiden passerte mens appen var stoppet, kjøres flowen ikke i etterkant.",
+        "da": "Køres én gang pr. periode, når tiden er gået. Hvis tiden gik, mens appen var stoppet, køres flowet ikke bagefter.",
+        "de": "Läuft einmal pro Zeitraum, sobald die Zeit vergangen ist. Ist die Zeit verstrichen, während die App gestoppt war, läuft der Flow nicht nachträglich.",
+        "nl": "Draait één keer per periode, zodra de tijd voorbij is. Is de tijd verstreken terwijl de app gestopt was, dan draait de flow niet achteraf."
       },
       "args": [
         {
@@ -159,7 +246,11 @@
           "name": "hours",
           "title": {
             "en": "Hours",
-            "sv": "Timmar"
+            "sv": "Timmar",
+            "no": "Timer",
+            "da": "Timer",
+            "de": "Stunden",
+            "nl": "Uren"
           },
           "min": 0.25,
           "max": 168,
@@ -176,7 +267,11 @@
           "type": "number",
           "title": {
             "en": "Hours unavailable",
-            "sv": "Timmar ej tillgängligt"
+            "sv": "Antal timmar",
+            "no": "Antall timer",
+            "da": "Antal timer",
+            "de": "Anzahl Stunden",
+            "nl": "Aantal uren"
           },
           "example": 3
         },
@@ -185,16 +280,31 @@
           "type": "string",
           "title": {
             "en": "Reason",
-            "sv": "Orsak"
+            "sv": "Orsak",
+            "no": "Årsak",
+            "da": "Årsag",
+            "de": "Grund",
+            "nl": "Reden"
           },
-          "example": "Ingen bil inkopplad"
+          "example": {
+            "en": "No car plugged in",
+            "sv": "Ingen bil inkopplad",
+            "no": "Ingen bil tilkoblet",
+            "da": "Ingen bil tilsluttet",
+            "de": "Kein Auto angeschlossen",
+            "nl": "Geen auto aangesloten"
+          }
         },
         {
           "name": "reason_code",
           "type": "string",
           "title": {
             "en": "Reason code",
-            "sv": "Orsakskod"
+            "sv": "Orsakskod",
+            "no": "Årsakskode",
+            "da": "Årsagskode",
+            "de": "Grundcode",
+            "nl": "Redencode"
           },
           "example": "noVehiclesPluggedIn"
         }
@@ -204,15 +314,27 @@
       "id": "reward_today_passed",
       "title": {
         "en": "Reward today passed an amount",
-        "sv": "Ersättningen idag passerade ett belopp"
+        "sv": "Ersättningen idag passerade ett belopp",
+        "no": "Godtgjørelsen i dag passerte et beløp",
+        "da": "Godtgørelsen i dag passerede et beløb",
+        "de": "Vergütung heute hat einen Betrag überschritten",
+        "nl": "Vergoeding vandaag heeft een bedrag overschreden"
       },
       "titleFormatted": {
         "en": "Reward today passed [[amount]]",
-        "sv": "Ersättningen idag passerade [[amount]]"
+        "sv": "Ersättningen idag passerade [[amount]]",
+        "no": "Godtgjørelsen i dag passerte [[amount]]",
+        "da": "Godtgørelsen i dag passerede [[amount]]",
+        "de": "Vergütung heute hat [[amount]] überschritten",
+        "nl": "Vergoeding vandaag heeft [[amount]] overschreden"
       },
       "hint": {
         "en": "Runs once per day, when the amount is passed.",
-        "sv": "Körs en gång per dag, när beloppet passeras."
+        "sv": "Körs en gång per dag, när beloppet passeras.",
+        "no": "Kjøres én gang per dag, når beløpet passeres.",
+        "da": "Køres én gang om dagen, når beløbet passeres.",
+        "de": "Läuft einmal pro Tag, wenn der Betrag überschritten wird.",
+        "nl": "Draait één keer per dag, wanneer het bedrag wordt overschreden."
       },
       "args": [
         {
@@ -220,7 +342,11 @@
           "name": "amount",
           "title": {
             "en": "Amount",
-            "sv": "Belopp"
+            "sv": "Belopp",
+            "no": "Beløp",
+            "da": "Beløb",
+            "de": "Betrag",
+            "nl": "Bedrag"
           },
           "min": 0,
           "step": 0.5,
@@ -236,7 +362,11 @@
           "type": "number",
           "title": {
             "en": "Reward today",
-            "sv": "Ersättning idag"
+            "sv": "Ersättning idag",
+            "no": "Godtgjørelse i dag",
+            "da": "Godtgørelse i dag",
+            "de": "Vergütung heute",
+            "nl": "Vergoeding vandaag"
           },
           "example": 10.25
         }
@@ -246,15 +376,27 @@
       "id": "reward_month_passed",
       "title": {
         "en": "Reward this month passed an amount",
-        "sv": "Ersättningen denna månad passerade ett belopp"
+        "sv": "Ersättningen denna månad passerade ett belopp",
+        "no": "Godtgjørelsen denne måneden passerte et beløp",
+        "da": "Godtgørelsen denne måned passerede et beløb",
+        "de": "Vergütung diesen Monat hat einen Betrag überschritten",
+        "nl": "Vergoeding deze maand heeft een bedrag overschreden"
       },
       "titleFormatted": {
         "en": "Reward this month passed [[amount]]",
-        "sv": "Ersättningen denna månad passerade [[amount]]"
+        "sv": "Ersättningen denna månad passerade [[amount]]",
+        "no": "Godtgjørelsen denne måneden passerte [[amount]]",
+        "da": "Godtgørelsen denne måned passerede [[amount]]",
+        "de": "Vergütung diesen Monat hat [[amount]] überschritten",
+        "nl": "Vergoeding deze maand heeft [[amount]] overschreden"
       },
       "hint": {
         "en": "Runs once per month, when the amount is passed.",
-        "sv": "Körs en gång per månad, när beloppet passeras."
+        "sv": "Körs en gång per månad, när beloppet passeras.",
+        "no": "Kjøres én gang per måned, når beløpet passeres.",
+        "da": "Køres én gang om måneden, når beløbet passeres.",
+        "de": "Läuft einmal pro Monat, wenn der Betrag überschritten wird.",
+        "nl": "Draait één keer per maand, wanneer het bedrag wordt overschreden."
       },
       "args": [
         {
@@ -262,7 +404,11 @@
           "name": "amount",
           "title": {
             "en": "Amount",
-            "sv": "Belopp"
+            "sv": "Belopp",
+            "no": "Beløp",
+            "da": "Beløb",
+            "de": "Betrag",
+            "nl": "Bedrag"
           },
           "min": 0,
           "step": 0.5,
@@ -278,7 +424,11 @@
           "type": "number",
           "title": {
             "en": "Reward this month",
-            "sv": "Ersättning denna månad"
+            "sv": "Ersättning denna månad",
+            "no": "Godtgjørelse denne måneden",
+            "da": "Godtgørelse denne måned",
+            "de": "Vergütung diesen Monat",
+            "nl": "Vergoeding deze maand"
           },
           "example": 500.5
         }
@@ -288,11 +438,19 @@
       "id": "monthly_summary",
       "title": {
         "en": "Monthly Grid Rewards summary",
-        "sv": "Månadens Grid Rewards-sammanfattning"
+        "sv": "Månadens Grid Rewards-sammanfattning",
+        "no": "Månedens Grid Rewards-oppsummering",
+        "da": "Månedens Grid Rewards-opsummering",
+        "de": "Monatliche Grid-Rewards-Zusammenfassung",
+        "nl": "Maandelijkse Grid Rewards-samenvatting"
       },
       "hint": {
         "en": "Runs at midnight when a new month starts, with the totals for the month that ended.",
-        "sv": "Körs vid midnatt när en ny månad börjar, med summan för månaden som tog slut."
+        "sv": "Körs vid midnatt när en ny månad börjar, med summan för månaden som tog slut.",
+        "no": "Kjøres ved midnatt når en ny måned begynner, med summen for måneden som ble avsluttet.",
+        "da": "Køres ved midnat, når en ny måned begynder, med summen for den måned, der sluttede.",
+        "de": "Läuft um Mitternacht, wenn ein neuer Monat beginnt, mit den Summen des vergangenen Monats.",
+        "nl": "Draait om middernacht wanneer een nieuwe maand begint, met de totalen van de afgelopen maand."
       },
       "tokens": [
         {
@@ -300,7 +458,11 @@
           "type": "number",
           "title": {
             "en": "Reward",
-            "sv": "Ersättning"
+            "sv": "Ersättning",
+            "no": "Godtgjørelse",
+            "da": "Godtgørelse",
+            "de": "Vergütung",
+            "nl": "Vergoeding"
           },
           "example": 679.69
         },
@@ -309,7 +471,11 @@
           "type": "number",
           "title": {
             "en": "Sessions",
-            "sv": "Sessioner"
+            "sv": "Sessioner",
+            "no": "Økter",
+            "da": "Sessioner",
+            "de": "Sessions",
+            "nl": "Sessies"
           },
           "example": 270
         },
@@ -318,7 +484,11 @@
           "type": "number",
           "title": {
             "en": "Delivery time (min)",
-            "sv": "Leveranstid (min)"
+            "sv": "Leveranstid (min)",
+            "no": "Leveringstid (min)",
+            "da": "Leveringstid (min)",
+            "de": "Lieferzeit (min)",
+            "nl": "Levertijd (min)"
           },
           "example": 13140
         },
@@ -327,7 +497,11 @@
           "type": "string",
           "title": {
             "en": "Month",
-            "sv": "Månad"
+            "sv": "Månad",
+            "no": "Måned",
+            "da": "Måned",
+            "de": "Monat",
+            "nl": "Maand"
           },
           "example": "2026-11"
         }
@@ -339,18 +513,30 @@
       "id": "is_delivering",
       "title": {
         "en": "A Grid Rewards session !{{is|is not}} active",
-        "sv": "En Grid Rewards-session !{{pågår|pågår inte}}"
+        "sv": "En Grid Rewards-session !{{pågår|pågår inte}}",
+        "no": "En Grid Rewards-økt !{{pågår|pågår ikke}}",
+        "da": "En Grid Rewards-session !{{er|er ikke}} i gang",
+        "de": "Eine Grid-Rewards-Session !{{läuft|läuft nicht}}",
+        "nl": "Een Grid Rewards-sessie !{{is|is niet}} actief"
       }
     },
     {
       "id": "state_is",
       "title": {
         "en": "Grid Rewards status !{{is|is not}} …",
-        "sv": "Grid Rewards-status !{{är|är inte}} …"
+        "sv": "Grid Rewards-status !{{är|är inte}} …",
+        "no": "Grid Rewards-status !{{er|er ikke}} …",
+        "da": "Grid Rewards-status !{{er|er ikke}} …",
+        "de": "Grid-Rewards-Status !{{ist|ist nicht}} …",
+        "nl": "Grid Rewards-status !{{is|is niet}} …"
       },
       "titleFormatted": {
         "en": "Grid Rewards status !{{is|is not}} [[state]]",
-        "sv": "Grid Rewards-status !{{är|är inte}} [[state]]"
+        "sv": "Grid Rewards-status !{{är|är inte}} [[state]]",
+        "no": "Grid Rewards-status !{{er|er ikke}} [[state]]",
+        "da": "Grid Rewards-status !{{er|er ikke}} [[state]]",
+        "de": "Grid-Rewards-Status !{{ist|ist nicht}} [[state]]",
+        "nl": "Grid Rewards-status !{{is|is niet}} [[state]]"
       },
       "args": [
         {
@@ -358,35 +544,52 @@
           "name": "state",
           "title": {
             "en": "Status",
-            "sv": "Status"
+            "sv": "Status",
+            "nl": "Status"
           },
           "values": [
             {
               "id": "available",
               "title": {
                 "en": "Available",
-                "sv": "Tillgänglig"
+                "sv": "Tillgänglig",
+                "no": "Tilgjengelig",
+                "da": "Tilgængelig",
+                "de": "Verfügbar",
+                "nl": "Beschikbaar"
               }
             },
             {
               "id": "unavailable",
               "title": {
                 "en": "Unavailable",
-                "sv": "Ej tillgänglig"
+                "sv": "Ej tillgänglig",
+                "no": "Utilgjengelig",
+                "da": "Utilgængelig",
+                "de": "Nicht verfügbar",
+                "nl": "Niet beschikbaar"
               }
             },
             {
               "id": "delivering",
               "title": {
                 "en": "Delivering",
-                "sv": "Levererar"
+                "sv": "Levererar",
+                "no": "Leverer",
+                "da": "Leverer",
+                "de": "Liefert",
+                "nl": "Levert"
               }
             },
             {
               "id": "unknown",
               "title": {
                 "en": "Unknown",
-                "sv": "Okänd"
+                "sv": "Okänd",
+                "no": "Ukjent",
+                "da": "Ukendt",
+                "de": "Unbekannt",
+                "nl": "Onbekend"
               }
             }
           ]
@@ -397,11 +600,19 @@
       "id": "reward_today_above",
       "title": {
         "en": "Reward today !{{is|is not}} above an amount",
-        "sv": "Ersättningen idag !{{är|är inte}} över ett belopp"
+        "sv": "Ersättningen idag !{{är|är inte}} över ett belopp",
+        "no": "Godtgjørelsen i dag !{{er|er ikke}} over et beløp",
+        "da": "Godtgørelsen i dag !{{er|er ikke}} over et beløb",
+        "de": "Vergütung heute !{{ist|ist nicht}} über einem Betrag",
+        "nl": "Vergoeding vandaag !{{is|is niet}} hoger dan een bedrag"
       },
       "titleFormatted": {
         "en": "Reward today !{{is|is not}} above [[amount]]",
-        "sv": "Ersättningen idag !{{är|är inte}} över [[amount]]"
+        "sv": "Ersättningen idag !{{är|är inte}} över [[amount]]",
+        "no": "Godtgjørelsen i dag !{{er|er ikke}} over [[amount]]",
+        "da": "Godtgørelsen i dag !{{er|er ikke}} over [[amount]]",
+        "de": "Vergütung heute !{{ist|ist nicht}} über [[amount]]",
+        "nl": "Vergoeding vandaag !{{is|is niet}} hoger dan [[amount]]"
       },
       "args": [
         {
@@ -409,7 +620,11 @@
           "name": "amount",
           "title": {
             "en": "Amount",
-            "sv": "Belopp"
+            "sv": "Belopp",
+            "no": "Beløp",
+            "da": "Beløb",
+            "de": "Betrag",
+            "nl": "Bedrag"
           },
           "min": 0,
           "step": 0.5,

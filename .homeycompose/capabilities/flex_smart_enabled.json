@@ -2,7 +2,11 @@
   "type": "boolean",
   "title": {
     "en": "Smart control on",
-    "sv": "Smart styrning på"
+    "sv": "Smart styrning på",
+    "no": "Smartstyring på",
+    "da": "Smart styring til",
+    "de": "Smarte Steuerung an",
+    "nl": "Slimme sturing aan"
   },
   "getable": true,
   "setable": false,
@@ -11,10 +15,18 @@
   "icon": "/assets/reward.svg",
   "insightsTitleTrue": {
     "en": "Smart control turned on",
-    "sv": "Smart styrning slogs på"
+    "sv": "Smart styrning slogs på",
+    "no": "Smartstyring ble slått på",
+    "da": "Smart styring blev slået til",
+    "de": "Smarte Steuerung eingeschaltet",
+    "nl": "Slimme sturing ingeschakeld"
   },
   "insightsTitleFalse": {
     "en": "Smart control turned off",
-    "sv": "Smart styrning slogs av"
+    "sv": "Smart styrning slogs av",
+    "no": "Smartstyring ble slått av",
+    "da": "Smart styring blev slået fra",
+    "de": "Smarte Steuerung ausgeschaltet",
+    "nl": "Slimme sturing uitgeschakeld"
   }
 }
