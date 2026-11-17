@@ -6,25 +6,56 @@
  * so interleaving bugs show up in tests.
  */
 
+const path = require('path');
+
 const tick = () => new Promise((r) => setImmediate(r));
+
+// Like Homey: translate from locales/en.json, return the key when missing.
+const EN = require(path.join(__dirname, '..', '..', 'locales', 'en.json'));
+function translate(key, tokens = {}) {
+  const v = key.split('.').reduce((o, k) => (o && typeof o === 'object' ? o[k] : undefined), EN);
+  if (typeof v !== 'string') return key;
+  return v.replace(/__(\w+)__/g, (m, name) => (name in tokens ? String(tokens[name]) : m));
+}
 
 function makeHomey({ timeZone = 'Europe/Stockholm' } = {}) {
   const triggered = [];
   const conditions = {};
   const timers = [];
+  const notifications = [];
+  const drivers = {}; // id -> { getDevices() }
+  const triggerListeners = {};
   return {
     triggered,
     conditions,
     timers,
+    notifications: {
+      sent: notifications,
+      createNotification: async (n) => { notifications.push(n); },
+    },
+    drivers: {
+      registry: drivers,
+      getDriver: (id) => {
+        if (!drivers[id]) throw new Error(`Driver not found: ${id}`);
+        return drivers[id];
+      },
+    },
     clock: { getTimezone: () => timeZone },
-    __: (key) => key,
+    i18n: { getLanguage: () => 'en' },
+    __: translate,
     setInterval(fn, ms) { const t = { fn, ms, cleared: false }; timers.push(t); return t; },
     clearInterval(t) { if (t) t.cleared = true; },
     setTimeout(fn, ms) { const t = { fn, ms, cleared: false }; timers.push(t); return t; },
     clearTimeout(t) { if (t) t.cleared = true; },
+    triggerListeners,
     flow: {
+      // Like Homey: a trigger with a run listener only fires when the listener says so.
       getDeviceTriggerCard: (id) => ({
-        trigger: async (device, tokens) => { await tick(); triggered.push({ id, tokens }); },
+        registerRunListener: (fn) => { triggerListeners[id] = fn; },
+        trigger: async (device, tokens, state) => {
+          await tick();
+          triggered.push({ id, tokens, ...(state !== undefined ? { state } : {}) });
+        },
       }),
       getConditionCard: (id) => ({
         registerRunListener: (fn) => { conditions[id] = fn; },
@@ -35,8 +66,9 @@ function makeHomey({ timeZone = 'Europe/Stockholm' } = {}) {
 
 class Device {
   constructor({
-    homey, data, store = {}, settings = {}, capabilities = {},
+    homey, data, store = {}, settings = {}, capabilities = {}, capabilityList = null,
   }) {
+    this._capList = capabilityList;
     this.homey = homey;
     this._data = data;
     this._store = { ...store };
@@ -61,9 +93,23 @@ class Device {
 
   getSetting(k) { return this._settings[k]; }
 
+  async setSettings(obj) { Object.assign(this._settings, obj); }
+
   getCapabilityValue(k) { return k in this._caps ? this._caps[k] : null; }
 
   async setCapabilityValue(k, v) { await tick(); this._caps[k] = v; }
+
+  hasCapability(k) { return !this._capList || this._capList.includes(k); }
+
+  async setCapabilityOptions(k, o) { this.capabilityOptions = { ...this.capabilityOptions, [k]: o }; }
+
+  async addCapability(k) { if (this._capList && !this._capList.includes(k)) this._capList.push(k); }
+
+  async setWarning(msg) { this.warning = msg; }
+
+  async unsetWarning() { this.warning = null; }
+
+  getAvailable() { return this.available; }
 
   async setAvailable() { this.available = true; }
 

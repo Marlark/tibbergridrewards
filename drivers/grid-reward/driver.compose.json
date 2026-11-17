@@ -11,7 +11,11 @@
     "grid_reward_session",
     "grid_reward_today",
     "grid_reward_month",
-    "grid_reward_all_time"
+    "grid_reward_all_time",
+    "grid_reward_last_session",
+    "grid_reward_sessions_today",
+    "grid_reward_minutes_today",
+    "grid_reward_sessions_month"
   ],
   "platforms": [
     "local"
@@ -66,6 +70,51 @@
     }
   ],
   "settings": [
+    {
+      "type": "group",
+      "label": {
+        "en": "Connection status",
+        "sv": "Anslutningsstatus"
+      },
+      "children": [
+        {
+          "id": "conn_status",
+          "type": "label",
+          "label": {
+            "en": "Connection",
+            "sv": "Anslutning"
+          },
+          "value": "–"
+        },
+        {
+          "id": "conn_last_update",
+          "type": "label",
+          "label": {
+            "en": "Last update from Tibber",
+            "sv": "Senaste uppdatering från Tibber"
+          },
+          "value": "–"
+        },
+        {
+          "id": "conn_connected_since",
+          "type": "label",
+          "label": {
+            "en": "Connected since",
+            "sv": "Ansluten sedan"
+          },
+          "value": "–"
+        },
+        {
+          "id": "conn_reconnects",
+          "type": "label",
+          "label": {
+            "en": "Reconnects since app start",
+            "sv": "Återanslutningar sedan appstart"
+          },
+          "value": "–"
+        }
+      ]
+    },
     {
       "type": "group",
       "label": {

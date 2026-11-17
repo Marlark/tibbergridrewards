@@ -2,6 +2,7 @@
 
 const Homey = require('homey');
 const { TibberAppClient, TibberAuthError } = require('../../lib/TibberAppClient');
+const { crossed } = require('../../lib/unavailable');
 
 /** Returns a logged-in client, or null on wrong credentials. Other errors are thrown. */
 async function tryLogin(email, password, log) {
@@ -20,6 +21,19 @@ class GridRewardDriver extends Homey.Driver {
   async onInit() {
     this.homey.flow.getConditionCard('is_delivering')
       .registerRunListener(async ({ device }) => device.getCapabilityValue('grid_reward_active') === true);
+    this.homey.flow.getConditionCard('state_is')
+      .registerRunListener(async ({ device, state }) => device.getCapabilityValue('grid_reward_state') === state);
+    // The device triggers every minute while unavailable; each flow runs once, when its hours pass.
+    this.homey.flow.getDeviceTriggerCard('unavailable_for')
+      .registerRunListener(async (args, state) => crossed(state, args.hours));
+
+    // Thresholds: the device triggers whenever the amount grows ({from, to}); a flow
+    // runs when its amount lies in between, i.e. once per day/month.
+    const passed = async (args, state) => state.from < args.amount && args.amount <= state.to;
+    this.homey.flow.getDeviceTriggerCard('reward_today_passed').registerRunListener(passed);
+    this.homey.flow.getDeviceTriggerCard('reward_month_passed').registerRunListener(passed);
+    this.homey.flow.getConditionCard('reward_today_above')
+      .registerRunListener(async ({ device, amount }) => (device.getCapabilityValue('grid_reward_today') || 0) > amount);
   }
 
   async onPair(session) {

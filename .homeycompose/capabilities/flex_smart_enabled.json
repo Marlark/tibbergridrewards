@@ -1,0 +1,20 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Smart control on",
+    "sv": "Smart styrning på"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "insights": true,
+  "icon": "/assets/reward.svg",
+  "insightsTitleTrue": {
+    "en": "Smart control turned on",
+    "sv": "Smart styrning slogs på"
+  },
+  "insightsTitleFalse": {
+    "en": "Smart control turned off",
+    "sv": "Smart styrning slogs av"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Battery activity",
+    "sv": "Batteriets aktivitet"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/battery.svg"
+}

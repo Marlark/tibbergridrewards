@@ -127,3 +127,57 @@ test('dead connection: watchdog terminates, pinger stops, reconnect is scheduled
   assert.strictEqual(live(homey, (t) => !t.interval && t.ms === 5000).length, 1);
   sub.stop();
 });
+
+// --- API changes ---
+
+const { TibberApiChangedError, graphqlError } = require('../lib/TibberAppClient');
+
+const send = (ws, msg) => ws.emit('message', Buffer.from(JSON.stringify(msg)));
+
+test('graphqlError: schema errors become TibberApiChangedError', () => {
+  assert.ok(graphqlError([{ message: 'Cannot query field "rewardCurrentMonth" on type "GridReward".' }]) instanceof TibberApiChangedError);
+  assert.ok(graphqlError([{ message: 'x', extensions: { code: 'GRAPHQL_VALIDATION_FAILED' } }]) instanceof TibberApiChangedError);
+  assert.ok(graphqlError([{ message: 'Unknown type "GridRewardBattery".' }]) instanceof TibberApiChangedError);
+  const other = graphqlError([{ message: 'Internal server error' }]);
+  assert.ok(!(other instanceof TibberApiChangedError));
+  assert.match(other.message, /Internal server error/);
+});
+
+test('subscription error with schema problem: emits API change, closes, retries in 1 h', async () => {
+  const { homey, sub, ws } = await connected();
+  const errors = [];
+  sub.on('error', (e) => errors.push(e));
+  send(ws, { id: 'grid-h1', type: 'error', payload: [{ message: 'Cannot query field "rewardAllTime" on type "GridReward".' }] });
+  assert.ok(errors[0] instanceof TibberApiChangedError);
+  assert.strictEqual(live(homey, (t) => !t.interval && t.ms === 60 * 60 * 1000).length, 1);
+  sub.stop();
+});
+
+test('other subscription error: closes and reconnects with normal backoff', async () => {
+  const { homey, sub, ws } = await connected();
+  sub.on('error', () => {});
+  send(ws, { id: 'grid-h1', type: 'error', payload: [{ message: 'Internal server error' }] });
+  assert.strictEqual(live(homey, (t) => !t.interval && t.ms === 5000).length, 1);
+  sub.stop();
+});
+
+test('next with errors and no data counts as a failed subscription', async () => {
+  const { homey, sub, ws } = await connected();
+  const errors = [];
+  sub.on('error', (e) => errors.push(e));
+  send(ws, { id: 'grid-h1', type: 'next', payload: { data: null, errors: [{ message: 'Unknown argument "homeId"' }] } });
+  assert.ok(errors[0] instanceof TibberApiChangedError);
+  assert.strictEqual(live(homey, (t) => !t.interval && t.ms === 60 * 60 * 1000).length, 1);
+  sub.stop();
+});
+
+test('login endpoint gone (404) counts as an API change and retries in 1 h', async () => {
+  const homey = fakeHomey();
+  const client = { getToken: async () => { throw new TibberApiChangedError('Login endpoint gone (404)'); } };
+  const sub = new GridRewardSubscription({ client, homeId: 'h1', homey });
+  sub.on('error', () => {});
+  sub.start();
+  await new Promise((r) => setImmediate(r));
+  assert.strictEqual(homey.timers.filter((t) => !t.cleared)[0].ms, 60 * 60 * 1000);
+  sub.stop();
+});

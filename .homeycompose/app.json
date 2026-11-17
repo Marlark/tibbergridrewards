@@ -1,7 +1,7 @@
 {
   "id": "se.ted.tibbergridrewards",
   "version": "0.1.0",
-  "compatibility": ">=5.0.0",
+  "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
     "local"
@@ -26,5 +26,11 @@
   "author": {
     "name": "Ted"
   },
-  "brandColor": "#0F2742"
+  "brandColor": "#0F2742",
+  "api": {
+    "getHistory": {
+      "method": "GET",
+      "path": "/history"
+    }
+  }
 }

@@ -1,0 +1,20 @@
+{
+  "type": "boolean",
+  "title": {
+    "en": "Plugged in",
+    "sv": "Inkopplad"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "insights": true,
+  "icon": "/assets/plug.svg",
+  "insightsTitleTrue": {
+    "en": "Plugged in",
+    "sv": "Kopplades in"
+  },
+  "insightsTitleFalse": {
+    "en": "Unplugged",
+    "sv": "Kopplades ur"
+  }
+}

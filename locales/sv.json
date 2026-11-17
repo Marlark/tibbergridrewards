@@ -1,6 +1,68 @@
 {
   "error": {
     "auth": "Inloggningen mot Tibber misslyckades – reparera enheten med nya uppgifter",
-    "home_missing": "Tibber-kontot har inte åtkomst till hemmet som enheten hör till"
+    "home_missing": "Tibber-kontot har inte åtkomst till hemmet som enheten hör till",
+    "api_changed": "Tibber har ändrat sitt API – appen behöver uppdateras. Försöker igen varje timme.",
+    "no_home_device": "Lägg först till en Grid Rewards-enhet för hemmet – bil och batteri läses via den",
+    "no_flex_devices": "Ingen bil eller inget batteri hittades än. Hemmets enhet visar dem efter första uppdateringen från Tibber.",
+    "flex_missing": "Tibber rapporterar inte längre den här enheten",
+    "battery_failed": "Kunde inte läsa batteriets uppgifter från Tibber"
+  },
+  "notification": {
+    "api_changed": "Tibber Grid Rewards: Tibber har ändrat sitt API och appen kan inte längre läsa data. Kolla om det finns en uppdatering av appen."
+  },
+  "reason": {
+    "available": "Tillgänglig",
+    "excess": "Överskott av el i nätet",
+    "shortage": "Brist på el i nätet",
+    "other": "Annat behov i nätet",
+    "noVehiclesPluggedIn": "Ingen bil inkopplad"
+  },
+  "battery": {
+    "charge": "Laddar",
+    "discharge": "Laddar ur",
+    "next": "__action__ kl __time__ (__power__ kW)",
+    "next_tomorrow": "__action__ i morgon kl __time__ (__power__ kW)",
+    "none": "Inget planerat"
+  },
+  "battery_activity": {
+    "ChargingForGridRewards": "Laddar för Grid Rewards"
+  },
+  "widget": {
+    "state": {
+      "available": "Tillgänglig",
+      "unavailable": "Ej tillgänglig",
+      "delivering": "Levererar",
+      "unknown": "Okänd"
+    },
+    "today": "Idag",
+    "month": "Denna månad",
+    "session": "Pågående session",
+    "last_session": "Senaste session",
+    "sessions": "sessioner",
+    "battery": "Batteri",
+    "saved_today": "sparat idag",
+    "unavailable": "Ingen kontakt med Tibber"
+  },
+  "conn": {
+    "connecting": "Ansluter…",
+    "connected": "Ansluten",
+    "reconnecting": "Återansluter…",
+    "auth": "Inloggningen misslyckades – reparera enheten",
+    "api": "Tibber har ändrat sitt API – försöker varje timme"
+  },
+  "history": {
+    "title": "Grid Rewards-historik",
+    "empty": "Inga avslutade sessioner än.",
+    "per_day": "Per dag",
+    "sessions": "Sessioner",
+    "when": "När",
+    "reward": "Ersättning",
+    "duration": "Längd",
+    "reason": "Orsak",
+    "total": "Totalt",
+    "min": "min",
+    "sessions_count": "sessioner",
+    "no_home": "Lägg till en Grid Rewards-enhet för hemmet för att se historiken."
   }
 }

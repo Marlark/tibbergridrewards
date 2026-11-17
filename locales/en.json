@@ -1,6 +1,68 @@
 {
   "error": {
     "auth": "Tibber login failed – repair the device with new credentials",
-    "home_missing": "This Tibber account has no access to the home this device belongs to"
+    "home_missing": "This Tibber account has no access to the home this device belongs to",
+    "api_changed": "Tibber has changed its API – the app needs an update. Retrying every hour.",
+    "no_home_device": "Add a Grid Rewards home device first – cars and batteries are read through it",
+    "no_flex_devices": "No car or battery found yet. The home device lists them after its first update from Tibber.",
+    "flex_missing": "Tibber no longer reports this device",
+    "battery_failed": "Could not read battery details from Tibber"
+  },
+  "notification": {
+    "api_changed": "Tibber Grid Rewards: Tibber has changed its API and the app can no longer read data. Check for an app update."
+  },
+  "reason": {
+    "available": "Available",
+    "excess": "Excess power in the grid",
+    "shortage": "Power shortage in the grid",
+    "other": "Other grid need",
+    "noVehiclesPluggedIn": "No car plugged in"
+  },
+  "battery": {
+    "charge": "Charges",
+    "discharge": "Discharges",
+    "next": "__action__ at __time__ (__power__ kW)",
+    "next_tomorrow": "__action__ tomorrow at __time__ (__power__ kW)",
+    "none": "Nothing planned"
+  },
+  "battery_activity": {
+    "ChargingForGridRewards": "Charging for Grid Rewards"
+  },
+  "widget": {
+    "state": {
+      "available": "Available",
+      "unavailable": "Unavailable",
+      "delivering": "Delivering",
+      "unknown": "Unknown"
+    },
+    "today": "Today",
+    "month": "This month",
+    "session": "Current session",
+    "last_session": "Last session",
+    "sessions": "sessions",
+    "battery": "Battery",
+    "saved_today": "saved today",
+    "unavailable": "No connection to Tibber"
+  },
+  "conn": {
+    "connecting": "Connecting…",
+    "connected": "Connected",
+    "reconnecting": "Reconnecting…",
+    "auth": "Login failed – repair the device",
+    "api": "Tibber has changed its API – retrying every hour"
+  },
+  "history": {
+    "title": "Grid Rewards history",
+    "empty": "No finished sessions yet.",
+    "per_day": "Per day",
+    "sessions": "Sessions",
+    "when": "When",
+    "reward": "Reward",
+    "duration": "Duration",
+    "reason": "Reason",
+    "total": "Total",
+    "min": "min",
+    "sessions_count": "sessions",
+    "no_home": "Add a Grid Rewards home device to see the history."
   }
 }

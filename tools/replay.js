@@ -26,7 +26,9 @@ function replay(records) {
   const violations = [];
   const check = (i, events) => {
     for (const ev of events) {
-      if (ev.type === 'session_started') {
+      if (ev.type === 'day_ended' || ev.type === 'month_ended') {
+        if (ev.reward < 0) violations.push(`#${i}: ${ev.type} reward ${ev.reward} < 0`);
+      } else if (ev.type === 'session_started') {
         open += 1;
         if (open > 2) violations.push(`#${i}: ${open} sessions open at once`);
       } else {
@@ -63,8 +65,12 @@ function replay(records) {
 if (require.main === module) {
   const { steps, violations } = replay(parseJsonl(fs.readFileSync(process.argv[2], 'utf8')));
   for (const s of steps) {
-    const ev = s.events.map((e) => (e.type === 'session_ended'
-      ? `ended ${e.reward} kr / ${e.minutes} min` : 'started')).join(', ');
+    const ev = s.events.map((e) => {
+      if (e.type === 'session_ended') return `ended ${e.reward} kr / ${e.minutes} min`;
+      if (e.type === 'month_ended') return `MONTH ${e.month}: ${e.reward} kr, ${e.sessions} sessions`;
+      if (e.type === 'day_ended') return `DAY ${e.date}: ${e.reward} kr, ${e.sessions} sessions, ${e.minutes} min`;
+      return 'started';
+    }).join(', ');
     console.log([new Date(s.t).toISOString(), s.gridState.padEnd(11), `month ${s.month}`,
       `today ${s.today}`, `session ${s.session}`, ev].join('  '));
   }

@@ -1,11 +1,33 @@
 'use strict';
 
 const Homey = require('homey');
-const { TibberAppClient, TibberAuthError } = require('../../lib/TibberAppClient');
+const { TibberAppClient, TibberAuthError, TibberApiChangedError } = require('../../lib/TibberAppClient');
 const GridRewardSubscription = require('../../lib/GridRewardSubscription');
 const {
-  parseStatus, applyUpdate, settle, rollDay, localDayKey, SETTLE_MS,
+  parseStatus, parseFlex, applyUpdate, settle, rollDayEvents, statsOf, localDayKey, SETTLE_MS,
 } = require('../../lib/RewardTracker');
+const { reasonText } = require('../../lib/reasons');
+const unavailable = require('../../lib/unavailable');
+const { unitFor } = require('../../lib/currency');
+
+// Capabilities shown in money; their unit follows Tibber's rewardCurrency.
+const MONEY_CAPABILITIES = [
+  'grid_reward_session',
+  'grid_reward_today',
+  'grid_reward_month',
+  'grid_reward_all_time',
+  'grid_reward_last_session',
+];
+
+const HISTORY_MAX = 100;
+const CONNECTION_SETTINGS_MS = 60 * 1000; // refresh "last update" in settings at most once a minute
+
+const STATS_CAPABILITIES = [
+  'grid_reward_last_session',
+  'grid_reward_sessions_today',
+  'grid_reward_minutes_today',
+  'grid_reward_sessions_month',
+];
 
 class GridRewardDevice extends Homey.Device {
 
@@ -13,9 +35,32 @@ class GridRewardDevice extends Homey.Device {
     this.homeId = this.getData().id;
     this.tracker = this.getStoreValue('tracker') || {};
     this.lastGridState = this.getCapabilityValue('grid_reward_state') || 'unknown';
+    // 'auth' | 'api' | null: why the device is unavailable, if it is.
+    this.problem = null;
+    this.lastReason = { text: '', code: '' };
+    // Highest value so far today / this month, for the threshold cards. Comparing
+    // with the highest value means a small dip and rise does not fire twice.
+    // null = not known yet (never fire on the first value).
+    this.high = {
+      today: this.getCapabilityValue('grid_reward_today'),
+      todayKey: this.tracker.dayKey,
+      month: this.getCapabilityValue('grid_reward_month'),
+      monthKey: this.tracker.monthKey,
+    };
+    // "Unavailable for X hours"; the start time survives restarts.
+    this.unavail = unavailable.restore(this.getStoreValue('unavailableSince'), Date.now());
+    // Connection status shown in the device settings.
+    this.conn = {
+      state: 'connecting', since: null, lastUpdate: null, reconnects: 0, shownAt: 0,
+    };
     // All work that touches tracker/capabilities/flows runs one job at a time,
     // so quick successive updates can't interleave (e.g. double state_changed).
     this._queue = Promise.resolve();
+
+    // Devices paired with an older version lack the newer capabilities.
+    for (const cap of STATS_CAPABILITIES) {
+      if (!this.hasCapability(cap)) await this.addCapability(cap).catch(this.error);
+    }
 
     this._startSubscription();
 
@@ -38,15 +83,44 @@ class GridRewardDevice extends Homey.Device {
       client: this.client, homeId: this.homeId, homey: this.homey, log: this.log.bind(this),
     });
     sub.on('data', (status) => this._enqueue(() => this._onStatus(status)));
-    sub.on('connected', () => this.setAvailable().catch(this.error));
+    sub.on('connected', () => {
+      // A successful login fixes an auth problem. An API problem is only
+      // fixed when real data arrives again (see _onStatus).
+      if (this.problem === 'auth') this._clearProblem();
+      this._setConnection('connected');
+    });
+    sub.on('disconnected', () => {
+      this.conn.reconnects += 1;
+      this._setConnection('reconnecting');
+    });
     sub.on('error', (err) => {
       this.error('Subscription:', err.message);
       if (err instanceof TibberAuthError) {
-        this.setUnavailable(this.homey.__('error.auth')).catch(this.error);
+        this._setProblem('auth');
+        this._setConnection('auth');
+      } else if (err instanceof TibberApiChangedError) {
+        this._setProblem('api');
+        this._setConnection('api');
       }
     });
     this.sub = sub;
     sub.start();
+  }
+
+  _setProblem(kind) {
+    const first = this.problem !== kind;
+    this.problem = kind;
+    this.setUnavailable(this.homey.__(kind === 'auth' ? 'error.auth' : 'error.api_changed')).catch(this.error);
+    // Tell the user once per episode, not on every hourly retry.
+    if (kind === 'api' && first) {
+      this.homey.notifications.createNotification({ excerpt: this.homey.__('notification.api_changed') })
+        .catch(this.error);
+    }
+  }
+
+  _clearProblem() {
+    this.problem = null;
+    this.setAvailable().catch(this.error);
   }
 
   /** Called from the driver's repair flow with verified credentials. */
@@ -62,11 +136,28 @@ class GridRewardDevice extends Homey.Device {
   }
 
   async _tickDay() {
+    await this._checkUnavailable(this.lastGridState);
     const key = this._dayKey();
     if (this.tracker.dayKey === key) return;
-    this.tracker = rollDay(this.tracker, key);
+    const result = rollDayEvents(this.tracker, key);
+    this.tracker = result.state;
     await this.setStoreValue('tracker', this.tracker);
     await this.setCapabilityValue('grid_reward_today', 0);
+    await this._publishStats();
+    await this._fireEvents(result.events);
+  }
+
+  async _publishStats() {
+    const st = statsOf(this.tracker, this._dayKey());
+    const values = {
+      grid_reward_last_session: st.lastSessionReward,
+      grid_reward_sessions_today: st.sessionsToday,
+      grid_reward_minutes_today: st.minutesToday,
+      grid_reward_sessions_month: st.sessionsMonth,
+    };
+    await Promise.all(Object.entries(values)
+      .filter(([cap, v]) => v !== null && this.hasCapability(cap) && this.getCapabilityValue(cap) !== v)
+      .map(([cap, v]) => this.setCapabilityValue(cap, v)));
   }
 
   async _onStatus(status) {
@@ -74,12 +165,19 @@ class GridRewardDevice extends Homey.Device {
       // One JSON line per update; extract with tools/extract-recording.js
       this.log('[REC]', JSON.stringify({ t: Date.now(), tz: this.homey.clock.getTimezone(), status }));
     }
-    const {
-      gridState, reason, month, allTime,
-    } = parseStatus(status);
+    if (this.problem) this._clearProblem();
 
+    const {
+      gridState, reasonCodes, month, allTime, currency,
+    } = parseStatus(status);
+    // null when the update has no flexDevices at all: then leave cars/batteries alone.
+    const flex = Array.isArray(status.flexDevices) ? status.flexDevices.map(parseFlex).filter((f) => f.id) : null;
+    const codes = this._reasonCodes(gridState, reasonCodes, flex || []);
+    const reason = { text: reasonText(this.homey, codes), code: codes.join(', ') };
+
+    this.lastReason = reason;
     const result = applyUpdate(this.tracker, {
-      month, gridState, dayKey: this._dayKey(), now: Date.now(),
+      month, gridState, dayKey: this._dayKey(), now: Date.now(), reason: reason.code,
     });
     this.tracker = result.state;
     await this.setStoreValue('tracker', this.tracker);
@@ -87,36 +185,198 @@ class GridRewardDevice extends Homey.Device {
     const sets = [
       this.setCapabilityValue('grid_reward_state', gridState),
       this.setCapabilityValue('grid_reward_active', gridState === 'delivering'),
-      this.setCapabilityValue('grid_reward_reason', reason || '-'),
+      this.setCapabilityValue('grid_reward_reason', reason.text || '-'),
       this.setCapabilityValue('grid_reward_session', result.sessionReward),
     ];
     if (month !== null) sets.push(this.setCapabilityValue('grid_reward_month', month));
     if (result.today !== null) sets.push(this.setCapabilityValue('grid_reward_today', result.today));
     if (allTime !== null) sets.push(this.setCapabilityValue('grid_reward_all_time', allTime));
     await Promise.all(sets);
+    await this._publishStats();
+    await this._applyCurrency(currency);
 
     // Flow triggers
+    await this._checkThresholds(result.today, month);
     if (gridState !== this.lastGridState) {
       this.lastGridState = gridState;
       await this.homey.flow.getDeviceTriggerCard('state_changed')
-        .trigger(this, { state: gridState, reason: reason || '' })
+        .trigger(this, { state: gridState, reason: reason.text, reason_code: reason.code })
         .catch(this.error);
     }
     await this._fireEvents(result.events, reason);
     this._scheduleSettle();
+    await this._checkUnavailable(gridState);
+    this.conn.lastUpdate = Date.now();
+    this._publishConnection();
+
+    await this._updateFlexDevices(flex);
   }
 
-  async _fireEvents(events, reason = '') {
+  async _fireEvents(events, reason = { text: '', code: '' }) {
     for (const ev of events) {
       if (ev.type === 'session_started') {
         await this.homey.flow.getDeviceTriggerCard('session_started')
-          .trigger(this, { reason: reason || '' }).catch(this.error);
+          .trigger(this, { reason: reason.text, reason_code: reason.code }).catch(this.error);
       } else if (ev.type === 'session_ended') {
+        await this._addToHistory(ev);
         await this.homey.flow.getDeviceTriggerCard('session_ended')
           .trigger(this, { reward: ev.reward, minutes: ev.minutes }).catch(this.error);
+      } else if (ev.type === 'day_ended') {
+        await this.homey.flow.getDeviceTriggerCard('daily_summary')
+          .trigger(this, {
+            reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, date: ev.date,
+          }).catch(this.error);
+      } else if (ev.type === 'month_ended') {
+        await this.homey.flow.getDeviceTriggerCard('monthly_summary')
+          .trigger(this, {
+            reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, month: ev.month,
+          }).catch(this.error);
       }
     }
   }
+
+  /**
+   * Reason codes to show for the home. When the home is unavailable, add the
+   * reasons of its unavailable car/battery (e.g. noVehiclesPluggedIn): that is
+   * usually why, and the home itself does not say so.
+   */
+  _reasonCodes(gridState, homeCodes, flex) {
+    if (gridState !== 'unavailable') return homeCodes;
+    const extra = flex.filter((f) => f.gridState === 'unavailable').flatMap((f) => f.reasonCodes);
+    return [...new Set([...homeCodes, ...extra])];
+  }
+
+  // --- Thresholds ---
+
+  async _checkThresholds(today, month) {
+    const h = this.high;
+    const fire = async (card, from, to, tokens) => {
+      if (typeof from !== 'number' || typeof to !== 'number' || to <= from) return;
+      await this.homey.flow.getDeviceTriggerCard(card).trigger(this, tokens, { from, to }).catch(this.error);
+    };
+    if (today !== null) {
+      // New day (also when the update itself rolled the day): start from 0.
+      if (h.todayKey !== this.tracker.dayKey) {
+        if (h.todayKey !== undefined && h.today !== null) h.today = 0;
+        h.todayKey = this.tracker.dayKey;
+      }
+      await fire('reward_today_passed', h.today, today, { today });
+      h.today = h.today === null ? today : Math.max(h.today, today);
+    }
+    if (month !== null) {
+      // New month (Tibber's reset, as detected by RewardTracker): start again, no fire.
+      if (h.monthKey !== this.tracker.monthKey) {
+        if (h.monthKey !== undefined) h.month = month;
+        h.monthKey = this.tracker.monthKey;
+      }
+      await fire('reward_month_passed', h.month, month, { month });
+      h.month = h.month === null ? month : Math.max(h.month, month);
+    }
+  }
+
+  // --- Currency ---
+
+  /** Use Tibber's currency as unit (kr for SEK/NOK/DKK, € for EUR). */
+  async _applyCurrency(currency) {
+    if (!currency) return;
+    const unit = unitFor(currency);
+    if (unit === this.getStoreValue('currencyUnit')) return;
+    for (const cap of MONEY_CAPABILITIES) {
+      if (this.hasCapability(cap)) await this.setCapabilityOptions(cap, { units: { en: unit } }).catch(this.error);
+    }
+    await this.setStoreValue('currencyUnit', unit);
+  }
+
+  /** Display unit for money, e.g. for the widget and the history page. */
+  getCurrencyUnit() {
+    return this.getStoreValue('currencyUnit') || 'kr';
+  }
+
+  // --- Unavailable for a long time ---
+
+  async _checkUnavailable(gridState) {
+    const r = unavailable.step(this.unavail, gridState, Date.now());
+    if (r.watch.since !== this.unavail.since) await this.setStoreValue('unavailableSince', r.watch.since);
+    this.unavail = r.watch;
+    if (!r.fire) return;
+    await this.homey.flow.getDeviceTriggerCard('unavailable_for')
+      .trigger(this, {
+        hours: Math.round((r.fire.toMin / 60) * 10) / 10,
+        reason: this.lastReason.text,
+        reason_code: this.lastReason.code,
+      }, r.fire)
+      .catch(this.error);
+  }
+
+  // --- Session history ---
+
+  /** Finished sessions, newest first. */
+  getHistory() {
+    return this.getStoreValue('history') || [];
+  }
+
+  async _addToHistory(ev) {
+    const entry = {
+      startedAt: ev.startedAt, endedAt: ev.endedAt, reward: ev.reward, minutes: ev.minutes, reason: ev.reason,
+    };
+    await this.setStoreValue('history', [entry, ...this.getHistory()].slice(0, HISTORY_MAX));
+  }
+
+  // --- Connection status in the device settings ---
+
+  _setConnection(state) {
+    if (state === 'connected' && this.conn.state !== 'connected') this.conn.since = Date.now();
+    if (state !== 'connected') this.conn.since = null;
+    this.conn.state = state;
+    this._publishConnection({ force: true });
+  }
+
+  _formatTime(ms) {
+    if (!ms) return '–';
+    const lang = this.homey.i18n.getLanguage() === 'sv' ? 'sv-SE' : 'en-GB';
+    return new Intl.DateTimeFormat(lang, {
+      timeZone: this.homey.clock.getTimezone(), dateStyle: 'short', timeStyle: 'medium',
+    }).format(new Date(ms));
+  }
+
+  _publishConnection({ force = false } = {}) {
+    const now = Date.now();
+    if (!force && now - this.conn.shownAt < CONNECTION_SETTINGS_MS) return;
+    this.conn.shownAt = now;
+    this.setSettings({
+      conn_status: this.homey.__(`conn.${this.conn.state}`),
+      conn_last_update: this._formatTime(this.conn.lastUpdate),
+      conn_connected_since: this._formatTime(this.conn.since),
+      conn_reconnects: String(this.conn.reconnects),
+    }).catch(this.error);
+  }
+
+  // --- Cars and batteries (flex devices) ---
+
+  /** Latest parsed flex devices of this home, used when pairing car/battery devices. */
+  getFlexDevices() {
+    return this.getStoreValue('flexDevices') || [];
+  }
+
+  async _updateFlexDevices(flex) {
+    if (!flex) return;
+    if (JSON.stringify(flex) !== JSON.stringify(this.getFlexDevices())) {
+      await this.setStoreValue('flexDevices', flex);
+    }
+    let devices = [];
+    try {
+      devices = this.homey.drivers.getDriver('flex-device').getDevices();
+    } catch (err) {
+      return; // driver not ready yet
+    }
+    for (const device of devices) {
+      if (device.getData().homeId !== this.homeId) continue;
+      const f = flex.find((x) => x.id === device.getData().id) || null;
+      await device.onFlexStatus(f).catch(this.error);
+    }
+  }
+
+  // --- Settlement after a session ---
 
   // An ended session waits for Tibber's settlement. If no update arrives,
   // close it after SETTLE_MS so the session_ended card still fires.
@@ -138,6 +398,7 @@ class GridRewardDevice extends Homey.Device {
     }
     this.tracker = result.state;
     await this.setStoreValue('tracker', this.tracker);
+    await this._publishStats();
     await this._fireEvents(result.events);
   }
 

@@ -1,0 +1,11 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Next planned",
+    "sv": "Nästa planerade"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/battery.svg"
+}

@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <style>
+      :root {
+        --gr-accent: #1fb8cc;
+        --gr-deliver: #22c55e;
+        --gr-off: #9ca3af;
+      }
+      body.homey-widget {
+        padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+        box-sizing: border-box;
+      }
+      .head { display: flex; align-items: center; gap: var(--homey-su-2, 8px); min-width: 0; }
+      .dot { width: 10px; height: 10px; border-radius: 50%; background: var(--gr-off); flex: none; }
+      .dot.available { background: var(--gr-accent); }
+      .dot.delivering { background: var(--gr-deliver); box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.2); }
+      .reason { opacity: 0.7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .big { font-size: 34px; line-height: 1.1; font-weight: 600; margin: var(--homey-su-2, 8px) 0 2px; font-variant-numeric: tabular-nums; }
+      .label { opacity: 0.7; }
+      .row { display: flex; justify-content: space-between; gap: var(--homey-su-3, 12px); margin-top: var(--homey-su-3, 12px); }
+      .row > div { min-width: 0; }
+      .value { font-weight: 600; font-variant-numeric: tabular-nums; }
+      .battery { margin-top: var(--homey-su-3, 12px); padding-top: var(--homey-su-2, 8px); border-top: 1px solid rgba(127, 127, 127, 0.25);
+        overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .error { opacity: 0.7; }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div id="root" class="homey-text-regular"></div>
+
+    <script type="text/javascript">
+      const INTERVAL_MS = 30 * 1000;
+
+      let UNIT = 'kr';
+
+      function kr(v) {
+        if (typeof v !== 'number') return '–';
+        const n = v.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return UNIT === '€' ? `€${n}` : `${n} ${UNIT}`;
+      }
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[c]));
+      }
+
+      function render(d) {
+        const root = document.getElementById('root');
+        if (d.error) {
+          root.innerHTML = `<p class="error">${esc(d.error)}</p>`;
+          return;
+        }
+        const L = d.labels;
+        UNIT = d.unit || 'kr';
+        const second = d.active
+          ? `<div><div class="label homey-text-small">${esc(L.session)}</div><div class="value">${kr(d.session)}</div></div>`
+          : `<div><div class="label homey-text-small">${esc(L.lastSession)}</div><div class="value">${kr(d.lastSession)}</div></div>`;
+        const sessions = typeof d.sessionsToday === 'number'
+          ? `<div style="text-align:right"><div class="label homey-text-small">${esc(L.today)}</div>
+               <div class="value">${d.sessionsToday} ${esc(L.sessions)} · ${d.minutesToday || 0} min</div></div>`
+          : '';
+        const battery = d.battery && (d.battery.activity || typeof d.battery.savingsToday === 'number')
+          ? `<div class="battery homey-text-small">${esc(L.battery)}: ${esc(d.battery.activity || '–')}${
+            typeof d.battery.savingsToday === 'number' ? ` · ${kr(d.battery.savingsToday)} ${esc(L.savedToday)}` : ''}</div>`
+          : '';
+
+        root.innerHTML = `
+          <div class="head">
+            <span class="dot ${esc(d.state)}"></span>
+            <span class="homey-text-medium">${esc(d.available ? d.stateText : L.unavailable)}</span>
+            <span class="reason homey-text-small">${d.reason && d.reason !== '-' ? `· ${esc(d.reason)}` : ''}</span>
+          </div>
+          <div class="big">${kr(d.today)}</div>
+          <div class="label homey-text-small">${esc(L.today)} · ${esc(L.month)} ${kr(d.month)}</div>
+          <div class="row">${second}${sessions}</div>
+          ${battery}`;
+      }
+
+      function onHomeyReady(Homey) {
+        let deviceId = '';
+        try {
+          const ids = Homey.getDeviceIds ? Homey.getDeviceIds() : [];
+          deviceId = (ids && ids[0]) || '';
+        } catch (err) { /* older Homey: fall back to the first home device */ }
+
+        let ready = false;
+        const load = () => Homey.api('GET', `/?deviceId=${encodeURIComponent(deviceId)}`)
+          .then((d) => render(d))
+          .catch((err) => render({ error: err && err.message ? err.message : String(err) }))
+          .finally(() => {
+            if (!ready) {
+              ready = true;
+              Homey.ready();
+            }
+          });
+
+        load();
+        setInterval(load, INTERVAL_MS);
+      }
+    </script>
+  </body>
+</html>

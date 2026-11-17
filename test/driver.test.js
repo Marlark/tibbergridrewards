@@ -59,7 +59,7 @@ test('repair: account without the home is rejected', async () => {
     const s = session();
     const device = fakeDevice();
     await driver.onRepair(s, device);
-    await assert.rejects(s.handlers.login({ username: 'b@example.com', password: 'right' }), /error\.home_missing/);
+    await assert.rejects(s.handlers.login({ username: 'b@example.com', password: 'right' }), /has no access to the home/);
     assert.strictEqual(device.updated, null);
   } finally {
     homes = [{ id: 'h1', title: 'Home' }];

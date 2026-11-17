@@ -23,7 +23,16 @@
             "en": "Reason",
             "sv": "Orsak"
           },
-          "example": "frequencyRegulation"
+          "example": "Överskott av el i nätet"
+        },
+        {
+          "name": "reason_code",
+          "type": "string",
+          "title": {
+            "en": "Reason code",
+            "sv": "Orsakskod"
+          },
+          "example": "excess"
         }
       ]
     },
@@ -41,7 +50,16 @@
             "en": "Reason",
             "sv": "Orsak"
           },
-          "example": "frequencyRegulation"
+          "example": "Överskott av el i nätet"
+        },
+        {
+          "name": "reason_code",
+          "type": "string",
+          "title": {
+            "en": "Reason code",
+            "sv": "Orsakskod"
+          },
+          "example": "excess"
         }
       ]
     },
@@ -71,6 +89,249 @@
           "example": 15
         }
       ]
+    },
+    {
+      "id": "daily_summary",
+      "title": {
+        "en": "Daily Grid Rewards summary",
+        "sv": "Dagens Grid Rewards-sammanfattning"
+      },
+      "hint": {
+        "en": "Runs at midnight with the totals for the day that ended. A session is counted on the day it ends.",
+        "sv": "Körs vid midnatt med summan för dagen som tog slut. En session räknas till dagen den slutar."
+      },
+      "tokens": [
+        {
+          "name": "reward",
+          "type": "number",
+          "title": {
+            "en": "Reward (kr)",
+            "sv": "Ersättning (kr)"
+          },
+          "example": 16.64
+        },
+        {
+          "name": "sessions",
+          "type": "number",
+          "title": {
+            "en": "Sessions",
+            "sv": "Sessioner"
+          },
+          "example": 9
+        },
+        {
+          "name": "minutes",
+          "type": "number",
+          "title": {
+            "en": "Delivery time (min)",
+            "sv": "Leveranstid (min)"
+          },
+          "example": 438
+        },
+        {
+          "name": "date",
+          "type": "string",
+          "title": {
+            "en": "Date",
+            "sv": "Datum"
+          },
+          "example": "2026-11-17"
+        }
+      ]
+    },
+    {
+      "id": "unavailable_for",
+      "title": {
+        "en": "Unavailable for a long time",
+        "sv": "Ej tillgänglig länge"
+      },
+      "titleFormatted": {
+        "en": "Grid Rewards has been unavailable for [[hours]] hours",
+        "sv": "Grid Rewards har varit ej tillgängligt i [[hours]] timmar"
+      },
+      "hint": {
+        "en": "Runs once per unavailable period, when the time passes. Missed time while the app was stopped is not counted twice.",
+        "sv": "Körs en gång per period när tiden passeras. Tid då appen var stoppad räknas inte dubbelt."
+      },
+      "args": [
+        {
+          "type": "number",
+          "name": "hours",
+          "title": {
+            "en": "Hours",
+            "sv": "Timmar"
+          },
+          "min": 0.25,
+          "max": 168,
+          "step": 0.25,
+          "placeholder": {
+            "en": "3",
+            "sv": "3"
+          }
+        }
+      ],
+      "tokens": [
+        {
+          "name": "hours",
+          "type": "number",
+          "title": {
+            "en": "Hours unavailable",
+            "sv": "Timmar ej tillgängligt"
+          },
+          "example": 3
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "title": {
+            "en": "Reason",
+            "sv": "Orsak"
+          },
+          "example": "Ingen bil inkopplad"
+        },
+        {
+          "name": "reason_code",
+          "type": "string",
+          "title": {
+            "en": "Reason code",
+            "sv": "Orsakskod"
+          },
+          "example": "noVehiclesPluggedIn"
+        }
+      ]
+    },
+    {
+      "id": "reward_today_passed",
+      "title": {
+        "en": "Reward today passed an amount",
+        "sv": "Ersättningen idag passerade ett belopp"
+      },
+      "titleFormatted": {
+        "en": "Reward today passed [[amount]]",
+        "sv": "Ersättningen idag passerade [[amount]]"
+      },
+      "hint": {
+        "en": "Runs once per day, when the amount is passed.",
+        "sv": "Körs en gång per dag, när beloppet passeras."
+      },
+      "args": [
+        {
+          "type": "number",
+          "name": "amount",
+          "title": {
+            "en": "Amount",
+            "sv": "Belopp"
+          },
+          "min": 0,
+          "step": 0.5,
+          "placeholder": {
+            "en": "10",
+            "sv": "10"
+          }
+        }
+      ],
+      "tokens": [
+        {
+          "name": "today",
+          "type": "number",
+          "title": {
+            "en": "Reward today",
+            "sv": "Ersättning idag"
+          },
+          "example": 10.25
+        }
+      ]
+    },
+    {
+      "id": "reward_month_passed",
+      "title": {
+        "en": "Reward this month passed an amount",
+        "sv": "Ersättningen denna månad passerade ett belopp"
+      },
+      "titleFormatted": {
+        "en": "Reward this month passed [[amount]]",
+        "sv": "Ersättningen denna månad passerade [[amount]]"
+      },
+      "hint": {
+        "en": "Runs once per month, when the amount is passed.",
+        "sv": "Körs en gång per månad, när beloppet passeras."
+      },
+      "args": [
+        {
+          "type": "number",
+          "name": "amount",
+          "title": {
+            "en": "Amount",
+            "sv": "Belopp"
+          },
+          "min": 0,
+          "step": 0.5,
+          "placeholder": {
+            "en": "10",
+            "sv": "10"
+          }
+        }
+      ],
+      "tokens": [
+        {
+          "name": "month",
+          "type": "number",
+          "title": {
+            "en": "Reward this month",
+            "sv": "Ersättning denna månad"
+          },
+          "example": 500.5
+        }
+      ]
+    },
+    {
+      "id": "monthly_summary",
+      "title": {
+        "en": "Monthly Grid Rewards summary",
+        "sv": "Månadens Grid Rewards-sammanfattning"
+      },
+      "hint": {
+        "en": "Runs at midnight when a new month starts, with the totals for the month that ended.",
+        "sv": "Körs vid midnatt när en ny månad börjar, med summan för månaden som tog slut."
+      },
+      "tokens": [
+        {
+          "name": "reward",
+          "type": "number",
+          "title": {
+            "en": "Reward",
+            "sv": "Ersättning"
+          },
+          "example": 679.69
+        },
+        {
+          "name": "sessions",
+          "type": "number",
+          "title": {
+            "en": "Sessions",
+            "sv": "Sessioner"
+          },
+          "example": 270
+        },
+        {
+          "name": "minutes",
+          "type": "number",
+          "title": {
+            "en": "Delivery time (min)",
+            "sv": "Leveranstid (min)"
+          },
+          "example": 13140
+        },
+        {
+          "name": "month",
+          "type": "string",
+          "title": {
+            "en": "Month",
+            "sv": "Månad"
+          },
+          "example": "2026-11"
+        }
+      ]
     }
   ],
   "conditions": [
@@ -80,6 +341,84 @@
         "en": "A Grid Rewards session !{{is|is not}} active",
         "sv": "En Grid Rewards-session !{{pågår|pågår inte}}"
       }
+    },
+    {
+      "id": "state_is",
+      "title": {
+        "en": "Grid Rewards status !{{is|is not}} …",
+        "sv": "Grid Rewards-status !{{är|är inte}} …"
+      },
+      "titleFormatted": {
+        "en": "Grid Rewards status !{{is|is not}} [[state]]",
+        "sv": "Grid Rewards-status !{{är|är inte}} [[state]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "state",
+          "title": {
+            "en": "Status",
+            "sv": "Status"
+          },
+          "values": [
+            {
+              "id": "available",
+              "title": {
+                "en": "Available",
+                "sv": "Tillgänglig"
+              }
+            },
+            {
+              "id": "unavailable",
+              "title": {
+                "en": "Unavailable",
+                "sv": "Ej tillgänglig"
+              }
+            },
+            {
+              "id": "delivering",
+              "title": {
+                "en": "Delivering",
+                "sv": "Levererar"
+              }
+            },
+            {
+              "id": "unknown",
+              "title": {
+                "en": "Unknown",
+                "sv": "Okänd"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "reward_today_above",
+      "title": {
+        "en": "Reward today !{{is|is not}} above an amount",
+        "sv": "Ersättningen idag !{{är|är inte}} över ett belopp"
+      },
+      "titleFormatted": {
+        "en": "Reward today !{{is|is not}} above [[amount]]",
+        "sv": "Ersättningen idag !{{är|är inte}} över [[amount]]"
+      },
+      "args": [
+        {
+          "type": "number",
+          "name": "amount",
+          "title": {
+            "en": "Amount",
+            "sv": "Belopp"
+          },
+          "min": 0,
+          "step": 0.5,
+          "placeholder": {
+            "en": "10",
+            "sv": "10"
+          }
+        }
+      ]
     }
   ]
 }

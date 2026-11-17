@@ -1,0 +1,21 @@
+{
+  "name": {
+    "en": "Grid Rewards",
+    "sv": "Grid Rewards"
+  },
+  "height": 196,
+  "settings": [],
+  "devices": {
+    "type": "app",
+    "singular": true,
+    "filter": {
+      "capabilities": "grid_reward_today"
+    }
+  },
+  "api": {
+    "getStatus": {
+      "method": "GET",
+      "path": "/"
+    }
+  }
+}

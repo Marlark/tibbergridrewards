@@ -1,0 +1,42 @@
+{
+  "name": {
+    "en": "Car / battery (Grid Rewards)",
+    "sv": "Bil / batteri (Grid Rewards)"
+  },
+  "class": "sensor",
+  "capabilities": [
+    "grid_reward_state",
+    "grid_reward_reason",
+    "flex_plugged_in",
+    "flex_smart_enabled",
+    "battery_savings_today",
+    "battery_savings_week",
+    "battery_savings_month",
+    "battery_activity",
+    "battery_next_activity"
+  ],
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "cloud"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "list_devices",
+      "template": "list_devices",
+      "navigation": {
+        "next": "add_devices"
+      }
+    },
+    {
+      "id": "add_devices",
+      "template": "add_devices"
+    }
+  ]
+}

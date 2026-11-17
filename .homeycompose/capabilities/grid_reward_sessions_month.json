@@ -1,0 +1,13 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Sessions this month",
+    "sv": "Sessioner denna månad"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 0,
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script type="text/javascript" src="/homey.js" data-origin="settings"></script>
+    <style>
+      body { margin: 0; padding: 16px; }
+      h2 { margin: 24px 0 8px; }
+      .muted { opacity: 0.65; }
+      .total { margin: 4px 0 16px; }
+      table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+      th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid rgba(127, 127, 127, 0.2); vertical-align: top; }
+      th { font-weight: 600; }
+      td.num, th.num { text-align: right; white-space: nowrap; }
+      .bar { height: 6px; border-radius: 3px; background: #1fb8cc; min-width: 2px; }
+      .reason { opacity: 0.75; }
+    </style>
+  </head>
+  <body>
+    <h1 id="title" class="homey-title"></h1>
+    <div id="root"><p class="muted">…</p></div>
+
+    <script type="text/javascript">
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[c]));
+      }
+
+      let UNIT = 'kr';
+
+      function kr(v) {
+        const n = Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        return UNIT === '€' ? `€${n}` : `${n} ${UNIT}`;
+      }
+
+      function renderHome(home, L) {
+        UNIT = home.unit || 'kr';
+        if (!home.sessions.length) {
+          return `<h2>${esc(home.name)}</h2><p class="muted">${esc(L.empty)}</p>`;
+        }
+        const max = Math.max(...home.days.map((d) => d.reward), 0.01);
+        const days = home.days.map((d) => `
+          <tr>
+            <td>${esc(d.date)}</td>
+            <td class="num">${kr(d.reward)}</td>
+            <td class="num">${d.sessions}</td>
+            <td class="num">${d.minutes} ${esc(L.min)}</td>
+            <td style="width:30%"><div class="bar" style="width:${Math.round((d.reward / max) * 100)}%"></div></td>
+          </tr>`).join('');
+        const sessions = home.sessions.map((s) => `
+          <tr>
+            <td>${esc(s.when)}</td>
+            <td class="num">${kr(s.reward)}</td>
+            <td class="num">${s.minutes} ${esc(L.min)}</td>
+            <td class="reason">${esc(s.reasonText || '–')}</td>
+          </tr>`).join('');
+        return `
+          <h2>${esc(home.name)}</h2>
+          <p class="total muted">${esc(L.total)}: ${kr(home.total)} · ${home.sessions.length} ${esc(L.sessions_count)}</p>
+          <h3>${esc(L.per_day)}</h3>
+          <table>
+            <thead><tr><th></th><th class="num">${esc(L.reward)}</th><th class="num">${esc(L.sessions)}</th>
+              <th class="num">${esc(L.duration)}</th><th></th></tr></thead>
+            <tbody>${days}</tbody>
+          </table>
+          <h3>${esc(L.sessions)}</h3>
+          <table>
+            <thead><tr><th>${esc(L.when)}</th><th class="num">${esc(L.reward)}</th>
+              <th class="num">${esc(L.duration)}</th><th>${esc(L.reason)}</th></tr></thead>
+            <tbody>${sessions}</tbody>
+          </table>`;
+      }
+
+      function onHomeyReady(Homey) {
+        Homey.api('GET', '/history', null, (err, data) => {
+          const root = document.getElementById('root');
+          if (err) {
+            root.innerHTML = `<p>${esc(err.message || err)}</p>`;
+          } else {
+            const L = data.labels;
+            document.getElementById('title').textContent = L.title;
+            root.innerHTML = data.homes.length
+              ? data.homes.map((h) => renderHome(h, L)).join('')
+              : `<p class="muted">${esc(L.no_home)}</p>`;
+          }
+          Homey.ready();
+        });
+      }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,16 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Battery savings this week",
+    "sv": "Batteribesparing denna vecka"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/battery.svg"
+}

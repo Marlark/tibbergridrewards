@@ -1,0 +1,221 @@
+{
+  "triggers": [
+    {
+      "id": "flex_state_changed",
+      "title": {
+        "en": "Grid Rewards status changed",
+        "sv": "Grid Rewards-status ändrades"
+      },
+      "tokens": [
+        {
+          "name": "state",
+          "type": "string",
+          "title": {
+            "en": "Status",
+            "sv": "Status"
+          },
+          "example": "unavailable"
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "title": {
+            "en": "Reason",
+            "sv": "Orsak"
+          },
+          "example": "Ingen bil inkopplad"
+        },
+        {
+          "name": "reason_code",
+          "type": "string",
+          "title": {
+            "en": "Reason code",
+            "sv": "Orsakskod"
+          },
+          "example": "noVehiclesPluggedIn"
+        }
+      ]
+    },
+    {
+      "id": "flex_plugged_in_changed",
+      "title": {
+        "en": "The car was plugged in or unplugged",
+        "sv": "Bilen kopplades in eller ur"
+      },
+      "tokens": [
+        {
+          "name": "plugged_in",
+          "type": "boolean",
+          "title": {
+            "en": "Plugged in",
+            "sv": "Inkopplad"
+          },
+          "example": true
+        }
+      ]
+    },
+    {
+      "id": "battery_activity_changed",
+      "title": {
+        "en": "The battery activity changed",
+        "sv": "Batteriets aktivitet ändrades"
+      },
+      "hint": {
+        "en": "Battery only. Checked every 5 minutes.",
+        "sv": "Bara för batteri. Kontrolleras var 5:e minut."
+      },
+      "tokens": [
+        {
+          "name": "activity",
+          "type": "string",
+          "title": {
+            "en": "Activity",
+            "sv": "Aktivitet"
+          },
+          "example": "Laddar för Grid Rewards"
+        },
+        {
+          "name": "activity_code",
+          "type": "string",
+          "title": {
+            "en": "Activity code",
+            "sv": "Aktivitetskod"
+          },
+          "example": "ChargingForGridRewards"
+        }
+      ]
+    },
+    {
+      "id": "flex_unavailable_for",
+      "title": {
+        "en": "Unavailable for a long time",
+        "sv": "Ej tillgänglig länge"
+      },
+      "titleFormatted": {
+        "en": "Grid Rewards has been unavailable for [[hours]] hours",
+        "sv": "Grid Rewards har varit ej tillgängligt i [[hours]] timmar"
+      },
+      "hint": {
+        "en": "Runs once per unavailable period, when the time passes. Missed time while the app was stopped is not counted twice.",
+        "sv": "Körs en gång per period när tiden passeras. Tid då appen var stoppad räknas inte dubbelt."
+      },
+      "args": [
+        {
+          "type": "number",
+          "name": "hours",
+          "title": {
+            "en": "Hours",
+            "sv": "Timmar"
+          },
+          "min": 0.25,
+          "max": 168,
+          "step": 0.25,
+          "placeholder": {
+            "en": "3",
+            "sv": "3"
+          }
+        }
+      ],
+      "tokens": [
+        {
+          "name": "hours",
+          "type": "number",
+          "title": {
+            "en": "Hours unavailable",
+            "sv": "Timmar ej tillgängligt"
+          },
+          "example": 3
+        },
+        {
+          "name": "reason",
+          "type": "string",
+          "title": {
+            "en": "Reason",
+            "sv": "Orsak"
+          },
+          "example": "Ingen bil inkopplad"
+        },
+        {
+          "name": "reason_code",
+          "type": "string",
+          "title": {
+            "en": "Reason code",
+            "sv": "Orsakskod"
+          },
+          "example": "noVehiclesPluggedIn"
+        }
+      ]
+    }
+  ],
+  "conditions": [
+    {
+      "id": "flex_plugged_in",
+      "title": {
+        "en": "The car !{{is|is not}} plugged in",
+        "sv": "Bilen !{{är|är inte}} inkopplad"
+      }
+    },
+    {
+      "id": "flex_available",
+      "title": {
+        "en": "Grid Rewards !{{is|is not}} available",
+        "sv": "Grid Rewards !{{är|är inte}} tillgängligt"
+      },
+      "hint": {
+        "en": "Available or delivering",
+        "sv": "Tillgänglig eller levererar"
+      }
+    },
+    {
+      "id": "flex_state_is",
+      "title": {
+        "en": "Grid Rewards status !{{is|is not}} …",
+        "sv": "Grid Rewards-status !{{är|är inte}} …"
+      },
+      "titleFormatted": {
+        "en": "Grid Rewards status !{{is|is not}} [[state]]",
+        "sv": "Grid Rewards-status !{{är|är inte}} [[state]]"
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "state",
+          "title": {
+            "en": "Status",
+            "sv": "Status"
+          },
+          "values": [
+            {
+              "id": "available",
+              "title": {
+                "en": "Available",
+                "sv": "Tillgänglig"
+              }
+            },
+            {
+              "id": "unavailable",
+              "title": {
+                "en": "Unavailable",
+                "sv": "Ej tillgänglig"
+              }
+            },
+            {
+              "id": "delivering",
+              "title": {
+                "en": "Delivering",
+                "sv": "Levererar"
+              }
+            },
+            {
+              "id": "unknown",
+              "title": {
+                "en": "Unknown",
+                "sv": "Okänd"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

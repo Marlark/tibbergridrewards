@@ -9,59 +9,21 @@ Samlade idéer på förbättringar. Fyll på fritt. Flytta en idé till "Att gö
 
 ## Prioriterat
 
-<!-- #1 klar 2026-11-17 -->
-1. **#20 Larma när API:t ändras.** Den största risken med appen. Utan larm försöker den tyst återansluta i all evighet.
-2. **#6 Dagssammanfattning.** Stort värde för liten insats: notiser och dagliga energianalyser.
-3. **#5 Översätt orsakerna.** Koderna är nu kända från inspelningen 2026-11-17 (se #5 nedan).
-4. **#11 Bil och batteri som egna enheter.** Det största nästa steget. Datan finns redan i subscriptionen (en bil och ett Huawei-batteri i inspelningen).
+Inget valt just nu.
 
 ---
 
-## 1. Rätt siffror
+## Flow-kort
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-<!-- #1 Vänta in ersättningen när en session slutar: klar 2026-11-17 -->
-| 2 | **Valuta från Tibber** | ★★ | S | `rewardCurrency` hämtas men används inte. Enheten är hårdkodad till "kr", vilket blir fel för användare i Norge eller med euro. Sätt enheten med `setCapabilityOptions` vid första uppdateringen. |
-| 3 | **Visa senaste sessionen** | ★★ | S | `tracker.lastSession` (ersättning, minuter, sluttid) sparas redan men visas ingenstans. Lägg till capabilities som `grid_reward_last_session` och "senast levererat". |
-| 4 | **Antal sessioner och leveranstid per dag/månad** | ★★ | S | Räknas i `RewardTracker` med samma dygns- och månadslogik. Bra att ha i Insights. |
-| 5 | **Översätt orsakerna** | ★★ | S | `grid_reward_reason` visar Tibbers råa koder. Sedda i inspelningen 2026-11-17: `available`, `excess`, `shortage`, `other` (hemmet) och `noVehiclesPluggedIn` (bilen). Översätt dem till svenska och engelska och låt okända koder passera som de är. |
+| 5 | **Ny ersättning registrerad** | ★ | S | Trigger när `rewardCurrentMonth` ökar, med token för ökningen i kr. Risk för brus: värdet ändras vid ungefär varannan uppdatering under en session. |
 
-## 2. Flow-kort
+## Stabilitet
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 6 | **Dagssammanfattning** | ★★★ | S | Trigger "Dagens Grid Rewards" vid dygnsbytet med tokens: ersättning idag, antal sessioner, minuter. Gör det enkelt att skicka en notis eller logga till Google Sheets. |
-| 7 | **Tröskelkort** | ★★ | S | Trigger "Ersättningen idag/månad passerade X kr". Villkor "Ersättningen idag är över X kr". |
-| 8 | **Villkor: status är …** | ★★ | S | Ett villkor med dropdown (tillgänglig / ej tillgänglig / levererar). Ersätter flera flöden på `state_changed`. |
-| 9 | **Ej tillgänglig för länge** | ★★ | S | Trigger när status har varit `unavailable` längre än X timmar. Fångar t.ex. att bilen inte är inkopplad eller att smartladdning är avstängd. |
-| 10 | **Ny ersättning registrerad** | ★ | S | Trigger när `rewardCurrentMonth` ökar, med token för ökningen i kr. |
-
-## 3. Nya enheter och data (fas 2)
-
-| # | Idé | Värde | Insats | Anteckning |
-|---|---|---|---|---|
-| 11 | **flexDevices som egna enheter** | ★★★ | L | Bil och batteri finns redan i subscriptionen (`flexDevices`). En enhet per fordon/batteri med status, `isPluggedIn` och `isSmartChargingEnabled`. Ger villkor som "bilen är inkopplad". |
-| 12 | **Husbatteriet** | ★★ | L | Besparing, aktivitetsorsak och planerat schema via GraphQL med polling var 5:e minut (står redan i README). |
-| 13 | **Varför är jag inte tillgänglig?** | ★★ | M | Kombinera `reasons` från flexDevices till en tydlig text: "Bilen är inte inkopplad" i stället för en kod. |
-
-## 4. Visa upp datan
-
-| # | Idé | Värde | Insats | Anteckning |
-|---|---|---|---|---|
-| 14 | **Dashboard-widget** | ★★★ | M | Homey Pro-widget: status, ersättning idag, månad och pågående session med en enkel stapel per dag. |
-| 15 | **Sessionshistorik** | ★★ | M | Spara de senaste ca 100 sessionerna (start, slut, ersättning, orsak) och visa dem på en inställningssida eller i widgeten. |
-| 16 | **Månadsrapport** | ★ | S | Trigger vid månadsskiftet med förra månadens total. Kan skickas som notis. |
-
-## 5. Stabilitet och säkerhet
-
-| # | Idé | Värde | Insats | Anteckning |
-|---|---|---|---|---|
-| 17 | **En inloggning och anslutning per konto** | ★★ | M | Idag loggar varje hem in och öppnar en egen WebSocket. Dela klient och anslutning per e-post och starta en subscription per hem på samma socket (`graphql-transport-ws` stöder flera id:n). |
-| 18 | **Undvik att spara lösenordet** | ★★ | M | Undersök om login-svaret innehåller en refresh-token eller om JWT:n lever länge. Spara i så fall bara token och be om lösenord vid reparation. |
-| 19 | **Status för anslutningen** | ★★ | S | Visa "senast uppdaterad" och anslutningsstatus i enhetens inställningar, så felsökning inte kräver loggar. |
-| 20 | **Larma när API:t ändras** | ★★ | S | Om GraphQL svarar med schemafel ska enheten bli otillgänglig med ett tydligt meddelande ("Tibber har ändrat sitt API") i stället för att tyst återansluta i all evighet. |
-| 21 | **Kontrollera `compatibility`** | ★ | S | `fetch` och `AbortSignal.timeout` kräver Node 18+. Sätt lägsta Homey-version därefter. |
+| 6 | **En inloggning och anslutning per konto** | ★★ | M | Idag loggar varje hem in och öppnar en egen WebSocket. Dela klient och anslutning per e-post och starta en subscription per hem på samma socket (`graphql-transport-ws` stöder flera id:n). Spelar bara roll med flera hem. |
 
 ---
 
@@ -71,4 +33,26 @@ Samlade idéer på förbättringar. Fyll på fritt. Flytta en idé till "Att gö
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 22 | | | | |
+| 8 | | | | |
+
+---
+
+## Parkerat
+
+| # | Idé | Varför parkerad |
+|---|---|---|
+| 7 | **Undvik att spara lösenordet** | Utrett 2026-11-17 med `tools/inspect-login.js`. Inloggningen ger en `refreshToken`, men förnyelse mot `thewall.tibber.com/connect/token` ger `invalid_client`: den kräver Tibber-appens klienthemlighet, som bara finns på Tibbers server. Någon dokumenterad förnyelse via `app.tibber.com` finns inte. Tas upp igen om en sådan dyker upp (t.ex. i Home Assistant-integrationen). |
+
+---
+
+## Klart
+
+Byggt 2026-11-17 (detaljer i [CHANGELOG.md](../CHANGELOG.md)):
+
+- **Rätt siffror:** vänta in Tibbers avräkning när en session slutar
+- **Enheter:** bil och batteri som egna enheter; husbatteriets besparing, aktivitet och planerade laddning
+- **Statistik:** senaste session, sessioner och leveranstid per dag och månad; sessionshistorik på appens inställningssida
+- **Flow-kort:** dagssammanfattning; ej tillgänglig länge; villkor "status är …"
+- **Visning:** översatta orsaker; dashboard-widget; anslutningsstatus i enhetens inställningar
+- **Stabilitet:** larm när Tibbers API ändras; rätt `compatibility` (`>=12.3.0`)
+- **Senare samma dag:** tröskelkort; månadsrapport; bilens/batteriets orsak på hemmet; valuta från Tibber

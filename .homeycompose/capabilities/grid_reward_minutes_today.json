@@ -1,0 +1,16 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Delivery time today",
+    "sv": "Leveranstid idag"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 0,
+  "units": {
+    "en": "min"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

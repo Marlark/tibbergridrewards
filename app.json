@@ -2,7 +2,7 @@
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "se.ted.tibbergridrewards",
   "version": "0.1.0",
-  "compatibility": ">=5.0.0",
+  "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
     "local"
@@ -28,8 +28,186 @@
     "name": "Ted"
   },
   "brandColor": "#0F2742",
+  "api": {
+    "getHistory": {
+      "method": "GET",
+      "path": "/history"
+    }
+  },
   "flow": {
     "triggers": [
+      {
+        "id": "flex_state_changed",
+        "title": {
+          "en": "Grid Rewards status changed",
+          "sv": "Grid Rewards-status ändrades"
+        },
+        "tokens": [
+          {
+            "name": "state",
+            "type": "string",
+            "title": {
+              "en": "Status",
+              "sv": "Status"
+            },
+            "example": "unavailable"
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "title": {
+              "en": "Reason",
+              "sv": "Orsak"
+            },
+            "example": "Ingen bil inkopplad"
+          },
+          {
+            "name": "reason_code",
+            "type": "string",
+            "title": {
+              "en": "Reason code",
+              "sv": "Orsakskod"
+            },
+            "example": "noVehiclesPluggedIn"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_plugged_in_changed",
+        "title": {
+          "en": "The car was plugged in or unplugged",
+          "sv": "Bilen kopplades in eller ur"
+        },
+        "tokens": [
+          {
+            "name": "plugged_in",
+            "type": "boolean",
+            "title": {
+              "en": "Plugged in",
+              "sv": "Inkopplad"
+            },
+            "example": true
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "battery_activity_changed",
+        "title": {
+          "en": "The battery activity changed",
+          "sv": "Batteriets aktivitet ändrades"
+        },
+        "hint": {
+          "en": "Battery only. Checked every 5 minutes.",
+          "sv": "Bara för batteri. Kontrolleras var 5:e minut."
+        },
+        "tokens": [
+          {
+            "name": "activity",
+            "type": "string",
+            "title": {
+              "en": "Activity",
+              "sv": "Aktivitet"
+            },
+            "example": "Laddar för Grid Rewards"
+          },
+          {
+            "name": "activity_code",
+            "type": "string",
+            "title": {
+              "en": "Activity code",
+              "sv": "Aktivitetskod"
+            },
+            "example": "ChargingForGridRewards"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_unavailable_for",
+        "title": {
+          "en": "Unavailable for a long time",
+          "sv": "Ej tillgänglig länge"
+        },
+        "titleFormatted": {
+          "en": "Grid Rewards has been unavailable for [[hours]] hours",
+          "sv": "Grid Rewards har varit ej tillgängligt i [[hours]] timmar"
+        },
+        "hint": {
+          "en": "Runs once per unavailable period, when the time passes. Missed time while the app was stopped is not counted twice.",
+          "sv": "Körs en gång per period när tiden passeras. Tid då appen var stoppad räknas inte dubbelt."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "sv": "Timmar"
+            },
+            "min": 0.25,
+            "max": 168,
+            "step": 0.25,
+            "placeholder": {
+              "en": "3",
+              "sv": "3"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours unavailable",
+              "sv": "Timmar ej tillgängligt"
+            },
+            "example": 3
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "title": {
+              "en": "Reason",
+              "sv": "Orsak"
+            },
+            "example": "Ingen bil inkopplad"
+          },
+          {
+            "name": "reason_code",
+            "type": "string",
+            "title": {
+              "en": "Reason code",
+              "sv": "Orsakskod"
+            },
+            "example": "noVehiclesPluggedIn"
+          }
+        ]
+      },
       {
         "id": "state_changed",
         "title": {
@@ -53,7 +231,16 @@
               "en": "Reason",
               "sv": "Orsak"
             },
-            "example": "frequencyRegulation"
+            "example": "Överskott av el i nätet"
+          },
+          {
+            "name": "reason_code",
+            "type": "string",
+            "title": {
+              "en": "Reason code",
+              "sv": "Orsakskod"
+            },
+            "example": "excess"
           }
         ],
         "args": [
@@ -78,7 +265,16 @@
               "en": "Reason",
               "sv": "Orsak"
             },
-            "example": "frequencyRegulation"
+            "example": "Överskott av el i nätet"
+          },
+          {
+            "name": "reason_code",
+            "type": "string",
+            "title": {
+              "en": "Reason code",
+              "sv": "Orsakskod"
+            },
+            "example": "excess"
           }
         ],
         "args": [
@@ -122,9 +318,369 @@
             "filter": "driver_id=grid-reward"
           }
         ]
+      },
+      {
+        "id": "daily_summary",
+        "title": {
+          "en": "Daily Grid Rewards summary",
+          "sv": "Dagens Grid Rewards-sammanfattning"
+        },
+        "hint": {
+          "en": "Runs at midnight with the totals for the day that ended. A session is counted on the day it ends.",
+          "sv": "Körs vid midnatt med summan för dagen som tog slut. En session räknas till dagen den slutar."
+        },
+        "tokens": [
+          {
+            "name": "reward",
+            "type": "number",
+            "title": {
+              "en": "Reward (kr)",
+              "sv": "Ersättning (kr)"
+            },
+            "example": 16.64
+          },
+          {
+            "name": "sessions",
+            "type": "number",
+            "title": {
+              "en": "Sessions",
+              "sv": "Sessioner"
+            },
+            "example": 9
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "title": {
+              "en": "Delivery time (min)",
+              "sv": "Leveranstid (min)"
+            },
+            "example": 438
+          },
+          {
+            "name": "date",
+            "type": "string",
+            "title": {
+              "en": "Date",
+              "sv": "Datum"
+            },
+            "example": "2026-11-17"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
+      },
+      {
+        "id": "unavailable_for",
+        "title": {
+          "en": "Unavailable for a long time",
+          "sv": "Ej tillgänglig länge"
+        },
+        "titleFormatted": {
+          "en": "Grid Rewards has been unavailable for [[hours]] hours",
+          "sv": "Grid Rewards har varit ej tillgängligt i [[hours]] timmar"
+        },
+        "hint": {
+          "en": "Runs once per unavailable period, when the time passes. Missed time while the app was stopped is not counted twice.",
+          "sv": "Körs en gång per period när tiden passeras. Tid då appen var stoppad räknas inte dubbelt."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          },
+          {
+            "type": "number",
+            "name": "hours",
+            "title": {
+              "en": "Hours",
+              "sv": "Timmar"
+            },
+            "min": 0.25,
+            "max": 168,
+            "step": 0.25,
+            "placeholder": {
+              "en": "3",
+              "sv": "3"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours unavailable",
+              "sv": "Timmar ej tillgängligt"
+            },
+            "example": 3
+          },
+          {
+            "name": "reason",
+            "type": "string",
+            "title": {
+              "en": "Reason",
+              "sv": "Orsak"
+            },
+            "example": "Ingen bil inkopplad"
+          },
+          {
+            "name": "reason_code",
+            "type": "string",
+            "title": {
+              "en": "Reason code",
+              "sv": "Orsakskod"
+            },
+            "example": "noVehiclesPluggedIn"
+          }
+        ]
+      },
+      {
+        "id": "reward_today_passed",
+        "title": {
+          "en": "Reward today passed an amount",
+          "sv": "Ersättningen idag passerade ett belopp"
+        },
+        "titleFormatted": {
+          "en": "Reward today passed [[amount]]",
+          "sv": "Ersättningen idag passerade [[amount]]"
+        },
+        "hint": {
+          "en": "Runs once per day, when the amount is passed.",
+          "sv": "Körs en gång per dag, när beloppet passeras."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          },
+          {
+            "type": "number",
+            "name": "amount",
+            "title": {
+              "en": "Amount",
+              "sv": "Belopp"
+            },
+            "min": 0,
+            "step": 0.5,
+            "placeholder": {
+              "en": "10",
+              "sv": "10"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "today",
+            "type": "number",
+            "title": {
+              "en": "Reward today",
+              "sv": "Ersättning idag"
+            },
+            "example": 10.25
+          }
+        ]
+      },
+      {
+        "id": "reward_month_passed",
+        "title": {
+          "en": "Reward this month passed an amount",
+          "sv": "Ersättningen denna månad passerade ett belopp"
+        },
+        "titleFormatted": {
+          "en": "Reward this month passed [[amount]]",
+          "sv": "Ersättningen denna månad passerade [[amount]]"
+        },
+        "hint": {
+          "en": "Runs once per month, when the amount is passed.",
+          "sv": "Körs en gång per månad, när beloppet passeras."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          },
+          {
+            "type": "number",
+            "name": "amount",
+            "title": {
+              "en": "Amount",
+              "sv": "Belopp"
+            },
+            "min": 0,
+            "step": 0.5,
+            "placeholder": {
+              "en": "10",
+              "sv": "10"
+            }
+          }
+        ],
+        "tokens": [
+          {
+            "name": "month",
+            "type": "number",
+            "title": {
+              "en": "Reward this month",
+              "sv": "Ersättning denna månad"
+            },
+            "example": 500.5
+          }
+        ]
+      },
+      {
+        "id": "monthly_summary",
+        "title": {
+          "en": "Monthly Grid Rewards summary",
+          "sv": "Månadens Grid Rewards-sammanfattning"
+        },
+        "hint": {
+          "en": "Runs at midnight when a new month starts, with the totals for the month that ended.",
+          "sv": "Körs vid midnatt när en ny månad börjar, med summan för månaden som tog slut."
+        },
+        "tokens": [
+          {
+            "name": "reward",
+            "type": "number",
+            "title": {
+              "en": "Reward",
+              "sv": "Ersättning"
+            },
+            "example": 679.69
+          },
+          {
+            "name": "sessions",
+            "type": "number",
+            "title": {
+              "en": "Sessions",
+              "sv": "Sessioner"
+            },
+            "example": 270
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "title": {
+              "en": "Delivery time (min)",
+              "sv": "Leveranstid (min)"
+            },
+            "example": 13140
+          },
+          {
+            "name": "month",
+            "type": "string",
+            "title": {
+              "en": "Month",
+              "sv": "Månad"
+            },
+            "example": "2026-11"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
       }
     ],
     "conditions": [
+      {
+        "id": "flex_plugged_in",
+        "title": {
+          "en": "The car !{{is|is not}} plugged in",
+          "sv": "Bilen !{{är|är inte}} inkopplad"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_available",
+        "title": {
+          "en": "Grid Rewards !{{is|is not}} available",
+          "sv": "Grid Rewards !{{är|är inte}} tillgängligt"
+        },
+        "hint": {
+          "en": "Available or delivering",
+          "sv": "Tillgänglig eller levererar"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_state_is",
+        "title": {
+          "en": "Grid Rewards status !{{is|is not}} …",
+          "sv": "Grid Rewards-status !{{är|är inte}} …"
+        },
+        "titleFormatted": {
+          "en": "Grid Rewards status !{{is|is not}} [[state]]",
+          "sv": "Grid Rewards-status !{{är|är inte}} [[state]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          },
+          {
+            "type": "dropdown",
+            "name": "state",
+            "title": {
+              "en": "Status",
+              "sv": "Status"
+            },
+            "values": [
+              {
+                "id": "available",
+                "title": {
+                  "en": "Available",
+                  "sv": "Tillgänglig"
+                }
+              },
+              {
+                "id": "unavailable",
+                "title": {
+                  "en": "Unavailable",
+                  "sv": "Ej tillgänglig"
+                }
+              },
+              {
+                "id": "delivering",
+                "title": {
+                  "en": "Delivering",
+                  "sv": "Levererar"
+                }
+              },
+              {
+                "id": "unknown",
+                "title": {
+                  "en": "Unknown",
+                  "sv": "Okänd"
+                }
+              }
+            ]
+          }
+        ]
+      },
       {
         "id": "is_delivering",
         "title": {
@@ -138,10 +694,141 @@
             "filter": "driver_id=grid-reward"
           }
         ]
+      },
+      {
+        "id": "state_is",
+        "title": {
+          "en": "Grid Rewards status !{{is|is not}} …",
+          "sv": "Grid Rewards-status !{{är|är inte}} …"
+        },
+        "titleFormatted": {
+          "en": "Grid Rewards status !{{is|is not}} [[state]]",
+          "sv": "Grid Rewards-status !{{är|är inte}} [[state]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          },
+          {
+            "type": "dropdown",
+            "name": "state",
+            "title": {
+              "en": "Status",
+              "sv": "Status"
+            },
+            "values": [
+              {
+                "id": "available",
+                "title": {
+                  "en": "Available",
+                  "sv": "Tillgänglig"
+                }
+              },
+              {
+                "id": "unavailable",
+                "title": {
+                  "en": "Unavailable",
+                  "sv": "Ej tillgänglig"
+                }
+              },
+              {
+                "id": "delivering",
+                "title": {
+                  "en": "Delivering",
+                  "sv": "Levererar"
+                }
+              },
+              {
+                "id": "unknown",
+                "title": {
+                  "en": "Unknown",
+                  "sv": "Okänd"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "reward_today_above",
+        "title": {
+          "en": "Reward today !{{is|is not}} above an amount",
+          "sv": "Ersättningen idag !{{är|är inte}} över ett belopp"
+        },
+        "titleFormatted": {
+          "en": "Reward today !{{is|is not}} above [[amount]]",
+          "sv": "Ersättningen idag !{{är|är inte}} över [[amount]]"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          },
+          {
+            "type": "number",
+            "name": "amount",
+            "title": {
+              "en": "Amount",
+              "sv": "Belopp"
+            },
+            "min": 0,
+            "step": 0.5,
+            "placeholder": {
+              "en": "10",
+              "sv": "10"
+            }
+          }
+        ]
       }
     ]
   },
   "drivers": [
+    {
+      "name": {
+        "en": "Car / battery (Grid Rewards)",
+        "sv": "Bil / batteri (Grid Rewards)"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "grid_reward_state",
+        "grid_reward_reason",
+        "flex_plugged_in",
+        "flex_smart_enabled",
+        "battery_savings_today",
+        "battery_savings_week",
+        "battery_savings_month",
+        "battery_activity",
+        "battery_next_activity"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "images": {
+        "small": "/drivers/flex-device/assets/images/small.png",
+        "large": "/drivers/flex-device/assets/images/large.png",
+        "xlarge": "/drivers/flex-device/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "list_devices",
+          "template": "list_devices",
+          "navigation": {
+            "next": "add_devices"
+          }
+        },
+        {
+          "id": "add_devices",
+          "template": "add_devices"
+        }
+      ],
+      "id": "flex-device"
+    },
     {
       "name": {
         "en": "Grid Rewards",
@@ -155,7 +842,11 @@
         "grid_reward_session",
         "grid_reward_today",
         "grid_reward_month",
-        "grid_reward_all_time"
+        "grid_reward_all_time",
+        "grid_reward_last_session",
+        "grid_reward_sessions_today",
+        "grid_reward_minutes_today",
+        "grid_reward_sessions_month"
       ],
       "platforms": [
         "local"
@@ -213,6 +904,51 @@
         {
           "type": "group",
           "label": {
+            "en": "Connection status",
+            "sv": "Anslutningsstatus"
+          },
+          "children": [
+            {
+              "id": "conn_status",
+              "type": "label",
+              "label": {
+                "en": "Connection",
+                "sv": "Anslutning"
+              },
+              "value": "–"
+            },
+            {
+              "id": "conn_last_update",
+              "type": "label",
+              "label": {
+                "en": "Last update from Tibber",
+                "sv": "Senaste uppdatering från Tibber"
+              },
+              "value": "–"
+            },
+            {
+              "id": "conn_connected_since",
+              "type": "label",
+              "label": {
+                "en": "Connected since",
+                "sv": "Ansluten sedan"
+              },
+              "value": "–"
+            },
+            {
+              "id": "conn_reconnects",
+              "type": "label",
+              "label": {
+                "en": "Reconnects since app start",
+                "sv": "Återanslutningar sedan appstart"
+              },
+              "value": "–"
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
             "en": "Developer",
             "sv": "Utvecklare"
           },
@@ -236,7 +972,141 @@
       "id": "grid-reward"
     }
   ],
+  "widgets": {
+    "grid-rewards": {
+      "name": {
+        "en": "Grid Rewards",
+        "sv": "Grid Rewards"
+      },
+      "height": 196,
+      "settings": [],
+      "devices": {
+        "type": "app",
+        "singular": true,
+        "filter": {
+          "capabilities": "grid_reward_today"
+        }
+      },
+      "api": {
+        "getStatus": {
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "id": "grid-rewards"
+    }
+  },
   "capabilities": {
+    "battery_activity": {
+      "type": "string",
+      "title": {
+        "en": "Battery activity",
+        "sv": "Batteriets aktivitet"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/battery.svg"
+    },
+    "battery_next_activity": {
+      "type": "string",
+      "title": {
+        "en": "Next planned",
+        "sv": "Nästa planerade"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/battery.svg"
+    },
+    "battery_savings_month": {
+      "type": "number",
+      "title": {
+        "en": "Battery savings this month",
+        "sv": "Batteribesparing denna månad"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "battery_savings_today": {
+      "type": "number",
+      "title": {
+        "en": "Battery savings today",
+        "sv": "Batteribesparing idag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "battery_savings_week": {
+      "type": "number",
+      "title": {
+        "en": "Battery savings this week",
+        "sv": "Batteribesparing denna vecka"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "flex_plugged_in": {
+      "type": "boolean",
+      "title": {
+        "en": "Plugged in",
+        "sv": "Inkopplad"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "icon": "/assets/plug.svg",
+      "insightsTitleTrue": {
+        "en": "Plugged in",
+        "sv": "Kopplades in"
+      },
+      "insightsTitleFalse": {
+        "en": "Unplugged",
+        "sv": "Kopplades ur"
+      }
+    },
+    "flex_smart_enabled": {
+      "type": "boolean",
+      "title": {
+        "en": "Smart control on",
+        "sv": "Smart styrning på"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": true,
+      "icon": "/assets/reward.svg",
+      "insightsTitleTrue": {
+        "en": "Smart control turned on",
+        "sv": "Smart styrning slogs på"
+      },
+      "insightsTitleFalse": {
+        "en": "Smart control turned off",
+        "sv": "Smart styrning slogs av"
+      }
+    },
     "grid_reward_active": {
       "type": "boolean",
       "title": {
@@ -269,6 +1139,38 @@
       "decimals": 2,
       "units": {
         "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_last_session": {
+      "type": "number",
+      "title": {
+        "en": "Last session",
+        "sv": "Senaste session"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_minutes_today": {
+      "type": "number",
+      "title": {
+        "en": "Delivery time today",
+        "sv": "Leveranstid idag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 0,
+      "units": {
+        "en": "min"
       },
       "insights": true,
       "icon": "/assets/reward.svg"
@@ -313,6 +1215,32 @@
       "units": {
         "en": "kr"
       },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_sessions_month": {
+      "type": "number",
+      "title": {
+        "en": "Sessions this month",
+        "sv": "Sessioner denna månad"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 0,
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_sessions_today": {
+      "type": "number",
+      "title": {
+        "en": "Sessions today",
+        "sv": "Sessioner idag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 0,
       "insights": true,
       "icon": "/assets/reward.svg"
     },
