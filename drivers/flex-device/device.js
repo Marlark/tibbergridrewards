@@ -2,15 +2,14 @@
 
 const Homey = require('homey');
 const { reasonText } = require('../../lib/reasons');
-const unavailable = require('../../lib/unavailable');
-const { unitFor } = require('../../lib/currency');
-
-const SAVINGS_CAPABILITIES = ['battery_savings_today', 'battery_savings_week', 'battery_savings_month'];
+const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
 const { TibberApiChangedError } = require('../../lib/TibberAppClient');
 const { localDayKey } = require('../../lib/RewardTracker');
 const {
   POLL_MS, BATTERY_QUERY, batteryVariables, parseBattery, humanize,
 } = require('../../lib/battery');
+
+const SAVINGS_CAPABILITIES = ['battery_savings_today', 'battery_savings_week', 'battery_savings_month'];
 
 const BATTERY_CAPABILITIES = [
   'battery_savings_today',
@@ -34,7 +33,7 @@ class FlexDevice extends Homey.Device {
     this.lastActivityCode = null;
     this.lastReason = { text: '', code: '' };
     // "Unavailable for X hours", e.g. the car has not been plugged in.
-    this.unavail = unavailable.restore(this.getStoreValue('unavailableSince'), Date.now());
+    this.unavailWatch = new UnavailableWatch(this, 'flex_unavailable_for');
     this.unavailTimer = this.homey.setInterval(
       () => this._checkUnavailable(this.lastGridState).catch(this.error), 60 * 1000,
     );
@@ -83,17 +82,13 @@ class FlexDevice extends Homey.Device {
 
     const text = reasonText(this.homey, f.reasonCodes);
     const code = f.reasonCodes.join(', ');
-    const sets = [
-      this.setCapabilityValue('grid_reward_state', f.gridState),
-      this.setCapabilityValue('grid_reward_reason', text || '-'),
-    ];
-    if (f.smartEnabled !== null && this.hasCapability('flex_smart_enabled')) {
-      sets.push(this.setCapabilityValue('flex_smart_enabled', f.smartEnabled));
-    }
-    if (f.pluggedIn !== null && this.hasCapability('flex_plugged_in')) {
-      sets.push(this.setCapabilityValue('flex_plugged_in', f.pluggedIn));
-    }
-    await Promise.all(sets);
+    // Car/battery data changed in only 24 of 209 updates on a real day.
+    await setIfChanged(this, {
+      grid_reward_state: f.gridState,
+      grid_reward_reason: text || '-',
+      flex_smart_enabled: f.smartEnabled,
+      flex_plugged_in: f.pluggedIn,
+    });
 
     this.lastReason = { text, code };
     const stateChanged = f.gridState !== this.lastGridState;
@@ -116,17 +111,7 @@ class FlexDevice extends Homey.Device {
   }
 
   async _checkUnavailable(gridState) {
-    const r = unavailable.step(this.unavail, gridState, Date.now());
-    if (r.watch.since !== this.unavail.since) await this.setStoreValue('unavailableSince', r.watch.since);
-    this.unavail = r.watch;
-    if (!r.fire) return;
-    await this.homey.flow.getDeviceTriggerCard('flex_unavailable_for')
-      .trigger(this, {
-        hours: Math.round((r.fire.toMin / 60) * 10) / 10,
-        reason: this.lastReason.text,
-        reason_code: this.lastReason.code,
-      }, r.fire)
-      .catch(this.error);
+    await this.unavailWatch.check(gridState, this.lastReason);
   }
 
   // --- Battery details ---
@@ -152,19 +137,16 @@ class FlexDevice extends Homey.Device {
       return;
     }
     await this.unsetWarning().catch(this.error);
-    await this._applyUnit(parsed.unit);
+    await applyCurrency(this, SAVINGS_CAPABILITIES, parsed.unit);
 
     const activityText = parsed.activity ? this._activityText(parsed.activity.code) : '-';
-    const values = {
+    await setIfChanged(this, {
       battery_savings_today: parsed.savingsToday,
       battery_savings_week: parsed.savingsWeek,
       battery_savings_month: parsed.savingsMonth,
       battery_activity: activityText,
       battery_next_activity: this._nextText(parsed.nextPlanned),
-    };
-    await Promise.all(Object.entries(values)
-      .filter(([cap, v]) => v !== null && this.hasCapability(cap))
-      .map(([cap, v]) => this.setCapabilityValue(cap, v)));
+    });
 
     const code = parsed.activity ? parsed.activity.code : '';
     if (this.lastActivityCode !== null && code !== this.lastActivityCode) {
@@ -173,17 +155,6 @@ class FlexDevice extends Homey.Device {
         .catch(this.error);
     }
     this.lastActivityCode = code;
-  }
-
-  /** Savings unit from Tibber: an ISO code (SEK, EUR) becomes kr / €, anything else is used as is. */
-  async _applyUnit(raw) {
-    if (!raw) return;
-    const unit = /^[A-Z]{3}$/.test(raw) ? unitFor(raw) : raw;
-    if (unit === this.getStoreValue('currencyUnit')) return;
-    for (const cap of SAVINGS_CAPABILITIES) {
-      if (this.hasCapability(cap)) await this.setCapabilityOptions(cap, { units: { en: unit } }).catch(this.error);
-    }
-    await this.setStoreValue('currencyUnit', unit);
   }
 
   /** Translated activity, or a readable version of an unknown code. */

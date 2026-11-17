@@ -7,8 +7,7 @@ const {
   parseStatus, parseFlex, applyUpdate, settle, rollDayEvents, statsOf, localDayKey, SETTLE_MS,
 } = require('../../lib/RewardTracker');
 const { reasonText } = require('../../lib/reasons');
-const unavailable = require('../../lib/unavailable');
-const { unitFor } = require('../../lib/currency');
+const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
 
 // Capabilities shown in money; their unit follows Tibber's rewardCurrency.
 const MONEY_CAPABILITIES = [
@@ -48,7 +47,9 @@ class GridRewardDevice extends Homey.Device {
       monthKey: this.tracker.monthKey,
     };
     // "Unavailable for X hours"; the start time survives restarts.
-    this.unavail = unavailable.restore(this.getStoreValue('unavailableSince'), Date.now());
+    this.unavailWatch = new UnavailableWatch(this, 'unavailable_for');
+    // Last saved tracker, to skip store writes when nothing changed (about half of all updates).
+    this._savedTracker = JSON.stringify(this.tracker);
     // Connection status shown in the device settings.
     this.conn = {
       state: 'connecting', since: null, lastUpdate: null, reconnects: 0, shownAt: 0,
@@ -141,23 +142,27 @@ class GridRewardDevice extends Homey.Device {
     if (this.tracker.dayKey === key) return;
     const result = rollDayEvents(this.tracker, key);
     this.tracker = result.state;
-    await this.setStoreValue('tracker', this.tracker);
+    await this._saveTracker();
     await this.setCapabilityValue('grid_reward_today', 0);
     await this._publishStats();
     await this._fireEvents(result.events);
   }
 
+  async _saveTracker() {
+    const json = JSON.stringify(this.tracker);
+    if (json === this._savedTracker) return;
+    await this.setStoreValue('tracker', this.tracker);
+    this._savedTracker = json;
+  }
+
   async _publishStats() {
     const st = statsOf(this.tracker, this._dayKey());
-    const values = {
+    await setIfChanged(this, {
       grid_reward_last_session: st.lastSessionReward,
       grid_reward_sessions_today: st.sessionsToday,
       grid_reward_minutes_today: st.minutesToday,
       grid_reward_sessions_month: st.sessionsMonth,
-    };
-    await Promise.all(Object.entries(values)
-      .filter(([cap, v]) => v !== null && this.hasCapability(cap) && this.getCapabilityValue(cap) !== v)
-      .map(([cap, v]) => this.setCapabilityValue(cap, v)));
+    });
   }
 
   async _onStatus(status) {
@@ -180,20 +185,19 @@ class GridRewardDevice extends Homey.Device {
       month, gridState, dayKey: this._dayKey(), now: Date.now(), reason: reason.code,
     });
     this.tracker = result.state;
-    await this.setStoreValue('tracker', this.tracker);
+    await this._saveTracker();
 
-    const sets = [
-      this.setCapabilityValue('grid_reward_state', gridState),
-      this.setCapabilityValue('grid_reward_active', gridState === 'delivering'),
-      this.setCapabilityValue('grid_reward_reason', reason.text || '-'),
-      this.setCapabilityValue('grid_reward_session', result.sessionReward),
-    ];
-    if (month !== null) sets.push(this.setCapabilityValue('grid_reward_month', month));
-    if (result.today !== null) sets.push(this.setCapabilityValue('grid_reward_today', result.today));
-    if (allTime !== null) sets.push(this.setCapabilityValue('grid_reward_all_time', allTime));
-    await Promise.all(sets);
+    await setIfChanged(this, {
+      grid_reward_state: gridState,
+      grid_reward_active: gridState === 'delivering',
+      grid_reward_reason: reason.text || '-',
+      grid_reward_session: result.sessionReward,
+      grid_reward_month: month,
+      grid_reward_today: result.today,
+      grid_reward_all_time: allTime,
+    });
     await this._publishStats();
-    await this._applyCurrency(currency);
+    await applyCurrency(this, MONEY_CAPABILITIES, currency);
 
     // Flow triggers
     await this._checkThresholds(result.today, month);
@@ -276,17 +280,6 @@ class GridRewardDevice extends Homey.Device {
 
   // --- Currency ---
 
-  /** Use Tibber's currency as unit (kr for SEK/NOK/DKK, € for EUR). */
-  async _applyCurrency(currency) {
-    if (!currency) return;
-    const unit = unitFor(currency);
-    if (unit === this.getStoreValue('currencyUnit')) return;
-    for (const cap of MONEY_CAPABILITIES) {
-      if (this.hasCapability(cap)) await this.setCapabilityOptions(cap, { units: { en: unit } }).catch(this.error);
-    }
-    await this.setStoreValue('currencyUnit', unit);
-  }
-
   /** Display unit for money, e.g. for the widget and the history page. */
   getCurrencyUnit() {
     return this.getStoreValue('currencyUnit') || 'kr';
@@ -295,17 +288,7 @@ class GridRewardDevice extends Homey.Device {
   // --- Unavailable for a long time ---
 
   async _checkUnavailable(gridState) {
-    const r = unavailable.step(this.unavail, gridState, Date.now());
-    if (r.watch.since !== this.unavail.since) await this.setStoreValue('unavailableSince', r.watch.since);
-    this.unavail = r.watch;
-    if (!r.fire) return;
-    await this.homey.flow.getDeviceTriggerCard('unavailable_for')
-      .trigger(this, {
-        hours: Math.round((r.fire.toMin / 60) * 10) / 10,
-        reason: this.lastReason.text,
-        reason_code: this.lastReason.code,
-      }, r.fire)
-      .catch(this.error);
+    await this.unavailWatch.check(gridState, this.lastReason);
   }
 
   // --- Session history ---
@@ -397,7 +380,7 @@ class GridRewardDevice extends Homey.Device {
       return;
     }
     this.tracker = result.state;
-    await this.setStoreValue('tracker', this.tracker);
+    await this._saveTracker();
     await this._publishStats();
     await this._fireEvents(result.events);
   }

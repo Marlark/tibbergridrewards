@@ -36,6 +36,7 @@ First version.
 - Monthly summary Flow card when a new month starts: reward, sessions, delivery time, month.
 - When the home is unavailable, the reason from the car/battery (e.g. *No car plugged in*) is shown on the home and in the widget.
 - Currency from Tibber (kr / €) on all money values, battery savings, widget and history.
+- Fewer writes to Homey: values and stored state are only written when they change. On a real day the home device went from 1 502 to 404 capability writes and from 209 to 95 store writes.
 - Tests for the device and driver with a stub of the `homey` module, and GitHub Actions CI running the tests and `homey app validate`.
 - Original icon and images.
 - English and Swedish translations.
