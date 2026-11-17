@@ -7,13 +7,13 @@ Samlade idéer på förbättringar. Fyll på fritt. Flytta en idé till "Att gö
 
 ---
 
-## Prioriterat – topp 5
+## Prioriterat
 
-1. **#1 Vänta in ersättningen när en session slutar.** Annars kan sessionskortet visa 0 kr. Slå på "Spela in rådata" först för att se hur Tibber faktiskt beter sig.
-2. **#20 Larma när API:t ändras.** Den största risken med appen. Utan larm försöker den tyst återansluta i all evighet.
-3. **#6 Dagssammanfattning.** Stort värde för liten insats: notiser och dagliga energianalyser.
-4. **#5 Översätt orsakerna.** Samma inspelning som till #1 visar vilka koder Tibber skickar, så de två görs med fördel tillsammans.
-5. **#11 Bil och batteri som egna enheter.** Det största nästa steget, när grunden är stabil. Datan finns redan i subscriptionen.
+<!-- #1 klar 2026-11-17 -->
+1. **#20 Larma när API:t ändras.** Den största risken med appen. Utan larm försöker den tyst återansluta i all evighet.
+2. **#6 Dagssammanfattning.** Stort värde för liten insats: notiser och dagliga energianalyser.
+3. **#5 Översätt orsakerna.** Koderna är nu kända från inspelningen 2026-11-17 (se #5 nedan).
+4. **#11 Bil och batteri som egna enheter.** Det största nästa steget. Datan finns redan i subscriptionen (en bil och ett Huawei-batteri i inspelningen).
 
 ---
 
@@ -21,11 +21,11 @@ Samlade idéer på förbättringar. Fyll på fritt. Flytta en idé till "Att gö
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 1 | **Vänta in ersättningen när en session slutar** | ★★★ | M | `session_ended` triggas just när status lämnar `delivering`. Tibber räknar troligen fram `rewardCurrentMonth` först efteråt. Vänta på nästa ändring av månadsvärdet (eller max ca 15 min) innan kortet triggas, eller rätta `lastSession` i efterhand. |
+<!-- #1 Vänta in ersättningen när en session slutar: klar 2026-11-17 -->
 | 2 | **Valuta från Tibber** | ★★ | S | `rewardCurrency` hämtas men används inte. Enheten är hårdkodad till "kr", vilket blir fel för användare i Norge eller med euro. Sätt enheten med `setCapabilityOptions` vid första uppdateringen. |
 | 3 | **Visa senaste sessionen** | ★★ | S | `tracker.lastSession` (ersättning, minuter, sluttid) sparas redan men visas ingenstans. Lägg till capabilities som `grid_reward_last_session` och "senast levererat". |
 | 4 | **Antal sessioner och leveranstid per dag/månad** | ★★ | S | Räknas i `RewardTracker` med samma dygns- och månadslogik. Bra att ha i Insights. |
-| 5 | **Översätt orsakerna** | ★★ | S | `grid_reward_reason` visar Tibbers råa värden (`frequencyRegulation`, `vehicleNotPluggedIn`...). Översätt dem till svenska och engelska och låt okända värden passera som de är. Logga vilka värden som faktiskt dyker upp. |
+| 5 | **Översätt orsakerna** | ★★ | S | `grid_reward_reason` visar Tibbers råa koder. Sedda i inspelningen 2026-11-17: `available`, `excess`, `shortage`, `other` (hemmet) och `noVehiclesPluggedIn` (bilen). Översätt dem till svenska och engelska och låt okända koder passera som de är. |
 
 ## 2. Flow-kort
 

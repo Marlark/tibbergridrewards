@@ -69,9 +69,33 @@ test('session_ended carries reward and duration', async (t) => {
   now += 10 * 60000;
   sub.emit('data', status('GridRewardAvailable', 41.5));
   await settle(device);
-  const ended = homey.triggered.find((x) => x.id === 'session_ended');
-  assert.deepStrictEqual(ended.tokens, { reward: 1.5, minutes: 30 });
   assert.strictEqual(device.getCapabilityValue('grid_reward_session'), 0);
+  // Waits for Tibber's settlement of the last quarter
+  assert.strictEqual(homey.triggered.find((x) => x.id === 'session_ended'), undefined);
+  now += 40000;
+  sub.emit('data', status('GridRewardAvailable', 41.6));
+  await settle(device);
+  const ended = homey.triggered.find((x) => x.id === 'session_ended');
+  assert.deepStrictEqual(ended.tokens, { reward: 1.6, minutes: 30 });
+});
+
+test('without a settlement, the timer fires session_ended after SETTLE_MS', async (t) => {
+  let now = Date.parse('2026-11-16T10:00:00Z');
+  t.mock.method(Date, 'now', () => now);
+  const { device, homey, sub } = await makeDevice({ capabilities: { grid_reward_state: 'available' } });
+  sub.emit('data', status('GridRewardDelivering', 40));
+  await settle(device);
+  now += 15 * 60000;
+  sub.emit('data', status('GridRewardAvailable', 41));
+  await settle(device);
+  const timer = homey.timers.find((x) => !x.cleared && x.ms > 3 * 60000 && x.ms < 4 * 60000);
+  assert.ok(timer, 'settle timer scheduled');
+  now += timer.ms;
+  timer.fn();
+  await settle(device);
+  const ended = homey.triggered.find((x) => x.id === 'session_ended');
+  assert.deepStrictEqual(ended.tokens, { reward: 1, minutes: 15 });
+  assert.strictEqual(device.getStoreValue('tracker').pending, null);
 });
 
 test('auth error makes the device unavailable; connected makes it available again', async () => {

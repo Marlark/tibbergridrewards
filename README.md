@@ -57,6 +57,7 @@ Because the values are logged to Insights, daily energy reports can read the Gri
 - Reconnects with exponential backoff (5 s → 5 min). The app pings the server every minute and reconnects if nothing has been received for 3 min.
 - With a wrong password, login is retried only every 6 hours (to avoid locking the account). Repair the device to enter a new password.
 - Updates are processed one at a time per device, so Flow cards are never triggered twice.
+- *Session ended* waits for Tibber to settle the last quarter (about 40 s after the session ends, at most 3 min), so the reward includes it. In real data this added 0.46 kr to 16.19 kr over 9 sessions.
 
 ## Getting started
 
@@ -80,7 +81,7 @@ Every `.jsonl` file in `test/fixtures/` is replayed by `npm test`. The recording
 ## To do before it is "real"
 
 - [ ] Review the icon and images (generated, original design – not Tibber's logo).
-- [ ] Verify against real data: which `reason`/`reasons` values Tibber sends, and whether `rewardCurrentMonth` updates continuously during a session.
+- [ ] Translate the reason codes. Seen in real data: `available`, `excess`, `shortage`, `other` and, for the car, `noVehiclesPluggedIn`. `rewardCurrentMonth` updates continuously during a session.
 - [ ] Phase 2: the home battery (savings, activity reason, planned schedule), via the same GraphQL endpoint with 5-minute polling.
 - [ ] Phase 2: flexDevices (car/battery) as separate devices.
 

@@ -25,8 +25,12 @@ test('session: start, live amount and end with reward and duration', () => {
   r = applyUpdate(r.state, { month: 41.2, gridState: 'delivering', dayKey: '2026-11-16', now: T0 + 5 * 60000 });
   assert.strictEqual(r.sessionReward, 1.2);
   r = applyUpdate(r.state, { month: 41.5, gridState: 'available', dayKey: '2026-11-16', now: T0 + 15 * 60000 });
-  assert.deepStrictEqual(r.events, [{ type: 'session_ended', reward: 1.5, minutes: 15 }]);
+  // Ended, but waiting for Tibber's settlement of the last quarter
+  assert.deepStrictEqual(r.events, []);
   assert.strictEqual(r.sessionReward, 0);
+  r = applyUpdate(r.state, { month: 41.6, gridState: 'available', dayKey: '2026-11-16', now: T0 + 15 * 60000 + 40000 });
+  assert.deepStrictEqual(r.events, [{ type: 'session_ended', reward: 1.6, minutes: 15 }]);
+  assert.deepStrictEqual(r.state.lastSession, { reward: 1.6, minutes: 15, endedAt: T0 + 15 * 60000 });
 });
 
 test('day rollover (even if Homey was offline at midnight)', () => {
@@ -95,4 +99,62 @@ test('old stored state without monthKey: a drop is treated as a reset', () => {
   const r = applyUpdate(old, { month: 0.4, gridState: 'available', dayKey: '2026-12-01', now: T0 });
   assert.strictEqual(r.today, 0.4);
   assert.strictEqual(r.state.monthKey, '2026-12');
+});
+
+// --- Settlement after a session ends (real data: +0.02–0.19 kr about 40 s later) ---
+
+const { settle, SETTLE_MS } = require('../lib/RewardTracker');
+
+const D = '2026-11-16';
+const up = (state, month, gridState, now) => applyUpdate(state, {
+  month, gridState, dayKey: D, now,
+});
+
+function endedSession() {
+  let r = up({}, 10, 'available', T0);
+  r = up(r.state, 10, 'delivering', T0);
+  r = up(r.state, 12, 'delivering', T0 + 10 * 60000);
+  return up(r.state, 12, 'available', T0 + 15 * 60000);
+}
+
+test('settle(): without a settlement, session_ended fires after SETTLE_MS', () => {
+  const r = endedSession();
+  const endedAt = T0 + 15 * 60000;
+  assert.deepStrictEqual(settle(r.state, endedAt + SETTLE_MS - 1).events, []);
+  const s = settle(r.state, endedAt + SETTLE_MS);
+  assert.deepStrictEqual(s.events, [{ type: 'session_ended', reward: 2, minutes: 15 }]);
+  assert.strictEqual(s.state.pending, null);
+});
+
+test('a late update without month change also closes after SETTLE_MS', () => {
+  const r = endedSession();
+  const late = up(r.state, 12, 'available', T0 + 15 * 60000 + SETTLE_MS + 1000);
+  assert.deepStrictEqual(late.events, [{ type: 'session_ended', reward: 2, minutes: 15 }]);
+});
+
+test('a new session started before the settlement does not count it twice', () => {
+  let r = endedSession();
+  r = up(r.state, 12, 'delivering', T0 + 15 * 60000 + 8000); // new session, settlement not here yet
+  assert.deepStrictEqual(r.events, [{ type: 'session_started' }]);
+  r = up(r.state, 12.2, 'delivering', T0 + 15 * 60000 + 40000); // settlement of the first
+  assert.deepStrictEqual(r.events, [{ type: 'session_ended', reward: 2.2, minutes: 15 }]);
+  assert.strictEqual(r.sessionReward, 0);
+  r = up(r.state, 12.5, 'delivering', T0 + 25 * 60000);
+  assert.strictEqual(r.sessionReward, 0.3);
+});
+
+test('two sessions ending without any settlement in between both fire', () => {
+  let r = endedSession();
+  r = up(r.state, 12, 'delivering', T0 + 16 * 60000);
+  r = up(r.state, 12, 'available', T0 + 17 * 60000);
+  assert.deepStrictEqual(r.events, [{ type: 'session_ended', reward: 2, minutes: 15 }]);
+  assert.ok(r.state.pending);
+});
+
+test('month reset while waiting closes the session with what it had', () => {
+  let r = applyUpdate({}, { month: 120, gridState: 'delivering', dayKey: '2026-11-30', now: T0 });
+  r = applyUpdate(r.state, { month: 121, gridState: 'available', dayKey: '2026-11-30', now: T0 + 60000 });
+  r = applyUpdate(r.state, { month: 0.1, gridState: 'available', dayKey: '2026-12-01', now: T0 + 90000 });
+  assert.deepStrictEqual(r.events, [{ type: 'session_ended', reward: 1, minutes: 1 }]);
+  assert.strictEqual(r.today, 0.1);
 });

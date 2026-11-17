@@ -4,7 +4,7 @@ const Homey = require('homey');
 const { TibberAppClient, TibberAuthError } = require('../../lib/TibberAppClient');
 const GridRewardSubscription = require('../../lib/GridRewardSubscription');
 const {
-  parseStatus, applyUpdate, rollDay, localDayKey,
+  parseStatus, applyUpdate, settle, rollDay, localDayKey, SETTLE_MS,
 } = require('../../lib/RewardTracker');
 
 class GridRewardDevice extends Homey.Device {
@@ -21,6 +21,9 @@ class GridRewardDevice extends Homey.Device {
 
     // Roll the day over at midnight even if Tibber sends nothing.
     this.dayTimer = this.homey.setInterval(() => this._enqueue(() => this._tickDay()), 60 * 1000);
+
+    // A session may have ended just before a restart and still await settlement.
+    this._scheduleSettle();
   }
 
   _enqueue(job) {
@@ -99,7 +102,12 @@ class GridRewardDevice extends Homey.Device {
         .trigger(this, { state: gridState, reason: reason || '' })
         .catch(this.error);
     }
-    for (const ev of result.events) {
+    await this._fireEvents(result.events, reason);
+    this._scheduleSettle();
+  }
+
+  async _fireEvents(events, reason = '') {
+    for (const ev of events) {
       if (ev.type === 'session_started') {
         await this.homey.flow.getDeviceTriggerCard('session_started')
           .trigger(this, { reason: reason || '' }).catch(this.error);
@@ -110,9 +118,33 @@ class GridRewardDevice extends Homey.Device {
     }
   }
 
+  // An ended session waits for Tibber's settlement. If no update arrives,
+  // close it after SETTLE_MS so the session_ended card still fires.
+  _scheduleSettle() {
+    const p = this.tracker.pending;
+    if (!p || this.settleTimer) return;
+    const delay = Math.max(0, p.endedAt + SETTLE_MS - Date.now()) + 1000;
+    this.settleTimer = this.homey.setTimeout(() => {
+      this.settleTimer = null;
+      this._enqueue(() => this._settle());
+    }, delay);
+  }
+
+  async _settle() {
+    const result = settle(this.tracker, Date.now());
+    if (!result.events.length) {
+      this._scheduleSettle();
+      return;
+    }
+    this.tracker = result.state;
+    await this.setStoreValue('tracker', this.tracker);
+    await this._fireEvents(result.events);
+  }
+
   async onUninit() {
     if (this.sub) this.sub.stop();
     if (this.dayTimer) this.homey.clearInterval(this.dayTimer);
+    if (this.settleTimer) this.homey.clearTimeout(this.settleTimer);
   }
 
   async onDeleted() {
