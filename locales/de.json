@@ -27,7 +27,8 @@
   },
   "battery_activity": {
     "ChargingForGridRewards": "Lädt für Grid Rewards",
-    "IdleWithUpcomingLowPrice": "Im Leerlauf – wartet auf niedrigeren Strompreis"
+    "IdleWithUpcomingLowPrice": "Im Leerlauf – wartet auf niedrigeren Strompreis",
+    "DischargingForGridRewards": "Entlädt für Grid Rewards"
   },
   "widget": {
     "state": {

@@ -27,7 +27,8 @@
   },
   "battery_activity": {
     "ChargingForGridRewards": "Laadt voor Grid Rewards",
-    "IdleWithUpcomingLowPrice": "Inactief – wacht op lagere stroomprijs"
+    "IdleWithUpcomingLowPrice": "Inactief – wacht op lagere stroomprijs",
+    "DischargingForGridRewards": "Ontlaadt voor Grid Rewards"
   },
   "widget": {
     "state": {
