@@ -2,5 +2,13 @@
   "0.1.0": {
     "en": "First version: real-time Tibber Grid Rewards status, rewards per session, day, month and all time, Insights and Flow cards.",
     "sv": "Första versionen: Tibber Grid Rewards-status i realtid, ersättning per session, dag, månad och totalt, Insights och Flow-kort."
+  },
+  "0.1.1": {
+    "en": "Removed the developer setting \"Record raw data\". It is now only used while developing the app.",
+    "sv": "Utvecklarinställningen \"Spela in rådata\" är borttagen. Den används nu bara när appen utvecklas.",
+    "no": "Utviklerinnstillingen \"Ta opp rådata\" er fjernet. Den brukes nå bare når appen utvikles.",
+    "da": "Udviklerindstillingen \"Optag rådata\" er fjernet. Den bruges nu kun, når appen udvikles.",
+    "de": "Die Entwicklereinstellung \"Rohdaten aufzeichnen\" wurde entfernt. Sie wird jetzt nur noch bei der Entwicklung der App verwendet.",
+    "nl": "De ontwikkelaarsinstelling \"Ruwe gegevens opnemen\" is verwijderd. Die wordt nu alleen nog gebruikt bij het ontwikkelen van de app."
   }
 }
