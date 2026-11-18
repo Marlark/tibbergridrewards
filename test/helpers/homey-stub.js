@@ -126,6 +126,9 @@ class Driver {
 
 class App {}
 
+// Like Homey.env: the contents of env.json. Tests may change it.
+const env = {};
+
 module.exports = {
-  Device, Driver, App, makeHomey,
+  Device, Driver, App, makeHomey, env,
 };

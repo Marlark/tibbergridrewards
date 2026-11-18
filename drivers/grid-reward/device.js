@@ -19,6 +19,17 @@ const MONEY_CAPABILITIES = [
   'grid_reward_last_session',
 ];
 
+/**
+ * Record raw updates only during development: `homey app run` sets DEBUG=1, a
+ * published app never does. Turn it off with "RECORD_RAW": "0" in env.json.
+ */
+function isRecording() {
+  if (process.env.DEBUG !== '1') return false;
+  // Homey.env warns when an unset variable is read, so check the key first.
+  const env = Homey.env || {};
+  return !Object.keys(env).includes('RECORD_RAW') || env.RECORD_RAW !== '0';
+}
+
 const HISTORY_MAX = 100;
 const CONNECTION_SETTINGS_MS = 60 * 1000; // refresh "last update" in settings at most once a minute
 
@@ -167,7 +178,7 @@ class GridRewardDevice extends Homey.Device {
   }
 
   async _onStatus(status) {
-    if (this.getSetting('record_raw')) {
+    if (isRecording()) {
       // One JSON line per update; extract with tools/extract-recording.js
       this.log('[REC]', JSON.stringify({ t: Date.now(), tz: this.homey.clock.getTimezone(), status }));
     }

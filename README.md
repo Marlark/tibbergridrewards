@@ -161,11 +161,10 @@ New battery activity codes are logged as `Unknown battery activity "…"` and sh
 
 To see exactly what Tibber sends, and to turn it into a test:
 
-1. In the home device's settings, turn on **Developer → Record raw data**.
-2. Run the app and save the log: `homey app run | tee run.log`
-3. Extract the recording: `node tools/extract-recording.js run.log > recordings/my-day.jsonl`
-4. Replay it: `node tools/replay.js recordings/my-day.jsonl` prints every update and lists impossible values.
-5. To keep it as a test, anonymise it first: `node tools/anonymize-recording.js recordings/my-day.jsonl > test/fixtures/my-day.jsonl`
+1. Run the app and save the log: `homey app run | tee run.log`. During `homey app run` every update from Tibber is logged as a `[REC]` line; a published app never does this. To run without it, put `{ "RECORD_RAW": "0" }` in `env.json` (ignored by git).
+2. Extract the recording: `node tools/extract-recording.js run.log > recordings/my-day.jsonl`
+3. Replay it: `node tools/replay.js recordings/my-day.jsonl` prints every update and lists impossible values.
+4. To keep it as a test, anonymise it first: `node tools/anonymize-recording.js recordings/my-day.jsonl > test/fixtures/my-day.jsonl`
 
 `run.log` and `recordings/` are ignored by git, because they contain your home, car and battery ids and the names you gave them (often an address). The anonymiser replaces those and refuses to write anything if an original value would remain. Every file in `test/fixtures/` is replayed by `npm test`.
 

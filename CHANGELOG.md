@@ -18,7 +18,7 @@ First version.
 - Month rollover detection that tells a new month apart from a downward correction, and still detects a late reset from Tibber.
 - Reconnects with exponential backoff (5 s → 5 min), a client ping every minute and a 3-minute watchdog.
 - Login is retried only every 6 hours after a wrong password, to avoid locking the Tibber account.
-- Developer setting *Record raw data*, plus `tools/extract-recording.js` and `tools/replay.js` for replaying real Tibber data through the app logic. The extractor reads logs saved by Windows PowerShell (UTF-16).
+- Recording of raw Tibber updates during `homey app run` (never in a published app), plus `tools/extract-recording.js` and `tools/replay.js` for replaying real Tibber data through the app logic. The extractor reads logs saved by Windows PowerShell (UTF-16).
 - *Session ended* waits for Tibber’s settlement of the last quarter (at most 3 min), so the reward is complete. Verified against a real 23-hour recording (`test/fixtures/real-2026-11-17.jsonl`, anonymised).
 - Car and battery as separate devices (status, reason, plugged in, smart control), fed by the home device. Flow cards: status changed, car plugged in/unplugged; conditions: car plugged in, Grid Rewards available.
 - Daily summary Flow card at midnight: reward, number of sessions, delivery time and date.

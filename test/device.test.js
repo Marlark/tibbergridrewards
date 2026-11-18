@@ -166,14 +166,49 @@ test('updateCredentials stores new login and restarts the subscription', async (
   assert.strictEqual(device.client.email, 'new@example.com');
 });
 
-test('record_raw logs each update as a [REC] line', async () => {
-  const { device, sub } = await makeDevice({ settings: { record_raw: true } });
-  sub.emit('data', status('GridRewardAvailable', 40));
-  await settle(device);
-  const line = device.logs.find((l) => l.startsWith('[REC] '));
+async function recLines(env, envJson = {}) {
+  const homeyModule = require('./helpers/homey-stub');
+  const saved = process.env.DEBUG;
+  if (env === undefined) delete process.env.DEBUG; else process.env.DEBUG = env;
+  Object.assign(homeyModule.env, envJson);
+  try {
+    const { device, sub } = await makeDevice();
+    sub.emit('data', status('GridRewardAvailable', 40));
+    await settle(device);
+    return device.logs.filter((l) => l.startsWith('[REC] '));
+  } finally {
+    if (saved === undefined) delete process.env.DEBUG; else process.env.DEBUG = saved;
+    for (const k of Object.keys(envJson)) delete homeyModule.env[k];
+  }
+}
+
+test('homey app run (DEBUG=1) records each update as a [REC] line', async () => {
+  const [line] = await recLines('1');
   const rec = JSON.parse(line.slice(6));
   assert.strictEqual(rec.tz, 'Europe/Stockholm');
   assert.strictEqual(rec.status.rewardCurrentMonth, 40);
+});
+
+test('a published app (no DEBUG) never records', async () => {
+  assert.deepStrictEqual(await recLines(undefined), []);
+});
+
+test('without RECORD_RAW in env.json, the variable is never read (Homey warns on that)', async () => {
+  const homeyModule = require('./helpers/homey-stub');
+  const real = homeyModule.env;
+  const reads = [];
+  // Like Homey.env: reading a missing key logs a warning
+  homeyModule.env = new Proxy({}, { get: (o, k) => { if (!(k in o)) reads.push(k); return o[k]; } });
+  try {
+    assert.strictEqual((await recLines('1')).length, 1);
+    assert.deepStrictEqual(reads, []);
+  } finally {
+    homeyModule.env = real;
+  }
+});
+
+test('RECORD_RAW=0 in env.json turns recording off during homey app run', async () => {
+  assert.deepStrictEqual(await recLines('1', { RECORD_RAW: '0' }), []);
 });
 
 test('onUninit stops subscription and day timer', async () => {

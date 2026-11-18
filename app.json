@@ -1326,40 +1326,6 @@
               "value": "–"
             }
           ]
-        },
-        {
-          "type": "group",
-          "label": {
-            "en": "Developer",
-            "sv": "Utvecklare",
-            "no": "Utvikler",
-            "da": "Udvikler",
-            "de": "Entwickler",
-            "nl": "Ontwikkelaar"
-          },
-          "children": [
-            {
-              "id": "record_raw",
-              "type": "checkbox",
-              "value": false,
-              "label": {
-                "en": "Record raw data",
-                "sv": "Spela in rådata",
-                "no": "Ta opp rådata",
-                "da": "Optag rådata",
-                "de": "Rohdaten aufzeichnen",
-                "nl": "Ruwe gegevens opnemen"
-              },
-              "hint": {
-                "en": "Writes every update from Tibber to the app log (lines starting with [REC]). Use during `homey app run` and extract with tools/extract-recording.js.",
-                "sv": "Skriver varje uppdatering från Tibber till apploggen (rader som börjar med [REC]). Använd under `homey app run` och plocka ut med tools/extract-recording.js.",
-                "no": "Skriver hver oppdatering fra Tibber til appens logg (linjer som begynner med [REC]). Bruk under `homey app run` og hent ut med tools/extract-recording.js.",
-                "da": "Skriver hver opdatering fra Tibber til appens log (linjer, der begynder med [REC]). Brug under `homey app run` og udtræk med tools/extract-recording.js.",
-                "de": "Schreibt jede Aktualisierung von Tibber ins App-Log (Zeilen, die mit [REC] beginnen). Während `homey app run` verwenden und mit tools/extract-recording.js extrahieren.",
-                "nl": "Schrijft elke update van Tibber naar het app-logboek (regels die beginnen met [REC]). Gebruik tijdens `homey app run` en haal ze eruit met tools/extract-recording.js."
-              }
-            }
-          ]
         }
       ],
       "id": "grid-reward"
