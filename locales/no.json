@@ -28,7 +28,10 @@
   "battery_activity": {
     "ChargingForGridRewards": "Lader for Grid Rewards",
     "IdleWithUpcomingLowPrice": "Hviler – venter på lavere strømpris",
-    "DischargingForGridRewards": "Lader ut for Grid Rewards"
+    "DischargingForGridRewards": "Lader ut for Grid Rewards",
+    "IdleForGridRewards": "Hviler – klar for Grid Rewards",
+    "IdleWithUpcomingHighPrice": "Hviler – sparer til høyere strømpris",
+    "ChargingWithSolarProduction": "Lader med solstrøm"
   },
   "widget": {
     "state": {

@@ -28,7 +28,10 @@
   "battery_activity": {
     "ChargingForGridRewards": "Charging for Grid Rewards",
     "IdleWithUpcomingLowPrice": "Idle – waiting for a lower price",
-    "DischargingForGridRewards": "Discharging for Grid Rewards"
+    "DischargingForGridRewards": "Discharging for Grid Rewards",
+    "IdleForGridRewards": "Idle – standing by for Grid Rewards",
+    "IdleWithUpcomingHighPrice": "Idle – saving for a higher price",
+    "ChargingWithSolarProduction": "Charging with solar power"
   },
   "widget": {
     "state": {

@@ -2,3 +2,5 @@ test/
 tools/
 .github/
 Docs/
+recordings/
+*.log

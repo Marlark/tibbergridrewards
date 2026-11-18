@@ -49,3 +49,37 @@ test('decode handles PowerShell tee output (UTF-16LE with BOM) and colour codes'
   assert.deepStrictEqual(extract(decode(buf)), ['{"t":1,"status":{}}']);
   assert.deepStrictEqual(extract(decode(Buffer.from(line, 'utf8'))), ['{"t":1,"status":{}}']);
 });
+
+test('anonymize replaces ids and names and leaves nothing behind', () => {
+  const { anonymize } = require('../tools/anonymize-recording');
+  const rec = (homeId) => ({
+    t: 1,
+    tz: 'Europe/Stockholm',
+    status: {
+      homeId,
+      rewardCurrentMonth: 5,
+      flexDevices: [
+        { vehicleId: 'v-real-123', shortName: 'My Tesla', make: 'Tesla', imgUrl: 'https://x/me.png' },
+        { batteryId: 'b-real-456', shortName: 'Storgatan 1', make: 'Huawei' },
+      ],
+    },
+  });
+  const out = anonymize([rec('h-real-789'), rec('h-real-789')]);
+  const text = JSON.stringify(out);
+  for (const secret of ['h-real-789', 'v-real-123', 'b-real-456', 'My Tesla', 'Storgatan 1', 'me.png']) {
+    assert.ok(!text.includes(secret), secret);
+  }
+  assert.strictEqual(out[1].status.homeId, 'home-1');
+  assert.deepStrictEqual(out[0].status.flexDevices.map((f) => [f.vehicleId || f.batteryId, f.shortName, f.make]),
+    [['vehicle-1', 'Car', 'Tesla'], ['battery-1', 'Battery', 'Huawei']]);
+  assert.strictEqual(out[0].status.rewardCurrentMonth, 5);
+});
+
+test('the committed real recording is anonymised', () => {
+  const text = fs.readFileSync(path.join(dir, 'real-2026-11-17.jsonl'), 'utf8');
+  const ids = [...text.matchAll(/"(homeId|vehicleId|batteryId)":"([^"]+)"/g)].map((m) => m[2]);
+  assert.ok(ids.length > 0);
+  assert.ok(ids.every((id) => /^(home|vehicle|battery)-\d+$/.test(id)), 'only anonymised ids');
+  const names = [...text.matchAll(/"shortName":"([^"]+)"/g)].map((m) => m[1]);
+  assert.ok(names.every((n) => n === 'Car' || n === 'Battery'), 'only anonymised names');
+});

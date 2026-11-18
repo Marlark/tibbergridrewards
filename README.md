@@ -1,135 +1,178 @@
-# Tibber Grid Rewards for Homey (draft, v0.1)
+# Tibber Grid Rewards for Homey
 
-A Homey app (SDK3) that follows Tibber Grid Rewards in real time. It uses the same unofficial app API as the Home Assistant integration
-[JohNan/homeassistant-tibber_grid_rewards](https://github.com/JohNan/homeassistant-tibber_grid_rewards).
+[![CI](https://github.com/Marlark/tibbergridrewards/actions/workflows/ci.yml/badge.svg)](https://github.com/Marlark/tibbergridrewards/actions/workflows/ci.yml)
 
-> **Unofficial.** This project is not affiliated with or endorsed by Tibber.
+<img src="assets/images/large.png" alt="Tibber Grid Rewards" width="320" align="right">
 
-## Architecture
+Follow your [Tibber Grid Rewards](https://tibber.com) in [Homey](https://homey.app) in real time: what you earn per session, day and month, why your home is or isn't available, and what your car and home battery are doing.
 
+> **Unofficial.** This app is not made, endorsed or supported by Tibber. It uses Tibber's undocumented app API, which can change at any time.
+
+## Features
+
+- **Live status** of Grid Rewards for each home: available, delivering or unavailable, with the reason (e.g. *Excess power in the grid*, *No car plugged in*).
+- **Earnings** for the current session, today, this month and all time, logged to Insights.
+- **Statistics**: last session, sessions and delivery time today, sessions this month.
+- **Car and home battery** as their own devices: plugged in, smart control, and for the battery its savings, current activity and next planned charge or discharge.
+- **Flow cards** for sessions, daily and monthly summaries, amounts passed, long unavailability and more.
+- **Dashboard widget** and a **session history** page.
+- **Six languages**: English, Swedish, Norwegian, Danish, German and Dutch.
+
+## Requirements
+
+- Homey Pro with firmware **12.3** or later.
+- A Tibber account with Grid Rewards. You log in with your Tibber e-mail and password.
+
+## Installation
+
+The app is not in the Homey App Store yet. To install it from source you need [Node.js](https://nodejs.org) and the [Homey CLI](https://apps.developer.homey.app/the-basics/getting-started/homey-cli):
+
+```bash
+npm install --global homey
+git clone https://github.com/Marlark/tibbergridrewards.git
+cd tibbergridrewards
+npm install
+homey app install     # or: homey app run, to see the log while it runs
 ```
-Tibber login (e-mail + password)
-        │  POST app.tibber.com/v1/login.credentials → JWT
-        ▼
-TibberAppClient ──── GraphQL HTTP (app.tibber.com/v4/gql): list of homes when pairing
-        │
-GridRewardSubscription ── WSS app.tibber.com/v4/gql/ws (graphql-transport-ws)
-        │                  subscription gridRewardStatus(homeId)
-        ▼  'data'
-GridRewardDevice ── RewardTracker (pure logic, tested)
-        │             • today   = month − month value at start of day
-        │             • session = month − month value when delivery started
-        ▼
-Capabilities (with Insights) + Flow cards
-        │
-        ▼  flexDevices in the same update
-FlexDevice (car / battery) ── no login of its own
-```
 
-One device per Tibber home. The credentials are stored in the device's store. Cars and batteries can be added as separate devices; they are fed by their home device, so they need no login and no extra API calls.
+## Setup
 
-## Capabilities
+1. **Add your home:** *Devices → + → Tibber Grid Rewards → Grid Rewards*. Log in with your Tibber e-mail and password and pick the home(s).
+2. **Add your car and battery (optional):** *Grid Rewards → Car / battery (Grid Rewards)*. The list shows what your home device has received from Tibber, so add the home first.
+3. **Add the widget (optional):** edit a dashboard, add *Grid Rewards* and pick the home.
+4. **See the history:** *Settings → Apps → Tibber Grid Rewards* shows the last 100 sessions per home and totals per day.
 
-| Capability | Type | Insights |
-|---|---|---|
-| `grid_reward_state` | enum: available / unavailable / delivering / unknown | – |
-| `grid_reward_active` | boolean (session in progress) | ✔ |
-| `grid_reward_reason` | string | – |
-| `grid_reward_session` | kr, current session | ✔ |
-| `grid_reward_today` | kr today | ✔ |
-| `grid_reward_month` | kr this month (directly from Tibber) | ✔ |
-| `grid_reward_all_time` | kr all time | ✔ |
-| `grid_reward_last_session` | kr, last finished session | ✔ |
-| `grid_reward_sessions_today` | sessions today | ✔ |
-| `grid_reward_minutes_today` | min delivered today | ✔ |
-| `grid_reward_sessions_month` | sessions this calendar month | ✔ |
+If your Tibber password changes, open the home device and choose **Repair** to enter the new one.
 
-Because the values are logged to Insights, daily energy reports can read the Grid Rewards income straight from Homey.
+## Devices and values
 
-**Car / battery devices** have `grid_reward_state`, `grid_reward_reason`, `flex_smart_enabled` (smart charging / smart mode on) and, for cars, `flex_plugged_in`. **Batteries** also poll Tibber every 5 minutes for `battery_savings_today` / `_week` / `_month` (kr, Insights), `battery_activity` (what the battery is doing now) and `battery_next_activity` (next planned charge/discharge). The query is the same as in the HA integration. A failed poll shows a warning on the battery but does not make it unavailable.
+### Home
 
-**Languages:** English, Swedish, Norwegian, Danish, German and Dutch (Tibber's markets). The Norwegian, Danish, German and Dutch texts were machine-assisted and should be reviewed by native speakers before publishing. `test/i18n.test.js` checks that every text exists in every language and that placeholders survive.
+| Value | Meaning | Insights |
+|---|---|:---:|
+| Grid Rewards status | Available, delivering, unavailable or unknown | |
+| Session active | A session is in progress | ✔ |
+| Reason | Why, e.g. *Excess power in the grid*. When the home is unavailable, the car's or battery's reason is shown too. | |
+| Current session | Earned in the session in progress | ✔ |
+| Reward today / this month | This month comes straight from Tibber | ✔ |
+| Total reward | All time | ✔ |
+| Last session | Earned in the last finished session | ✔ |
+| Sessions today / this month | Number of finished sessions | ✔ |
+| Delivery time today | Minutes delivered today | ✔ |
 
-**Reasons** are translated. Codes seen in real data: `available`, `excess`, `shortage`, `other` and, for the car, `noVehiclesPluggedIn`. Unknown codes are shown as they are; add them under `reason` in `locales/*.json`. When the home is unavailable, the reasons of its unavailable car/battery are shown on the home too (e.g. *No car plugged in*).
+The device settings also show the **connection status**: connected, reconnecting, login failed or *Tibber has changed its API*, the last update from Tibber and the number of reconnects.
 
-**Currency** follows Tibber's `rewardCurrency`: SEK, NOK and DKK are shown as *kr*, EUR as *€* (capabilities, battery savings, widget and history).
+### Car and battery
+
+| Value | Car | Battery | Insights |
+|---|:---:|:---:|:---:|
+| Grid Rewards status and reason | ✔ | ✔ | |
+| Smart control on | ✔ | ✔ | ✔ |
+| Plugged in | ✔ | | ✔ |
+| Savings today / this week / this month | | ✔ | ✔ |
+| Battery activity, e.g. *Charging with solar power* | | ✔ | |
+| Next planned activity, e.g. *Discharge at 14:30 (2.5 kW)* | | ✔ | |
+
+Battery details are fetched every 5 minutes. If that fails, the battery shows a warning but keeps working.
+
+Money is shown in Tibber's currency: SEK, NOK and DKK as *kr*, EUR as *€*.
 
 ## Flow cards
 
 **Home**
 
-- **When:** status changed (tokens: status, reason, reason code) · session started (reason, reason code) · session ended (reward, duration in min) · daily summary at midnight (reward, sessions, delivery time in min, date) · monthly summary when a new month starts (reward, sessions, delivery time, month) · reward today / this month passed *X* · unavailable for *X* hours (hours, reason, reason code)
-- **And:** a Grid Rewards session is / is not active · the status is / is not *available / unavailable / delivering / unknown* · reward today is / is not above *X*
+| | Cards |
+|---|---|
+| When | Status changed · Session started · Session ended (reward, duration) · Daily summary at midnight · Monthly summary when a new month starts · Reward today / this month passed *X* · Unavailable for *X* hours |
+| And | A session is active · Status is … · Reward today is above *X* |
 
-**Car / battery**
+**Car and battery**
 
-- **When:** status changed (status, reason, reason code) · the car was plugged in or unplugged · the battery activity changed (activity, activity code) · unavailable for *X* hours (e.g. the car has not been plugged in)
-- **And:** the car is / is not plugged in · Grid Rewards is / is not available · the status is / is not …
+| | Cards |
+|---|---|
+| When | Status changed · The car was plugged in or unplugged · The battery activity changed · Unavailable for *X* hours |
+| And | The car is plugged in · Grid Rewards is available · Status is … |
 
-Use the *reason code* token for conditions in flows; it does not change with the language.
+Good to know:
 
-*Unavailable for X hours* runs once per unavailable period, when the chosen time has passed (checked every minute). Time while the app was stopped does not make it fire afterwards. *Reward passed X* runs once per day (today) or month (this month) when the amount is passed; a small dip and rise does not run it twice.
+- Cards with a reason also have a **reason code** token (e.g. `noVehiclesPluggedIn`). Use it in conditions; it does not change with Homey's language.
+- *Reward passed X* runs once per day or month when the amount is passed. *Unavailable for X hours* runs once per unavailable period.
+- *Session ended* fires up to 3 minutes after the session, because Tibber pays out the last quarter about 40 seconds after it ends. Waiting includes that in the reward.
 
-## Dashboard widget
+## Privacy and risks
 
-*Grid Rewards* shows status and reason, reward today and this month, the current or last session, sessions and delivery time today, and the battery's activity and savings if the home has one. Choose the home when you add the widget. It refreshes every 30 seconds and follows the dashboard's light/dark theme. Requires Homey 12.3 or later (the app's `compatibility` is `>=12.3.0`).
+- Your Tibber **password is stored on your Homey** (in the device), because Tibber's app API has no way to renew a login without it. The Home Assistant integration works the same way. Nothing is sent anywhere except to Tibber.
+- The API is **undocumented**. If Tibber changes it, the device becomes unavailable with a clear message, you get one notification, and the app retries every hour.
 
-## Session history
+## How it works
 
-The app's settings page (*Settings → Apps → Tibber Grid Rewards*) lists the last 100 finished sessions per home (time, reward, duration, reason) and totals per day.
+The app logs in like the Tibber mobile app and subscribes to `gridRewardStatus` over a WebSocket. Earnings per day and session are derived from Tibber's month total:
 
-## Connection status
+- **today** = month total − month total at the start of the day
+- **session** = month total − month total when the session started
 
-The home device's settings show the connection (connected / reconnecting / login failed / API changed), the last update from Tibber, connected since and the number of reconnects since the app started.
+This is robust where it matters:
 
-## Pairing and repair
+- Counters are kept **per home**, so several homes or accounts don't mix.
+- The day rollover uses Homey's time zone and works even if Homey was off at midnight.
+- A small downward correction from Tibber is not mistaken for a new month, and a late month reset is still detected.
+- Reconnects use exponential backoff (5 s → 5 min). The app pings every minute and reconnects if nothing arrives for 3 minutes.
+- After a wrong password, login is retried only every 6 hours, to avoid locking the account.
+- Values are only written to Homey when they change: on a real day 404 writes instead of 1,502.
 
-- **Pairing:** log in with your Tibber e-mail and password, then pick the home(s) to add.
-- **Repair:** if the password changes, repair the device and enter the new credentials. The app checks that the account still has access to the device's home.
-- **Car / battery:** add the home device first. Then add *Car / battery (Grid Rewards)*; it lists what the home device has received from Tibber.
+Thanks to [JohNan/homeassistant-tibber_grid_rewards](https://github.com/JohNan/homeassistant-tibber_grid_rewards), whose work showed how Tibber's app API is used.
 
-## Improvements over the HA integration
-
-- Day and session counters are stored **per device (home)**. The HA version shares them between homes and accounts.
-- The day rollover is based on the last known month value, so it is correct even if Homey was off at midnight. The time zone comes from Homey's clock.
-- A downward correction from Tibber within the month is not mistaken for a new month, and a late month reset is still detected.
-- Reconnects with exponential backoff (5 s → 5 min). The app pings the server every minute and reconnects if nothing has been received for 3 min.
-- With a wrong password, login is retried only every 6 hours (to avoid locking the account). Repair the device to enter a new password.
-- Updates are processed one at a time per device, so Flow cards are never triggered twice.
-- If Tibber changes its API (the query no longer fits the schema, or the login endpoint is gone), the device becomes unavailable with a clear message, you get one notification, and the app retries every hour instead of failing silently.
-- *Session ended* waits for Tibber to settle the last quarter (about 40 s after the session ends, at most 3 min), so the reward includes it. In real data this added 0.46 kr to 16.19 kr over 9 sessions.
-
-## Getting started
+## Development
 
 ```bash
-npm install          # installs ws
-npm test             # runs all tests (no Homey or Tibber account needed)
-homey app run        # runs the app on your Homey during development
+npm install     # installs ws
+npm test        # all tests; no Homey or Tibber account needed
+homey app run   # run on your Homey with the log in the terminal
 ```
 
-The tests cover the reward logic, the WebSocket subscription, the home and car/battery devices and drivers (with a stub of the `homey` module in `test/helpers/`), and replay recorded data. GitHub Actions ([.github/workflows/ci.yml](.github/workflows/ci.yml)) runs the tests and `homey app validate --level publish` on every push.
+GitHub Actions runs the tests and `homey app validate --level publish` on every push.
 
-## Recording real data
+### Project layout
 
-1. In the device settings, turn on **Developer → Record raw data**.
+```
+lib/                 Logic without Homey dependencies (tested on its own)
+  TibberAppClient.js   Login and GraphQL over HTTP
+  GridRewardSubscription.js  WebSocket subscription, reconnects, API-change detection
+  RewardTracker.js     Today, sessions, settlement, day/month rollover
+  battery.js           Battery query and parsing
+drivers/grid-reward/ The home device (login, subscription, flow cards)
+drivers/flex-device/ Car and battery, fed by the home device
+widgets/grid-rewards/ Dashboard widget
+settings/            Session history page (served by api.js)
+locales/             Translations (en, sv, no, da, de, nl)
+test/                Tests, with a stub of the homey module in test/helpers/
+tools/               Recording, replay and login inspection
+```
+
+### Translations
+
+Texts live in `locales/*.json` and in the `.homeycompose/` and `drivers/*/` manifests. `test/i18n.test.js` fails if a text is missing in a language or a placeholder such as `__time__` or `[[amount]]` is lost.
+
+The Norwegian, Danish, German and Dutch texts were machine-assisted. Corrections from native speakers are welcome.
+
+New battery activity codes are logged as `Unknown battery activity "…"` and shown in readable English until they are added under `battery_activity` in `locales/*.json`. Seen so far: `ChargingForGridRewards`, `DischargingForGridRewards`, `IdleForGridRewards`, `IdleWithUpcomingLowPrice`, `IdleWithUpcomingHighPrice`, `ChargingWithSolarProduction`.
+
+### Recording real data
+
+To see exactly what Tibber sends, and to turn it into a test:
+
+1. In the home device's settings, turn on **Developer → Record raw data**.
 2. Run the app and save the log: `homey app run | tee run.log`
-3. Extract the recording: `node tools/extract-recording.js run.log > test/fixtures/my-day.jsonl`
-4. Look at it: `node tools/replay.js test/fixtures/my-day.jsonl` prints every update with today, session and events, and lists impossible values.
+3. Extract the recording: `node tools/extract-recording.js run.log > recordings/my-day.jsonl`
+4. Replay it: `node tools/replay.js recordings/my-day.jsonl` prints every update and lists impossible values.
+5. To keep it as a test, anonymise it first: `node tools/anonymize-recording.js recordings/my-day.jsonl > test/fixtures/my-day.jsonl`
 
-Every `.jsonl` file in `test/fixtures/` is replayed by `npm test`. The recording contains your home id, so check it before you commit it.
+`run.log` and `recordings/` are ignored by git, because they contain your home, car and battery ids and the names you gave them (often an address). The anonymiser replaces those and refuses to write anything if an original value would remain. Every file in `test/fixtures/` is replayed by `npm test`.
 
-## To do before it is "real"
+## More
 
-- [ ] Review the icon and images (generated, original design – not Tibber's logo).
-- [ ] Try the car/battery devices, the battery details, the widget and the daily summary on a real Homey. Record a battery response and add translations for the activity codes Tibber sends (`battery_activity` in `locales/*.json`; unknown codes are logged and shown in readable English).
-
-More ideas are collected in [Docs/IDEBANK.md](Docs/IDEBANK.md) (in Swedish).
-
-## Risks
-
-- The API is **undocumented** and Tibber can change or shut it down at any time.
-- Your real Tibber password is stored on Homey (in the device's store). The Home Assistant integration does the same. Checked with `tools/inspect-login.js`: the login returns a refresh token, but renewing it at Tibber's token endpoint needs the Tibber app's client secret, so the password is still needed to log in again.
-- Unofficial project, not approved by Tibber.
+- [CHANGELOG.md](CHANGELOG.md): what has changed.
+- [Docs/IDEBANK.md](Docs/IDEBANK.md): ideas for future features (in Swedish).
 
 ## License
 

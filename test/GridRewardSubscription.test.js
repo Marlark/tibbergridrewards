@@ -181,3 +181,35 @@ test('login endpoint gone (404) counts as an API change and retries in 1 h', asy
   assert.strictEqual(homey.timers.filter((t) => !t.cleared)[0].ms, 60 * 60 * 1000);
   sub.stop();
 });
+
+// --- Why the server closed the connection ---
+
+test('describeClose: code, meaning, reason and how long the connection lived', () => {
+  const { describeClose } = GridRewardSubscription;
+  const t0 = Date.parse('2026-11-18T09:00:00Z');
+  assert.strictEqual(describeClose(1000, Buffer.from(''), t0, t0 + 62 * 60000), 'Connection closed: 1000 normal closure, after 62 min');
+  assert.strictEqual(describeClose(4401, Buffer.from('Unauthorized'), t0, t0 + 180 * 60000),
+    'Connection closed: 4401 unauthorized (token expired?), "Unauthorized", after 180 min');
+  assert.strictEqual(describeClose(4999, '', null), 'Connection closed: 4999, before it was ready');
+});
+
+test('a server close is logged with its code before reconnecting', async () => {
+  created.length = 0;
+  const lines = [];
+  const homey = fakeHomey();
+  homey.setInterval = () => ({});
+  homey.clearInterval = () => {};
+  const sub = new GridRewardSubscription({
+    client: { getToken: async () => 'tok' }, homeId: 'h1', homey, log: (l) => lines.push(l),
+  });
+  sub.on('error', () => {});
+  sub.start();
+  await new Promise((r) => setImmediate(r));
+  const ws = created[0];
+  ws.emit('open');
+  ws.emit('message', Buffer.from(JSON.stringify({ type: 'connection_ack' })));
+  ws.emit('close', 1001, Buffer.from(''));
+  assert.match(lines.find((l) => l.startsWith('Connection closed')), /^Connection closed: 1001 server going away, after 0 min$/);
+  assert.ok(lines.some((l) => l.startsWith('Reconnecting in 5 s')));
+  sub.stop();
+});

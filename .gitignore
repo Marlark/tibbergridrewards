@@ -3,3 +3,10 @@ node_modules/
 
 # Homey logs from `homey app run | tee run.log`
 *.log
+
+# Real recordings from your own Homey (contain home/car/battery ids and names).
+# Anonymise with tools/anonymize-recording.js before copying one to test/fixtures/.
+recordings/
+
+# Homey app secrets (homey app run reads env.json)
+env.json
