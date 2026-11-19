@@ -155,7 +155,7 @@ Texts live in `locales/*.json` and in the `.homeycompose/` and `drivers/*/` mani
 
 The Norwegian, Danish, German and Dutch texts were machine-assisted. Corrections from native speakers are welcome.
 
-New battery activity codes are logged as `Unknown battery activity "…"` and shown in readable English until they are added under `battery_activity` in `locales/*.json`. Seen so far: `ChargingForGridRewards`, `DischargingForGridRewards`, `IdleForGridRewards`, `IdleWithUpcomingLowPrice`, `IdleWithUpcomingHighPrice`, `ChargingWithSolarProduction`.
+New battery activity codes are logged as `Unknown battery activity "…"` and shown in readable English until they are added under `battery_activity` in `locales/*.json`. Seen so far: `ChargingForGridRewards`, `DischargingForGridRewards`, `IdleForGridRewards`, `IdleWithUpcomingLowPrice`, `IdleWithUpcomingHighPrice`, `ChargingWithSolarProduction`, `ChargingAtLowPrice`, `DischargingAtHighPrice`.
 
 ### Recording real data
 

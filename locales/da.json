@@ -31,7 +31,9 @@
     "DischargingForGridRewards": "Aflader for Grid Rewards",
     "IdleForGridRewards": "Hviler – klar til Grid Rewards",
     "IdleWithUpcomingHighPrice": "Hviler – sparer til højere elpris",
-    "ChargingWithSolarProduction": "Oplader med solstrøm"
+    "ChargingWithSolarProduction": "Oplader med solstrøm",
+    "DischargingAtHighPrice": "Aflader ved høj elpris",
+    "ChargingAtLowPrice": "Oplader ved lav elpris"
   },
   "widget": {
     "state": {

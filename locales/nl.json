@@ -31,7 +31,9 @@
     "DischargingForGridRewards": "Ontlaadt voor Grid Rewards",
     "IdleForGridRewards": "Inactief – paraat voor Grid Rewards",
     "IdleWithUpcomingHighPrice": "Inactief – spaart voor hogere stroomprijs",
-    "ChargingWithSolarProduction": "Laadt met zonnestroom"
+    "ChargingWithSolarProduction": "Laadt met zonnestroom",
+    "DischargingAtHighPrice": "Ontlaadt bij hoge stroomprijs",
+    "ChargingAtLowPrice": "Laadt bij lage stroomprijs"
   },
   "widget": {
     "state": {

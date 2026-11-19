@@ -31,7 +31,9 @@
     "DischargingForGridRewards": "Laddar ur för Grid Rewards",
     "IdleForGridRewards": "Vilar – redo för Grid Rewards",
     "IdleWithUpcomingHighPrice": "Vilar – sparar till högre elpris",
-    "ChargingWithSolarProduction": "Laddar med solel"
+    "ChargingWithSolarProduction": "Laddar med solel",
+    "DischargingAtHighPrice": "Laddar ur vid högt elpris",
+    "ChargingAtLowPrice": "Laddar vid lågt elpris"
   },
   "widget": {
     "state": {

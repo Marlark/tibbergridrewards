@@ -31,7 +31,9 @@
     "DischargingForGridRewards": "Entlädt für Grid Rewards",
     "IdleForGridRewards": "Im Leerlauf – bereit für Grid Rewards",
     "IdleWithUpcomingHighPrice": "Im Leerlauf – spart für höheren Strompreis",
-    "ChargingWithSolarProduction": "Lädt mit Solarstrom"
+    "ChargingWithSolarProduction": "Lädt mit Solarstrom",
+    "DischargingAtHighPrice": "Entlädt bei hohem Strompreis",
+    "ChargingAtLowPrice": "Lädt bei niedrigem Strompreis"
   },
   "widget": {
     "state": {
