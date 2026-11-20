@@ -3,13 +3,17 @@
 All notable changes to this app are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the app uses [Semantic Versioning](https://semver.org/).
 
-## [0.1.1] – unreleased
+## [0.1.1] – 2026-11-18
+
+### Added
+
+- Translations for more battery activities seen on a real battery: charging at a low price, discharging at a high price, and discharging before expected solar power.
 
 ### Changed
 
 - The developer setting *Record raw data* is removed. Raw Tibber updates are now only recorded during `homey app run`, never in a published app.
 
-## [0.1.0] – unreleased
+## [0.1.0] – 2026-11-18
 
 First version.
 

@@ -33,7 +33,8 @@
     "IdleWithUpcomingHighPrice": "Hviler – sparer til høyere strømpris",
     "ChargingWithSolarProduction": "Lader med solstrøm",
     "DischargingAtHighPrice": "Lader ut ved høy strømpris",
-    "ChargingAtLowPrice": "Lader ved lav strømpris"
+    "ChargingAtLowPrice": "Lader ved lav strømpris",
+    "DischargingWithUpcomingSolar": "Lader ut – solstrøm ventes"
   },
   "widget": {
     "state": {

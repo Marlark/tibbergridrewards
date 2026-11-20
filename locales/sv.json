@@ -33,7 +33,8 @@
     "IdleWithUpcomingHighPrice": "Vilar – sparar till högre elpris",
     "ChargingWithSolarProduction": "Laddar med solel",
     "DischargingAtHighPrice": "Laddar ur vid högt elpris",
-    "ChargingAtLowPrice": "Laddar vid lågt elpris"
+    "ChargingAtLowPrice": "Laddar vid lågt elpris",
+    "DischargingWithUpcomingSolar": "Laddar ur – solel väntas"
   },
   "widget": {
     "state": {

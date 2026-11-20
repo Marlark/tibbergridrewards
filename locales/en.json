@@ -33,7 +33,8 @@
     "IdleWithUpcomingHighPrice": "Idle – saving for a higher price",
     "ChargingWithSolarProduction": "Charging with solar power",
     "DischargingAtHighPrice": "Discharging at a high price",
-    "ChargingAtLowPrice": "Charging at a low price"
+    "ChargingAtLowPrice": "Charging at a low price",
+    "DischargingWithUpcomingSolar": "Discharging – solar power expected"
   },
   "widget": {
     "state": {

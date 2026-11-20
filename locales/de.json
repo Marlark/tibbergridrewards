@@ -33,7 +33,8 @@
     "IdleWithUpcomingHighPrice": "Im Leerlauf – spart für höheren Strompreis",
     "ChargingWithSolarProduction": "Lädt mit Solarstrom",
     "DischargingAtHighPrice": "Entlädt bei hohem Strompreis",
-    "ChargingAtLowPrice": "Lädt bei niedrigem Strompreis"
+    "ChargingAtLowPrice": "Lädt bei niedrigem Strompreis",
+    "DischargingWithUpcomingSolar": "Entlädt – Solarstrom erwartet"
   },
   "widget": {
     "state": {
