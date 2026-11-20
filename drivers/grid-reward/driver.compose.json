@@ -15,7 +15,8 @@
     "grid_reward_last_session",
     "grid_reward_sessions_today",
     "grid_reward_minutes_today",
-    "grid_reward_sessions_month"
+    "grid_reward_sessions_month",
+    "grid_reward_availability"
   ],
   "platforms": [
     "local"

@@ -60,7 +60,9 @@ function makeHomey({ timeZone = 'Europe/Stockholm' } = {}) {
         registerRunListener: (fn) => { triggerListeners[id] = fn; },
         trigger: async (device, tokens, state) => {
           await tick();
-          triggered.push({ id, tokens, ...(state !== undefined ? { state } : {}) });
+          triggered.push({
+            id, tokens, ...(state !== undefined ? { state } : {}), device,
+          });
         },
       }),
       getConditionCard: (id) => ({

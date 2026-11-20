@@ -1,0 +1,25 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Share of earnings this month",
+    "sv": "Andel av månadens intjäning",
+    "no": "Andel av månedens inntjening",
+    "da": "Andel af månedens indtjening",
+    "de": "Anteil am Verdienst diesen Monat",
+    "nl": "Aandeel in de verdiensten deze maand"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 0,
+  "units": {
+    "en": "%",
+    "sv": "%",
+    "no": "%",
+    "da": "%",
+    "de": "%",
+    "nl": "%"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

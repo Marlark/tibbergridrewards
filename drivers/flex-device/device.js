@@ -6,6 +6,7 @@ const { localeFor } = require('../../lib/i18n');
 const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
 const { TibberApiChangedError } = require('../../lib/TibberAppClient');
 const { localDayKey } = require('../../lib/RewardTracker');
+const { AvailabilityWatch } = require('../../lib/availability');
 const {
   POLL_MS, BATTERY_QUERY, batteryVariables, parseBattery, humanize,
 } = require('../../lib/battery');
@@ -21,6 +22,18 @@ const POLL_SOON_DELAY_MS = 10 * 1000;
 const POLL_SOON_MIN_GAP_MS = 60 * 1000;
 
 const SAVINGS_CAPABILITIES = ['battery_savings_today', 'battery_savings_week', 'battery_savings_month'];
+
+// What this car/battery earned: its share of the home's sessions (lib/flexEarnings.js).
+const EARNED_CAPABILITIES = ['flex_reward_today', 'flex_reward_month', 'flex_reward_total'];
+// Added to cars/batteries paired with an older version.
+const NEW_CAPABILITIES = [
+  ...EARNED_CAPABILITIES,
+  'flex_reward_share',
+  'grid_reward_sessions_today',
+  'grid_reward_minutes_today',
+  'grid_reward_sessions_month',
+  'grid_reward_availability',
+];
 
 const BATTERY_CAPABILITIES = [
   'battery_savings_today',
@@ -46,9 +59,13 @@ class FlexDevice extends Homey.Device {
     this.lastReason = { text: '', code: '' };
     // "Unavailable for X hours", e.g. the car has not been plugged in.
     this.unavailWatch = new UnavailableWatch(this, 'flex_unavailable_for');
-    this.unavailTimer = this.homey.setInterval(
-      () => this._checkUnavailable(this.lastGridState).catch(this.error), 60 * 1000,
-    );
+    this.availability = new AvailabilityWatch(this);
+    this.unavailTimer = this.homey.setInterval(() => this._minuteTick().catch(this.error), 60 * 1000);
+
+    // Cars/batteries paired with an older version lack the "earned" capabilities.
+    for (const cap of NEW_CAPABILITIES) {
+      if (!this.hasCapability(cap)) await this.addCapability(cap).catch(this.error);
+    }
 
     if (kind === 'battery') {
       // Batteries paired with an older version lack the battery capabilities.
@@ -68,6 +85,9 @@ class FlexDevice extends Homey.Device {
     }
     const f = home.getFlexDevices().find((x) => x.id === id);
     if (f) await this.onFlexStatus(f, { silent: true });
+    if (home.getFlexEarnings) {
+      await this.onEarnings(home.getFlexEarnings(id), home.getCurrencyUnit ? home.getCurrencyUnit() : '');
+    }
     this.homeId = homeId;
   }
 
@@ -103,6 +123,7 @@ class FlexDevice extends Homey.Device {
     });
 
     this.lastReason = { text, code };
+    await this.availability.update(f.gridState, this._dayKey());
     const stateChanged = f.gridState !== this.lastGridState;
     const plugChanged = f.pluggedIn !== null && this.lastPluggedIn !== null && f.pluggedIn !== this.lastPluggedIn;
     // Grid Rewards needs smart charging / smart mode: tell the user when it changes.
@@ -132,6 +153,36 @@ class FlexDevice extends Homey.Device {
       }
     }
     await this._checkUnavailable(f.gridState);
+  }
+
+  /** Earned, sessions and share, from the home device (lib/flexEarnings.js earningsOf). */
+  async onEarnings(e, unit) {
+    await applyCurrency(this, EARNED_CAPABILITIES, unit);
+    await setIfChanged(this, {
+      flex_reward_today: e.today,
+      flex_reward_month: e.month,
+      flex_reward_total: e.total,
+      flex_reward_share: e.share,
+      grid_reward_sessions_today: e.sessionsToday,
+      grid_reward_minutes_today: e.minutesToday,
+      grid_reward_sessions_month: e.sessionsMonth,
+    });
+  }
+
+  /** A session this device delivered in has been settled; reward is its share. */
+  async onSessionEnded({ reward, minutes, earnedToday }) {
+    await this.homey.flow.getDeviceTriggerCard('flex_session_ended')
+      .trigger(this, { reward, minutes, earned_today: earnedToday })
+      .catch(this.error);
+  }
+
+  async _minuteTick() {
+    await this._checkUnavailable(this.lastGridState);
+    await this.availability.update(this.lastGridState, this._dayKey());
+  }
+
+  _dayKey() {
+    return localDayKey(new Date(), this.homey.clock.getTimezone());
   }
 
   async _checkUnavailable(gridState) {
@@ -255,6 +306,7 @@ class FlexDevice extends Homey.Device {
   }
 
   async onUninit() {
+    if (this.availability) await this.availability.save();
     if (this.unavailTimer) this.homey.clearInterval(this.unavailTimer);
     if (this.batteryTimer) this.homey.clearInterval(this.batteryTimer);
     if (this.batteryKick) this.homey.clearTimeout(this.batteryKick);

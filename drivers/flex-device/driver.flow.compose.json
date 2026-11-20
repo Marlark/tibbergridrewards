@@ -276,6 +276,133 @@
           "example": false
         }
       ]
+    },
+    {
+      "id": "flex_session_ended",
+      "title": {
+        "en": "A Grid Rewards session ended",
+        "sv": "En Grid Rewards-session slutade",
+        "no": "En Grid Rewards-økt ble avsluttet",
+        "da": "En Grid Rewards-session sluttede",
+        "de": "Eine Grid-Rewards-Session wurde beendet",
+        "nl": "Een Grid Rewards-sessie is beëindigd"
+      },
+      "hint": {
+        "en": "Runs when a session this device delivered in has been settled, with its share of the reward. If several devices delivered at the same time, the reward is split evenly.",
+        "sv": "Körs när en session som enheten levererade i har räknats klart, med enhetens del av ersättningen. Om flera enheter levererade samtidigt delas ersättningen lika.",
+        "no": "Kjøres når en økt denne enheten leverte i er avregnet, med enhetens andel av godtgjørelsen. Hvis flere enheter leverte samtidig, deles godtgjørelsen likt.",
+        "da": "Køres, når en session, som enheden leverede i, er afregnet, med enhedens andel af godtgørelsen. Hvis flere enheder leverede samtidig, deles godtgørelsen ligeligt.",
+        "de": "Läuft, wenn eine Session, in der dieses Gerät geliefert hat, abgerechnet ist, mit seinem Anteil an der Vergütung. Haben mehrere Geräte gleichzeitig geliefert, wird die Vergütung gleichmäßig geteilt.",
+        "nl": "Draait wanneer een sessie waarin dit apparaat leverde is verrekend, met zijn deel van de vergoeding. Leverden meerdere apparaten tegelijk, dan wordt de vergoeding gelijk verdeeld."
+      },
+      "tokens": [
+        {
+          "name": "reward",
+          "type": "number",
+          "title": {
+            "en": "Reward",
+            "sv": "Ersättning",
+            "no": "Godtgjørelse",
+            "da": "Godtgørelse",
+            "de": "Vergütung",
+            "nl": "Vergoeding"
+          },
+          "example": 1.25
+        },
+        {
+          "name": "minutes",
+          "type": "number",
+          "title": {
+            "en": "Duration (min)",
+            "sv": "Längd (min)",
+            "no": "Varighet (min)",
+            "da": "Varighed (min)",
+            "de": "Dauer (min)",
+            "nl": "Duur (min)"
+          },
+          "example": 15
+        },
+        {
+          "name": "earned_today",
+          "type": "number",
+          "title": {
+            "en": "Earned today",
+            "sv": "Intjänat idag",
+            "no": "Tjent i dag",
+            "da": "Tjent i dag",
+            "de": "Heute verdient",
+            "nl": "Vandaag verdiend"
+          },
+          "example": 3.4
+        }
+      ]
+    },
+    {
+      "id": "flex_record_broken",
+      "title": {
+        "en": "A new record was set",
+        "sv": "Ett nytt rekord sattes",
+        "no": "En ny rekord ble satt",
+        "da": "En ny rekord blev sat",
+        "de": "Ein neuer Rekord wurde aufgestellt",
+        "nl": "Er is een nieuw record gevestigd"
+      },
+      "hint": {
+        "en": "Best day, best session or longest session so far. The value is in your currency, or in minutes for the longest session.",
+        "sv": "Bästa dagen, bästa sessionen eller längsta sessionen hittills. Värdet är i din valuta, eller i minuter för längsta sessionen.",
+        "no": "Beste dag, beste økt eller lengste økt så langt. Verdien er i din valuta, eller i minutter for lengste økt.",
+        "da": "Bedste dag, bedste session eller længste session indtil nu. Værdien er i din valuta, eller i minutter for længste session.",
+        "de": "Bester Tag, beste Session oder längste Session bisher. Der Wert ist in deiner Währung, bei der längsten Session in Minuten.",
+        "nl": "Beste dag, beste sessie of langste sessie tot nu toe. De waarde is in je valuta, of in minuten voor de langste sessie."
+      },
+      "tokens": [
+        {
+          "name": "record",
+          "type": "string",
+          "title": {
+            "en": "Record",
+            "sv": "Rekord",
+            "no": "Rekord",
+            "da": "Rekord",
+            "de": "Rekord",
+            "nl": "Record"
+          },
+          "example": {
+            "en": "Best day",
+            "sv": "Bästa dagen",
+            "no": "Beste dag",
+            "da": "Bedste dag",
+            "de": "Bester Tag",
+            "nl": "Beste dag"
+          }
+        },
+        {
+          "name": "value",
+          "type": "number",
+          "title": {
+            "en": "New value",
+            "sv": "Nytt värde",
+            "no": "Ny verdi",
+            "da": "Ny værdi",
+            "de": "Neuer Wert",
+            "nl": "Nieuwe waarde"
+          },
+          "example": 24.1
+        },
+        {
+          "name": "previous",
+          "type": "number",
+          "title": {
+            "en": "Previous record",
+            "sv": "Förra rekordet",
+            "no": "Forrige rekord",
+            "da": "Forrige rekord",
+            "de": "Bisheriger Rekord",
+            "nl": "Vorig record"
+          },
+          "example": 21.35
+        }
+      ]
     }
   ],
   "conditions": [

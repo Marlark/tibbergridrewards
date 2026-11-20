@@ -9,6 +9,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 - The app settings page shows each battery's planned charge level as a curve, with planned charging and discharging per quarter, until the end of tomorrow (Tibber's forecast, updated every 5 minutes).
 - Dashboard widget *Grid Rewards – battery plan* with the same curve and the current charge level.
+- What the car and the battery have earned: *Earned today*, *this month* and *in total* on each car/battery device, live during a session, and the flow card *A Grid Rewards session ended* with the device's share. Tibber only reports the home's total, so each session is credited to the device that delivered during it (split evenly if both did). On a real day: battery 14.91 kr + car 1.73 kr = the home's 16.64 kr.
+- On the car and the battery: sessions and delivery time today and this month, and its share (%) of what the cars and batteries earned this month.
+- *Available today* (%) on the home, the car and the battery: the part of the day it was available for Grid Rewards or delivering, logged to Insights. Only time Homey actually observed counts.
+- Records: best day, best session and longest session, for the home and for each car and battery, with the flow card *A new record was set*. Existing history gives the starting records, so updating does not fire the card.
+- The history page shows which car or battery delivered in each session, with a filter per device, and the records. The CSV export of sessions has a *Device* column.
+- Cars and batteries get their own icon when they are added (devices added earlier keep theirs).
+- Export of the sessions or the daily totals as CSV from the app settings page, to download or copy. English uses commas and a decimal point; the other languages use semicolons and a decimal comma, as spreadsheets in those countries expect.
 
 ## [0.2.0] – 2026-11-20
 

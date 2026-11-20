@@ -79,6 +79,35 @@
     "plan_charge": "Laddar",
     "plan_discharge": "Laddar ur",
     "plan_empty": "Ingen plan från Tibber än. Den hämtas var 5:e minut.",
-    "plan_note": "Tibbers prognos, kvart för kvart, till slutet av i morgon. Uppdaterad"
+    "plan_note": "Tibbers prognos, kvart för kvart, till slutet av i morgon. Uppdaterad",
+    "export_title": "Exportera",
+    "export_sessions": "Sessioner (senaste 100 per hem)",
+    "export_days": "Dagssummor (ungefär ett år)",
+    "export_download": "Ladda ner CSV",
+    "export_copy": "Kopiera",
+    "export_empty": "Inget att exportera än.",
+    "export_rows": "rader",
+    "export_copied": "Kopierat till urklipp",
+    "export_copy_failed": "Kunde inte kopiera. Prova Ladda ner i stället.",
+    "device": "Enhet",
+    "all_devices": "Alla bilar och batterier",
+    "records": "Rekord"
+  },
+  "export": {
+    "home": "Hem",
+    "started": "Start",
+    "ended": "Slut",
+    "date": "Datum",
+    "sessions": "Sessioner",
+    "minutes": "Minuter",
+    "reward": "Ersättning",
+    "currency": "Valuta",
+    "reason": "Orsak",
+    "device": "Enhet"
+  },
+  "records": {
+    "bestDay": "Bästa dagen",
+    "bestSession": "Bästa sessionen",
+    "longestSession": "Längsta sessionen"
   }
 }

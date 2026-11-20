@@ -7,9 +7,15 @@
  */
 
 const history = require('./lib/history');
+const csv = require('./lib/csv');
 
 module.exports = {
   async getHistory({ homey }) {
     return history.getHistory({ homey });
+  },
+
+  // CSV of the sessions or the daily totals (#10). query.kind: 'sessions' | 'days'
+  async getExport({ homey, query = {} }) {
+    return csv.exportCsv({ homey, kind: query.kind });
   },
 };

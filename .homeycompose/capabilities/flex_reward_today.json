@@ -1,0 +1,20 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Earned today",
+    "sv": "Intjänat idag",
+    "no": "Tjent i dag",
+    "da": "Tjent i dag",
+    "de": "Heute verdient",
+    "nl": "Vandaag verdiend"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

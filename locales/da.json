@@ -79,6 +79,35 @@
     "plan_charge": "Oplader",
     "plan_discharge": "Aflader",
     "plan_empty": "Ingen plan fra Tibber endnu. Den hentes hvert 5. minut.",
-    "plan_note": "Tibbers prognose, kvarter for kvarter, til slutningen af i morgen. Opdateret"
+    "plan_note": "Tibbers prognose, kvarter for kvarter, til slutningen af i morgen. Opdateret",
+    "export_title": "Eksportér",
+    "export_sessions": "Sessioner (seneste 100 pr. hjem)",
+    "export_days": "Dagssummer (omkring et år)",
+    "export_download": "Hent CSV",
+    "export_copy": "Kopiér",
+    "export_empty": "Intet at eksportere endnu.",
+    "export_rows": "rækker",
+    "export_copied": "Kopieret til udklipsholderen",
+    "export_copy_failed": "Kunne ikke kopiere. Prøv Hent CSV i stedet.",
+    "device": "Enhed",
+    "all_devices": "Alle biler og batterier",
+    "records": "Rekorder"
+  },
+  "export": {
+    "home": "Hjem",
+    "started": "Start",
+    "ended": "Slut",
+    "date": "Dato",
+    "sessions": "Sessioner",
+    "minutes": "Minutter",
+    "reward": "Godtgørelse",
+    "currency": "Valuta",
+    "reason": "Årsag",
+    "device": "Enhed"
+  },
+  "records": {
+    "bestDay": "Bedste dag",
+    "bestSession": "Bedste session",
+    "longestSession": "Længste session"
   }
 }

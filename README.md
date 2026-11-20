@@ -12,10 +12,10 @@ Follow your [Tibber Grid Rewards](https://tibber.com) in [Homey](https://homey.a
 
 - **Live status** of Grid Rewards for each home: available, delivering or unavailable, with the reason (e.g. *Excess power in the grid*, *No car plugged in*).
 - **Earnings** for the current session, today, this month and all time, logged to Insights.
-- **Statistics**: last session, sessions and delivery time today, sessions this month.
-- **Car and home battery** as their own devices: plugged in, smart control, and for the battery its savings, current activity and next planned charge or discharge.
+- **Statistics**: last session, sessions and delivery time today, sessions this month, how much of the day the home was available, and records (best day, best session, longest session).
+- **Car and home battery** as their own devices: what each one earned today, this month and in total, its sessions and share, how much of the day it was available, records, plugged in, smart control, and for the battery its savings, current activity and next planned charge or discharge.
 - **Flow cards** for sessions, daily and monthly summaries, amounts passed, long unavailability and more.
-- **Three dashboard widgets** (status, the last 7 days and the battery plan) and a **session history** page that is kept even if you remove and add the home again. The history page also shows each battery’s planned charge level.
+- **Three dashboard widgets** (status, the last 7 days and the battery plan) and a **session history** page that is kept even if you remove and add the home again. The history page also shows each battery’s planned charge level, and exports sessions or daily totals as CSV.
 - **Six languages**: English, Swedish, Norwegian, Danish, German and Dutch.
 
 ## Requirements
@@ -111,6 +111,7 @@ The app logs in like the Tibber mobile app and subscribes to `gridRewardStatus` 
 
 - **today** = month total − month total at the start of the day
 - **session** = month total − month total when the session started
+- **car / battery** = the sessions it delivered in. Tibber only reports the home's total, but each car and battery has its own status, and in real data only one of them delivers at a time. If both deliver during the same session, its reward is split evenly. Counted from when you update to the first version with this feature; earlier sessions are not split.
 
 This is robust where it matters:
 
@@ -144,6 +145,10 @@ lib/                 Logic without Homey dependencies (tested on its own)
   RewardTracker.js     Today, sessions, settlement, day/month rollover
   battery.js           Battery query and parsing
   planChart.js         The battery plan curve (SVG), for the settings page and widget
+  csv.js               CSV export of sessions and daily totals
+  flexEarnings.js      What each car/battery earned, from the sessions it delivered in
+  availability.js      "Available today" in %
+  records.js           Best day, best session, longest session
 drivers/grid-reward/ The home device (login, subscription, flow cards)
 drivers/flex-device/ Car and battery, fed by the home device
 widgets/             Dashboard widgets: status, last 7 days, battery plan

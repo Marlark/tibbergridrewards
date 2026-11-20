@@ -79,6 +79,35 @@
     "plan_charge": "Laden",
     "plan_discharge": "Ontladen",
     "plan_empty": "Nog geen plan van Tibber. Het wordt elke 5 minuten opgehaald.",
-    "plan_note": "Prognose van Tibber, per kwartier, tot het einde van morgen. Bijgewerkt"
+    "plan_note": "Prognose van Tibber, per kwartier, tot het einde van morgen. Bijgewerkt",
+    "export_title": "Exporteren",
+    "export_sessions": "Sessies (laatste 100 per huis)",
+    "export_days": "Dagtotalen (ongeveer een jaar)",
+    "export_download": "CSV downloaden",
+    "export_copy": "Kopiëren",
+    "export_empty": "Nog niets om te exporteren.",
+    "export_rows": "regels",
+    "export_copied": "Gekopieerd naar het klembord",
+    "export_copy_failed": "Kopiëren lukt niet. Probeer Downloaden.",
+    "device": "Apparaat",
+    "all_devices": "Alle auto’s en batterijen",
+    "records": "Persoonlijke records"
+  },
+  "export": {
+    "home": "Huis",
+    "started": "Begin",
+    "ended": "Einde",
+    "date": "Datum",
+    "sessions": "Sessies",
+    "minutes": "Minuten",
+    "reward": "Vergoeding",
+    "currency": "Valuta",
+    "reason": "Reden",
+    "device": "Apparaat"
+  },
+  "records": {
+    "bestDay": "Beste dag",
+    "bestSession": "Beste sessie",
+    "longestSession": "Langste sessie"
   }
 }

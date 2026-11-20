@@ -24,12 +24,22 @@
       .plan .charge { fill: #2bb673; }
       .plan .discharge { fill: #f2994a; }
       .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 6px 0; }
+      .export { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin: 8px 0; }
+      .export select, .export button { font: inherit; padding: 6px 10px; }
       .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
     </style>
   </head>
   <body>
     <h1 id="title" class="homey-title"></h1>
     <div id="root"><p class="muted">…</p></div>
+
+    <h2 id="export_title"></h2>
+    <div class="export">
+      <select id="export_kind"><option value="sessions"></option><option value="days"></option></select>
+      <button id="export_download" class="homey-button-secondary-shadow"></button>
+      <button id="export_copy" class="homey-button-secondary-shadow"></button>
+    </div>
+    <p id="export_status" class="muted"></p>
 
     <script type="text/javascript">
       function esc(s) {
@@ -45,13 +55,30 @@
         return UNIT === '€' ? `€${n}` : `${n} ${UNIT}`;
       }
 
-      function renderHome(home, L) {
+      // Sessions per local day, newest first (the same as perDay in lib/history.js).
+      function perDay(sessions) {
+        const days = new Map();
+        for (const x of sessions) {
+          const d = days.get(x.date) || { date: x.date, reward: 0, sessions: 0, minutes: 0 };
+          d.reward = Math.round((d.reward + x.reward) * 100) / 100;
+          d.sessions += 1;
+          d.minutes += x.minutes;
+          days.set(x.date, d);
+        }
+        return [...days.values()].sort((p, q) => (p.date < q.date ? 1 : -1));
+      }
+
+      // filter: '' for all sessions, or a car/battery name (#69).
+      function renderHome(home, L, filter = '') {
         UNIT = home.unit || 'kr';
         if (!home.sessions.length) {
           return `<h2>${esc(home.name)}</h2><p class="muted">${esc(L.empty)}</p>`;
         }
-        const max = Math.max(...home.days.map((d) => d.reward), 0.01);
-        const days = home.days.map((d) => `
+        const list = filter ? home.sessions.filter((x) => x.devices.includes(filter)) : home.sessions;
+        const daysList = filter ? perDay(list) : home.days;
+        const total = Math.round(list.reduce((sum, x) => sum + x.reward, 0) * 100) / 100;
+        const max = Math.max(...daysList.map((d) => d.reward), 0.01);
+        const days = daysList.map((d) => `
           <tr>
             <td>${esc(d.date)}</td>
             <td class="num">${kr(d.reward)}</td>
@@ -59,16 +86,35 @@
             <td class="num">${d.minutes} ${esc(L.min)}</td>
             <td style="width:30%"><div class="bar" style="width:${Math.round((d.reward / max) * 100)}%"></div></td>
           </tr>`).join('');
-        const sessions = home.sessions.map((s) => `
+        const withDevices = home.devices && home.devices.length;
+        const sessions = list.map((x) => `
           <tr>
-            <td>${esc(s.when)}</td>
-            <td class="num">${kr(s.reward)}</td>
-            <td class="num">${s.minutes} ${esc(L.min)}</td>
-            <td class="reason">${esc(s.reasonText || '–')}</td>
+            <td>${esc(x.when)}</td>
+            <td class="num">${kr(x.reward)}</td>
+            <td class="num">${x.minutes} ${esc(L.min)}</td>
+            ${withDevices ? `<td>${esc(x.devices.join(' + ') || '–')}</td>` : ''}
+            <td class="reason">${esc(x.reasonText || '–')}</td>
           </tr>`).join('');
+        const picker = withDevices ? `
+          <p><select class="device-filter" data-home="${esc(home.id)}">
+            <option value="">${esc(L.all_devices)}</option>
+            ${home.devices.map((d) => `<option value="${esc(d)}"${d === filter ? ' selected' : ''}>${esc(d)}</option>`).join('')}
+          </select></p>` : '';
+        const records = (home.records || []).length ? `
+          <h3>${esc(L.records)}</h3>
+          <table>
+            ${home.records.map((r) => r.items.map((x, i) => `
+              <tr>
+                <td>${i === 0 ? esc(r.name) : ''}</td>
+                <td>${esc(x.label)}</td>
+                <td class="num">${x.minutes ? `${x.value} ${esc(L.min)}` : kr(x.value)}</td>
+                <td class="muted">${esc(x.when)}</td>
+              </tr>`).join('')).join('')}
+          </table>` : '';
         return `
           <h2>${esc(home.name)}</h2>
-          <p class="total muted">${esc(L.total)}: ${kr(home.total)} · ${home.sessions.length} ${esc(L.sessions_count)}</p>
+          ${picker}
+          <p class="total muted">${esc(L.total)}: ${kr(total)} · ${list.length} ${esc(L.sessions_count)}</p>
           <h3>${esc(L.per_day)}</h3>
           <table>
             <thead><tr><th></th><th class="num">${esc(L.reward)}</th><th class="num">${esc(L.sessions)}</th>
@@ -78,9 +124,10 @@
           <h3>${esc(L.sessions)}</h3>
           <table>
             <thead><tr><th>${esc(L.when)}</th><th class="num">${esc(L.reward)}</th>
-              <th class="num">${esc(L.duration)}</th><th>${esc(L.reason)}</th></tr></thead>
+              <th class="num">${esc(L.duration)}</th>${withDevices ? `<th>${esc(L.device)}</th>` : ''}<th>${esc(L.reason)}</th></tr></thead>
             <tbody>${sessions}</tbody>
-          </table>`;
+          </table>
+          ${records}`;
       }
 
       // Battery plan (#15): the curve comes as an SVG from the API (lib/planChart.js).
@@ -94,6 +141,51 @@
         return `${head}<div class="plan">${b.svg}</div>${legend}${note}`;
       }
 
+      // Export (#10). Downloading does not work in every Homey app, so copying is offered too.
+      function setupExport(Homey, L) {
+        const $ = (id) => document.getElementById(id);
+        $('export_title').textContent = L.export_title;
+        $('export_kind').options[0].textContent = L.export_sessions;
+        $('export_kind').options[1].textContent = L.export_days;
+        $('export_download').textContent = L.export_download;
+        $('export_copy').textContent = L.export_copy;
+        const status = (t) => { $('export_status').textContent = t; };
+        const fetchCsv = () => new Promise((resolve, reject) => {
+          Homey.api('GET', `/export?kind=${encodeURIComponent($('export_kind').value)}`, null,
+            (err, data) => (err ? reject(err) : resolve(data)));
+        });
+        const fail = (err) => status(err && err.message ? err.message : String(err));
+
+        $('export_download').addEventListener('click', () => fetchCsv().then((d) => {
+          if (!d.rows) { status(L.export_empty); return; }
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(new Blob([d.csv], { type: 'text/csv;charset=utf-8' }));
+          a.download = d.filename;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          status(`${d.filename} · ${d.rows} ${L.export_rows}`);
+        }).catch(fail));
+
+        $('export_copy').addEventListener('click', () => fetchCsv().then(async (d) => {
+          if (!d.rows) { status(L.export_empty); return; }
+          const text = d.csv.replace(/^﻿/, '');
+          try {
+            await navigator.clipboard.writeText(text);
+          } catch (err) {
+            // Older web views: copy through a hidden text field.
+            const t = document.createElement('textarea');
+            t.value = text;
+            document.body.appendChild(t);
+            t.select();
+            const ok = document.execCommand('copy');
+            t.remove();
+            if (!ok) throw new Error(L.export_copy_failed);
+          }
+          status(`${L.export_copied} · ${d.rows} ${L.export_rows}`);
+        }).catch(fail));
+      }
+
       function onHomeyReady(Homey) {
         Homey.api('GET', '/history', null, (err, data) => {
           const root = document.getElementById('root');
@@ -102,10 +194,16 @@
           } else {
             const L = data.labels;
             document.getElementById('title').textContent = L.title;
+            setupExport(Homey, L);
             root.innerHTML = (data.homes.length
-              ? data.homes.map((h) => renderHome(h, L)).join('')
+              ? data.homes.map((h, i) => `<section id="home-${i}">${renderHome(h, L)}</section>`).join('')
               : `<p class="muted">${esc(L.no_home)}</p>`)
               + (data.batteries || []).map((b) => renderPlan(b, L)).join('');
+            root.addEventListener('change', (e) => {
+              if (!e.target.classList.contains('device-filter')) return;
+              const i = data.homes.findIndex((h) => h.id === e.target.dataset.home);
+              if (i >= 0) document.getElementById(`home-${i}`).innerHTML = renderHome(data.homes[i], L, e.target.value);
+            });
           }
           Homey.ready();
         });

@@ -43,6 +43,10 @@
     "getHistory": {
       "method": "GET",
       "path": "/history"
+    },
+    "getExport": {
+      "method": "GET",
+      "path": "/export"
     }
   },
   "flow": {
@@ -354,6 +358,147 @@
               "nl": "Slimme sturing aan"
             },
             "example": false
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_session_ended",
+        "title": {
+          "en": "A Grid Rewards session ended",
+          "sv": "En Grid Rewards-session slutade",
+          "no": "En Grid Rewards-økt ble avsluttet",
+          "da": "En Grid Rewards-session sluttede",
+          "de": "Eine Grid-Rewards-Session wurde beendet",
+          "nl": "Een Grid Rewards-sessie is beëindigd"
+        },
+        "hint": {
+          "en": "Runs when a session this device delivered in has been settled, with its share of the reward. If several devices delivered at the same time, the reward is split evenly.",
+          "sv": "Körs när en session som enheten levererade i har räknats klart, med enhetens del av ersättningen. Om flera enheter levererade samtidigt delas ersättningen lika.",
+          "no": "Kjøres når en økt denne enheten leverte i er avregnet, med enhetens andel av godtgjørelsen. Hvis flere enheter leverte samtidig, deles godtgjørelsen likt.",
+          "da": "Køres, når en session, som enheden leverede i, er afregnet, med enhedens andel af godtgørelsen. Hvis flere enheder leverede samtidig, deles godtgørelsen ligeligt.",
+          "de": "Läuft, wenn eine Session, in der dieses Gerät geliefert hat, abgerechnet ist, mit seinem Anteil an der Vergütung. Haben mehrere Geräte gleichzeitig geliefert, wird die Vergütung gleichmäßig geteilt.",
+          "nl": "Draait wanneer een sessie waarin dit apparaat leverde is verrekend, met zijn deel van de vergoeding. Leverden meerdere apparaten tegelijk, dan wordt de vergoeding gelijk verdeeld."
+        },
+        "tokens": [
+          {
+            "name": "reward",
+            "type": "number",
+            "title": {
+              "en": "Reward",
+              "sv": "Ersättning",
+              "no": "Godtgjørelse",
+              "da": "Godtgørelse",
+              "de": "Vergütung",
+              "nl": "Vergoeding"
+            },
+            "example": 1.25
+          },
+          {
+            "name": "minutes",
+            "type": "number",
+            "title": {
+              "en": "Duration (min)",
+              "sv": "Längd (min)",
+              "no": "Varighet (min)",
+              "da": "Varighed (min)",
+              "de": "Dauer (min)",
+              "nl": "Duur (min)"
+            },
+            "example": 15
+          },
+          {
+            "name": "earned_today",
+            "type": "number",
+            "title": {
+              "en": "Earned today",
+              "sv": "Intjänat idag",
+              "no": "Tjent i dag",
+              "da": "Tjent i dag",
+              "de": "Heute verdient",
+              "nl": "Vandaag verdiend"
+            },
+            "example": 3.4
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_record_broken",
+        "title": {
+          "en": "A new record was set",
+          "sv": "Ett nytt rekord sattes",
+          "no": "En ny rekord ble satt",
+          "da": "En ny rekord blev sat",
+          "de": "Ein neuer Rekord wurde aufgestellt",
+          "nl": "Er is een nieuw record gevestigd"
+        },
+        "hint": {
+          "en": "Best day, best session or longest session so far. The value is in your currency, or in minutes for the longest session.",
+          "sv": "Bästa dagen, bästa sessionen eller längsta sessionen hittills. Värdet är i din valuta, eller i minuter för längsta sessionen.",
+          "no": "Beste dag, beste økt eller lengste økt så langt. Verdien er i din valuta, eller i minutter for lengste økt.",
+          "da": "Bedste dag, bedste session eller længste session indtil nu. Værdien er i din valuta, eller i minutter for længste session.",
+          "de": "Bester Tag, beste Session oder längste Session bisher. Der Wert ist in deiner Währung, bei der längsten Session in Minuten.",
+          "nl": "Beste dag, beste sessie of langste sessie tot nu toe. De waarde is in je valuta, of in minuten voor de langste sessie."
+        },
+        "tokens": [
+          {
+            "name": "record",
+            "type": "string",
+            "title": {
+              "en": "Record",
+              "sv": "Rekord",
+              "no": "Rekord",
+              "da": "Rekord",
+              "de": "Rekord",
+              "nl": "Record"
+            },
+            "example": {
+              "en": "Best day",
+              "sv": "Bästa dagen",
+              "no": "Beste dag",
+              "da": "Bedste dag",
+              "de": "Bester Tag",
+              "nl": "Beste dag"
+            }
+          },
+          {
+            "name": "value",
+            "type": "number",
+            "title": {
+              "en": "New value",
+              "sv": "Nytt värde",
+              "no": "Ny verdi",
+              "da": "Ny værdi",
+              "de": "Neuer Wert",
+              "nl": "Nieuwe waarde"
+            },
+            "example": 24.1
+          },
+          {
+            "name": "previous",
+            "type": "number",
+            "title": {
+              "en": "Previous record",
+              "sv": "Förra rekordet",
+              "no": "Forrige rekord",
+              "da": "Forrige rekord",
+              "de": "Bisheriger Rekord",
+              "nl": "Vorig record"
+            },
+            "example": 21.35
           }
         ],
         "args": [
@@ -920,6 +1065,80 @@
             "filter": "driver_id=grid-reward"
           }
         ]
+      },
+      {
+        "id": "record_broken",
+        "title": {
+          "en": "A new record was set",
+          "sv": "Ett nytt rekord sattes",
+          "no": "En ny rekord ble satt",
+          "da": "En ny rekord blev sat",
+          "de": "Ein neuer Rekord wurde aufgestellt",
+          "nl": "Er is een nieuw record gevestigd"
+        },
+        "hint": {
+          "en": "Best day, best session or longest session so far. The value is in your currency, or in minutes for the longest session.",
+          "sv": "Bästa dagen, bästa sessionen eller längsta sessionen hittills. Värdet är i din valuta, eller i minuter för längsta sessionen.",
+          "no": "Beste dag, beste økt eller lengste økt så langt. Verdien er i din valuta, eller i minutter for lengste økt.",
+          "da": "Bedste dag, bedste session eller længste session indtil nu. Værdien er i din valuta, eller i minutter for længste session.",
+          "de": "Bester Tag, beste Session oder längste Session bisher. Der Wert ist in deiner Währung, bei der längsten Session in Minuten.",
+          "nl": "Beste dag, beste sessie of langste sessie tot nu toe. De waarde is in je valuta, of in minuten voor de langste sessie."
+        },
+        "tokens": [
+          {
+            "name": "record",
+            "type": "string",
+            "title": {
+              "en": "Record",
+              "sv": "Rekord",
+              "no": "Rekord",
+              "da": "Rekord",
+              "de": "Rekord",
+              "nl": "Record"
+            },
+            "example": {
+              "en": "Best day",
+              "sv": "Bästa dagen",
+              "no": "Beste dag",
+              "da": "Bedste dag",
+              "de": "Bester Tag",
+              "nl": "Beste dag"
+            }
+          },
+          {
+            "name": "value",
+            "type": "number",
+            "title": {
+              "en": "New value",
+              "sv": "Nytt värde",
+              "no": "Ny verdi",
+              "da": "Ny værdi",
+              "de": "Neuer Wert",
+              "nl": "Nieuwe waarde"
+            },
+            "example": 24.1
+          },
+          {
+            "name": "previous",
+            "type": "number",
+            "title": {
+              "en": "Previous record",
+              "sv": "Förra rekordet",
+              "no": "Forrige rekord",
+              "da": "Forrige rekord",
+              "de": "Bisheriger Rekord",
+              "nl": "Vorig record"
+            },
+            "example": 21.35
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=grid-reward"
+          }
+        ]
       }
     ],
     "conditions": [
@@ -1225,6 +1444,14 @@
       "capabilities": [
         "grid_reward_state",
         "grid_reward_reason",
+        "flex_reward_today",
+        "flex_reward_month",
+        "flex_reward_total",
+        "flex_reward_share",
+        "grid_reward_sessions_today",
+        "grid_reward_minutes_today",
+        "grid_reward_sessions_month",
+        "grid_reward_availability",
         "flex_plugged_in",
         "flex_smart_enabled",
         "battery_savings_today",
@@ -1276,7 +1503,8 @@
         "grid_reward_last_session",
         "grid_reward_sessions_today",
         "grid_reward_minutes_today",
-        "grid_reward_sessions_month"
+        "grid_reward_sessions_month",
+        "grid_reward_availability"
       ],
       "platforms": [
         "local"
@@ -1604,6 +1832,91 @@
         "nl": "Losgekoppeld"
       }
     },
+    "flex_reward_month": {
+      "type": "number",
+      "title": {
+        "en": "Earned this month",
+        "sv": "Intjänat denna månad",
+        "no": "Tjent denne måneden",
+        "da": "Tjent denne måned",
+        "de": "Diesen Monat verdient",
+        "nl": "Deze maand verdiend"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "flex_reward_share": {
+      "type": "number",
+      "title": {
+        "en": "Share of earnings this month",
+        "sv": "Andel av månadens intjäning",
+        "no": "Andel av månedens inntjening",
+        "da": "Andel af månedens indtjening",
+        "de": "Anteil am Verdienst diesen Monat",
+        "nl": "Aandeel in de verdiensten deze maand"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 0,
+      "units": {
+        "en": "%",
+        "sv": "%",
+        "no": "%",
+        "da": "%",
+        "de": "%",
+        "nl": "%"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "flex_reward_today": {
+      "type": "number",
+      "title": {
+        "en": "Earned today",
+        "sv": "Intjänat idag",
+        "no": "Tjent i dag",
+        "da": "Tjent i dag",
+        "de": "Heute verdient",
+        "nl": "Vandaag verdiend"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "flex_reward_total": {
+      "type": "number",
+      "title": {
+        "en": "Earned in total",
+        "sv": "Intjänat totalt",
+        "no": "Tjent totalt",
+        "da": "Tjent i alt",
+        "de": "Insgesamt verdient",
+        "nl": "Totaal verdiend"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
     "flex_smart_enabled": {
       "type": "boolean",
       "title": {
@@ -1687,6 +2000,31 @@
       },
       "insights": true,
       "icon": "/assets/reward.svg"
+    },
+    "grid_reward_availability": {
+      "type": "number",
+      "title": {
+        "en": "Available today",
+        "sv": "Tillgänglig idag",
+        "no": "Tilgjengelig i dag",
+        "da": "Tilgængelig i dag",
+        "de": "Heute verfügbar",
+        "nl": "Vandaag beschikbaar"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 0,
+      "units": {
+        "en": "%",
+        "sv": "%",
+        "no": "%",
+        "da": "%",
+        "de": "%",
+        "nl": "%"
+      },
+      "insights": true,
+      "icon": "/assets/plug.svg"
     },
     "grid_reward_last_session": {
       "type": "number",

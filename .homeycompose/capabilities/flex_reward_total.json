@@ -1,0 +1,20 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Earned in total",
+    "sv": "Intjänat totalt",
+    "no": "Tjent totalt",
+    "da": "Tjent i alt",
+    "de": "Insgesamt verdient",
+    "nl": "Totaal verdiend"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

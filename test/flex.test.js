@@ -54,6 +54,11 @@ test('home device caches flex devices for pairing', async () => {
   assert.deepStrictEqual(home.getFlexDevices().map((f) => [f.id, f.kind, f.name]), [['v1', 'vehicle', 'Car'], ['b1', 'battery', 'Battery']]);
 });
 
+const EARNED = [
+  'flex_reward_today', 'flex_reward_month', 'flex_reward_total', 'flex_reward_share',
+  'grid_reward_sessions_today', 'grid_reward_minutes_today', 'grid_reward_sessions_month', 'grid_reward_availability',
+];
+
 test('pairing lists car and battery with the right capabilities', async () => {
   const { homey, home, sub } = await setup();
   sub.emit('data', status([car(false), battery]));
@@ -64,16 +69,21 @@ test('pairing lists car and battery with the right capabilities', async () => {
     {
       name: 'Car (EV3)',
       data: { id: 'v1', homeId: 'h1', kind: 'vehicle' },
-      capabilities: ['grid_reward_state', 'grid_reward_reason', 'flex_plugged_in', 'flex_smart_enabled'],
+      capabilities: ['grid_reward_state', 'grid_reward_reason', ...EARNED, 'flex_plugged_in', 'flex_smart_enabled'],
+      icon: '/vehicle.svg',
     },
     {
       name: 'Battery (Huawei)',
       data: { id: 'b1', homeId: 'h1', kind: 'battery' },
-      capabilities: ['grid_reward_state', 'grid_reward_reason', 'flex_smart_enabled',
+      capabilities: ['grid_reward_state', 'grid_reward_reason', ...EARNED, 'flex_smart_enabled',
         'battery_savings_today', 'battery_savings_week', 'battery_savings_month',
         'battery_activity', 'battery_next_activity'],
+      icon: '/battery.svg',
     },
   ]);
+  // Every capability the devices get must be declared for the driver.
+  const declared = require('../drivers/flex-device/driver.compose.json').capabilities;
+  for (const d of list) for (const c of d.capabilities) assert.ok(declared.includes(c), c);
 });
 
 test('pairing without a home device, or before any data, explains what to do', async () => {

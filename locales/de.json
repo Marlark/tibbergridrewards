@@ -79,6 +79,35 @@
     "plan_charge": "Laden",
     "plan_discharge": "Entladen",
     "plan_empty": "Noch kein Plan von Tibber. Er wird alle 5 Minuten abgerufen.",
-    "plan_note": "Prognose von Tibber, Viertelstunde für Viertelstunde, bis Ende morgen. Aktualisiert"
+    "plan_note": "Prognose von Tibber, Viertelstunde für Viertelstunde, bis Ende morgen. Aktualisiert",
+    "export_title": "Exportieren",
+    "export_sessions": "Sessions (letzte 100 pro Zuhause)",
+    "export_days": "Tagessummen (etwa ein Jahr)",
+    "export_download": "CSV herunterladen",
+    "export_copy": "Kopieren",
+    "export_empty": "Noch nichts zu exportieren.",
+    "export_rows": "Zeilen",
+    "export_copied": "In die Zwischenablage kopiert",
+    "export_copy_failed": "Kopieren nicht möglich. Versuche stattdessen Herunterladen.",
+    "device": "Gerät",
+    "all_devices": "Alle Autos und Batterien",
+    "records": "Rekorde"
+  },
+  "export": {
+    "home": "Zuhause",
+    "started": "Beginn",
+    "ended": "Ende",
+    "date": "Datum",
+    "sessions": "Sessions",
+    "minutes": "Minuten",
+    "reward": "Vergütung",
+    "currency": "Währung",
+    "reason": "Grund",
+    "device": "Gerät"
+  },
+  "records": {
+    "bestDay": "Bester Tag",
+    "bestSession": "Beste Session",
+    "longestSession": "Längste Session"
   }
 }

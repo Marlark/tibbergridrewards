@@ -79,6 +79,35 @@
     "plan_charge": "Charging",
     "plan_discharge": "Discharging",
     "plan_empty": "No plan from Tibber yet. It is fetched every 5 minutes.",
-    "plan_note": "Tibber’s forecast, quarter by quarter, until the end of tomorrow. Updated"
+    "plan_note": "Tibber’s forecast, quarter by quarter, until the end of tomorrow. Updated",
+    "export_title": "Export",
+    "export_sessions": "Sessions (last 100 per home)",
+    "export_days": "Daily totals (about a year)",
+    "export_download": "Download CSV",
+    "export_copy": "Copy",
+    "export_empty": "Nothing to export yet.",
+    "export_rows": "rows",
+    "export_copied": "Copied to the clipboard",
+    "export_copy_failed": "Could not copy. Try Download instead.",
+    "device": "Device",
+    "all_devices": "All cars and batteries",
+    "records": "Records"
+  },
+  "export": {
+    "home": "Home",
+    "started": "Started",
+    "ended": "Ended",
+    "date": "Date",
+    "sessions": "Sessions",
+    "minutes": "Minutes",
+    "reward": "Reward",
+    "currency": "Currency",
+    "reason": "Reason",
+    "device": "Device"
+  },
+  "records": {
+    "bestDay": "Best day",
+    "bestSession": "Best session",
+    "longestSession": "Longest session"
   }
 }

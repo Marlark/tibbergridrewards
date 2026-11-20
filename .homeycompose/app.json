@@ -42,6 +42,10 @@
     "getHistory": {
       "method": "GET",
       "path": "/history"
+    },
+    "getExport": {
+      "method": "GET",
+      "path": "/export"
     }
   }
 }

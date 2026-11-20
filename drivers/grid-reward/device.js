@@ -9,6 +9,9 @@ const {
 const { reasonText } = require('../../lib/reasons');
 const { localeFor } = require('../../lib/i18n');
 const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
+const { splitSession, liveShares, earningsOf } = require('../../lib/flexEarnings');
+const { AvailabilityWatch } = require('../../lib/availability');
+const records = require('../../lib/records');
 
 // Capabilities shown in money; their unit follows Tibber's rewardCurrency.
 const MONEY_CAPABILITIES = [
@@ -39,6 +42,7 @@ const STATS_CAPABILITIES = [
   'grid_reward_sessions_today',
   'grid_reward_minutes_today',
   'grid_reward_sessions_month',
+  'grid_reward_availability',
 ];
 
 class GridRewardDevice extends Homey.Device {
@@ -76,6 +80,9 @@ class GridRewardDevice extends Homey.Device {
     for (const cap of STATS_CAPABILITIES) {
       if (!this.hasCapability(cap)) await this.addCapability(cap).catch(this.error);
     }
+
+    this.availability = new AvailabilityWatch(this);
+    this._seedRecords();
 
     this._startSubscription();
 
@@ -171,6 +178,7 @@ class GridRewardDevice extends Homey.Device {
 
   async _tickDay() {
     await this._checkUnavailable(this.lastGridState);
+    await this.availability.update(this.lastGridState, this._dayKey());
     const key = this._dayKey();
     if (this.tracker.dayKey === key) return;
     const result = rollDayEvents(this.tracker, key);
@@ -179,6 +187,7 @@ class GridRewardDevice extends Homey.Device {
     await this.setCapabilityValue('grid_reward_today', 0);
     await this._publishStats();
     await this._fireEvents(result.events);
+    await this._publishFlexEarnings();
   }
 
   async _saveTracker() {
@@ -214,8 +223,10 @@ class GridRewardDevice extends Homey.Device {
     const reason = { text: reasonText(this.homey, codes), code: codes.join(', ') };
 
     this.lastReason = reason;
+    // Cars/batteries delivering now: the session's reward is theirs (see lib/flexEarnings.js).
+    const flexDelivering = (flex || []).filter((f) => f.gridState === 'delivering').map((f) => f.id);
     const result = applyUpdate(this.tracker, {
-      month, gridState, dayKey: this._dayKey(), now: Date.now(), reason: reason.code,
+      month, gridState, dayKey: this._dayKey(), now: Date.now(), reason: reason.code, flexDelivering,
     });
     this.tracker = result.state;
     await this._saveTracker();
@@ -231,6 +242,8 @@ class GridRewardDevice extends Homey.Device {
     });
     await this._publishStats();
     await applyCurrency(this, MONEY_CAPABILITIES, currency);
+
+    await this.availability.update(gridState, this._dayKey());
 
     // Flow triggers
     await this._checkThresholds(result.today, month);
@@ -248,6 +261,7 @@ class GridRewardDevice extends Homey.Device {
     this._publishConnection();
 
     await this._updateFlexDevices(flex, { homeStateChanged });
+    await this._publishFlexEarnings();
   }
 
   async _fireEvents(events, reason = { text: '', code: '' }) {
@@ -257,10 +271,13 @@ class GridRewardDevice extends Homey.Device {
           .trigger(this, { reason: reason.text, reason_code: reason.code }).catch(this.error);
       } else if (ev.type === 'session_ended') {
         await this._addToHistory(ev);
+        await this._creditFlexDevices(ev);
+        await this._recordSession(ev);
         await this.homey.flow.getDeviceTriggerCard('session_ended')
           .trigger(this, { reward: ev.reward, minutes: ev.minutes }).catch(this.error);
       } else if (ev.type === 'day_ended') {
         await this._addDay(ev);
+        await this._recordDay(ev);
         await this.homey.flow.getDeviceTriggerCard('daily_summary')
           .trigger(this, {
             reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, date: ev.date,
@@ -352,6 +369,7 @@ class GridRewardDevice extends Homey.Device {
   async _addToHistory(ev) {
     const entry = {
       startedAt: ev.startedAt, endedAt: ev.endedAt, reward: ev.reward, minutes: ev.minutes, reason: ev.reason,
+      ...(ev.flex ? { flex: ev.flex } : {}),
     };
     this.homey.settings.set(this._key('history'), [entry, ...this.getHistory()].slice(0, HISTORY_MAX));
   }
@@ -449,9 +467,128 @@ class GridRewardDevice extends Homey.Device {
     await this._saveTracker();
     await this._publishStats();
     await this._fireEvents(result.events);
+    await this._publishFlexEarnings();
+  }
+
+  // --- What each car/battery earned (lib/flexEarnings.js) ---
+
+  /** What a car/battery of this home earned (lib/flexEarnings.js earningsOf), including the running session. */
+  getFlexEarnings(flexId) {
+    const store = this.homey.settings.get(this._key('flexearn')) || {};
+    return earningsOf(store, flexId, this._dayKey(), liveShares(this.tracker));
+  }
+
+  /** Name of a car/battery: as the user named its device, or as Tibber names it. */
+  flexName(flexId) {
+    const paired = this._flexDevicesOfHome().find((d) => d.getData().id === flexId);
+    if (paired && paired.getName) return paired.getName();
+    const f = this.getFlexDevices().find((x) => x.id === flexId);
+    return f ? (f.name || f.make || f.kind) : flexId;
+  }
+
+  // --- Records (lib/records.js) ---
+
+  /** { home: rec, [flexId]: rec } */
+  getRecords() {
+    return this.homey.settings.get(this._key('records')) || {};
+  }
+
+  /** First start with records: take them from the saved history, without triggers. */
+  _seedRecords() {
+    if (this.homey.settings.get(this._key('records'))) return;
+    const sessions = this.getHistory();
+    const all = { home: records.seed({ sessions, days: this.getDays() }) };
+    for (const id of new Set(sessions.flatMap((s) => s.flex || []))) {
+      all[id] = records.seed({ sessions, flexId: id });
+    }
+    this.homey.settings.set(this._key('records'), all);
+  }
+
+  async _recordSession(ev) {
+    const all = { ...this.getRecords() };
+    const found = [];
+    const home = records.onSession(all.home, ev);
+    all.home = home.rec;
+    found.push(...home.broken.map((b) => ({ ...b, id: null })));
+    for (const id of ev.flex || []) {
+      const r = records.onSession(all[id], { ...ev, reward: ev.reward / ev.flex.length });
+      all[id] = r.rec;
+      found.push(...r.broken.map((b) => ({ ...b, id })));
+    }
+    this.homey.settings.set(this._key('records'), all);
+    await this._fireRecords(found);
+  }
+
+  async _recordDay(ev) {
+    const all = { ...this.getRecords() };
+    const found = [];
+    const home = records.onDay(all.home, ev);
+    all.home = home.rec;
+    found.push(...home.broken.map((b) => ({ ...b, id: null })));
+    // Each car/battery's total for the day that ended.
+    const earned = this.homey.settings.get(this._key('flexearn')) || {};
+    for (const [id, e] of Object.entries(earned)) {
+      if (e.dayKey !== ev.date) continue;
+      const r = records.onDay(all[id], { reward: e.today, date: ev.date });
+      all[id] = r.rec;
+      found.push(...r.broken.map((b) => ({ ...b, id })));
+    }
+    this.homey.settings.set(this._key('records'), all);
+    await this._fireRecords(found);
+  }
+
+  async _fireRecords(found) {
+    for (const b of found) {
+      const tokens = { record: this.homey.__(`records.${b.type}`), value: b.value, previous: b.previous };
+      this.log(`New record${b.id ? ` for ${b.id}` : ''}: ${b.type} ${b.previous} -> ${b.value}`);
+      if (!b.id) {
+        await this.homey.flow.getDeviceTriggerCard('record_broken').trigger(this, tokens).catch(this.error);
+        continue;
+      }
+      const device = this._flexDevicesOfHome().find((d) => d.getData().id === b.id);
+      if (device) {
+        await this.homey.flow.getDeviceTriggerCard('flex_record_broken').trigger(device, tokens).catch(this.error);
+      }
+    }
+  }
+
+  _flexDevicesOfHome() {
+    try {
+      return this.homey.drivers.getDriver('flex-device').getDevices()
+        .filter((d) => d.getData().homeId === this.homeId);
+    } catch (err) {
+      return []; // driver not ready yet
+    }
+  }
+
+  /** A session ended: give its reward to the cars/batteries that delivered during it. */
+  async _creditFlexDevices(ev) {
+    if (!ev.flex || !ev.flex.length) return;
+    // The same day as the home's "today": a settlement after midnight counts in the new day.
+    const dayKey = this._dayKey();
+    const key = this._key('flexearn');
+    this.homey.settings.set(key, splitSession(this.homey.settings.get(key) || {}, ev, dayKey));
+    const share = Math.round((ev.reward / ev.flex.length) * 100) / 100;
+    for (const device of this._flexDevicesOfHome()) {
+      if (!ev.flex.includes(device.getData().id) || !device.onSessionEnded) continue;
+      const earnedToday = this.getFlexEarnings(device.getData().id).today;
+      await device.onSessionEnded({
+        reward: share, minutes: ev.minutes, earnedToday, shared: ev.flex.length > 1,
+      })
+        .catch(this.error);
+    }
+  }
+
+  async _publishFlexEarnings() {
+    const unit = this.getCurrencyUnit();
+    for (const device of this._flexDevicesOfHome()) {
+      if (!device.onEarnings) continue;
+      await device.onEarnings(this.getFlexEarnings(device.getData().id), unit).catch(this.error);
+    }
   }
 
   async onUninit() {
+    if (this.availability) await this.availability.save();
     this._stopSubscription();
     if (this.dayTimer) this.homey.clearInterval(this.dayTimer);
     if (this.settleTimer) this.homey.clearTimeout(this.settleTimer);

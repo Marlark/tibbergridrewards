@@ -1,0 +1,25 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Available today",
+    "sv": "Tillgänglig idag",
+    "no": "Tilgjengelig i dag",
+    "da": "Tilgængelig i dag",
+    "de": "Heute verfügbar",
+    "nl": "Vandaag beschikbaar"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 0,
+  "units": {
+    "en": "%",
+    "sv": "%",
+    "no": "%",
+    "da": "%",
+    "de": "%",
+    "nl": "%"
+  },
+  "insights": true,
+  "icon": "/assets/plug.svg"
+}

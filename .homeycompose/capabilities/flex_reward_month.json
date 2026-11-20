@@ -1,0 +1,20 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Earned this month",
+    "sv": "Intjänat denna månad",
+    "no": "Tjent denne måneden",
+    "da": "Tjent denne måned",
+    "de": "Diesen Monat verdient",
+    "nl": "Deze maand verdiend"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}
