@@ -51,7 +51,8 @@
     "battery": "Batteri",
     "saved_today": "sparat idag",
     "unavailable": "Ingen kontakt med Tibber",
-    "week_title": "Senaste 7 dagarna"
+    "week_title": "Senaste 7 dagarna",
+    "no_battery": "Lägg till ett husbatteri från Tibber för att se dess plan."
   },
   "conn": {
     "connecting": "Ansluter…",
@@ -72,6 +73,12 @@
     "total": "Totalt",
     "min": "min",
     "sessions_count": "sessioner",
-    "no_home": "Lägg till en Grid Rewards-enhet för hemmet för att se historiken."
+    "no_home": "Lägg till en Grid Rewards-enhet för hemmet för att se historiken.",
+    "plan_title": "Planerad laddnivå",
+    "plan_soc": "Laddnivå",
+    "plan_charge": "Laddar",
+    "plan_discharge": "Laddar ur",
+    "plan_empty": "Ingen plan från Tibber än. Den hämtas var 5:e minut.",
+    "plan_note": "Tibbers prognos, kvart för kvart, till slutet av i morgon. Uppdaterad"
   }
 }

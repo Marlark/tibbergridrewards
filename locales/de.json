@@ -51,7 +51,8 @@
     "battery": "Batterie",
     "saved_today": "heute gespart",
     "unavailable": "Keine Verbindung zu Tibber",
-    "week_title": "Letzte 7 Tage"
+    "week_title": "Letzte 7 Tage",
+    "no_battery": "Füge eine Heimbatterie von Tibber hinzu, um ihren Plan zu sehen."
   },
   "conn": {
     "connecting": "Verbinde…",
@@ -72,6 +73,12 @@
     "total": "Gesamt",
     "min": "min",
     "sessions_count": "Sessions",
-    "no_home": "Füge ein Grid-Rewards-Gerät für dein Zuhause hinzu, um den Verlauf zu sehen."
+    "no_home": "Füge ein Grid-Rewards-Gerät für dein Zuhause hinzu, um den Verlauf zu sehen.",
+    "plan_title": "Geplanter Ladestand",
+    "plan_soc": "Ladestand",
+    "plan_charge": "Laden",
+    "plan_discharge": "Entladen",
+    "plan_empty": "Noch kein Plan von Tibber. Er wird alle 5 Minuten abgerufen.",
+    "plan_note": "Prognose von Tibber, Viertelstunde für Viertelstunde, bis Ende morgen. Aktualisiert"
   }
 }

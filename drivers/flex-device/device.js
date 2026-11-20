@@ -189,6 +189,8 @@ class FlexDevice extends Homey.Device {
     }
     this.batteryFailures = 0;
     this.batteryWarning = false;
+    this.plan = parsed.plan;
+    this.planAt = Date.now();
     await applyCurrency(this, SAVINGS_CAPABILITIES, parsed.unit);
 
     const activityText = parsed.activity ? this._activityText(parsed.activity.code) : '-';
@@ -207,6 +209,11 @@ class FlexDevice extends Homey.Device {
         .catch(this.error);
     }
     this.lastActivityCode = code;
+  }
+
+  /** The latest planned charge level (#15), for the settings page. */
+  getPlan() {
+    return { points: this.plan || [], updatedAt: this.planAt || null };
   }
 
   /**

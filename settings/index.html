@@ -15,6 +15,16 @@
       td.num, th.num { text-align: right; white-space: nowrap; }
       .bar { height: 6px; border-radius: 3px; background: #1fb8cc; min-width: 2px; }
       .reason { opacity: 0.75; }
+      .plan svg { width: 100%; height: auto; display: block; font-size: 11px; }
+      .plan .grid { stroke: currentColor; stroke-opacity: 0.15; }
+      .plan .day { stroke: currentColor; stroke-opacity: 0.4; stroke-dasharray: 3 3; }
+      .plan text { fill: currentColor; fill-opacity: 0.7; }
+      .plan .soc { fill: none; stroke: #1fb8cc; stroke-width: 2; }
+      .plan .area { fill: #1fb8cc; fill-opacity: 0.12; }
+      .plan .charge { fill: #2bb673; }
+      .plan .discharge { fill: #f2994a; }
+      .legend { display: flex; gap: 16px; flex-wrap: wrap; margin: 6px 0; }
+      .legend i { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
     </style>
   </head>
   <body>
@@ -73,6 +83,17 @@
           </table>`;
       }
 
+      // Battery plan (#15): the curve comes as an SVG from the API (lib/planChart.js).
+      function renderPlan(b, L) {
+        const head = `<h2>${esc(b.name)}</h2><h3>${esc(L.plan_title)}</h3>`;
+        if (!b.svg) return `${head}<p class="muted">${esc(L.plan_empty)}</p>`;
+        const legend = `<div class="legend muted"><span><i style="background:#1fb8cc"></i>${esc(L.plan_soc)}</span>
+          <span><i style="background:#2bb673"></i>${esc(L.plan_charge)}</span>
+          <span><i style="background:#f2994a"></i>${esc(L.plan_discharge)}</span></div>`;
+        const note = `<p class="muted">${esc(L.plan_note)}${b.updated ? ` (${esc(b.updated)})` : ''}</p>`;
+        return `${head}<div class="plan">${b.svg}</div>${legend}${note}`;
+      }
+
       function onHomeyReady(Homey) {
         Homey.api('GET', '/history', null, (err, data) => {
           const root = document.getElementById('root');
@@ -81,9 +102,10 @@
           } else {
             const L = data.labels;
             document.getElementById('title').textContent = L.title;
-            root.innerHTML = data.homes.length
+            root.innerHTML = (data.homes.length
               ? data.homes.map((h) => renderHome(h, L)).join('')
-              : `<p class="muted">${esc(L.no_home)}</p>`;
+              : `<p class="muted">${esc(L.no_home)}</p>`)
+              + (data.batteries || []).map((b) => renderPlan(b, L)).join('');
           }
           Homey.ready();
         });

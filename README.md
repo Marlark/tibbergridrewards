@@ -15,7 +15,7 @@ Follow your [Tibber Grid Rewards](https://tibber.com) in [Homey](https://homey.a
 - **Statistics**: last session, sessions and delivery time today, sessions this month.
 - **Car and home battery** as their own devices: plugged in, smart control, and for the battery its savings, current activity and next planned charge or discharge.
 - **Flow cards** for sessions, daily and monthly summaries, amounts passed, long unavailability and more.
-- **Two dashboard widgets** (status and the last 7 days) and a **session history** page that is kept even if you remove and add the home again.
+- **Three dashboard widgets** (status, the last 7 days and the battery plan) and a **session history** page that is kept even if you remove and add the home again. The history page also shows each battery’s planned charge level.
 - **Six languages**: English, Swedish, Norwegian, Danish, German and Dutch.
 
 ## Requirements
@@ -39,7 +39,7 @@ homey app install     # or: homey app run, to see the log while it runs
 
 1. **Add your home:** *Devices → + → Tibber Grid Rewards → Grid Rewards*. Log in with your Tibber e-mail and password and pick the home(s).
 2. **Add your car and battery (optional):** *Grid Rewards → Car / battery (Grid Rewards)*. The list shows what your home device has received from Tibber, so add the home first.
-3. **Add a widget (optional):** edit a dashboard, add *Grid Rewards* (status) or *Grid Rewards – last 7 days* (a bar per day) and pick the home.
+3. **Add a widget (optional):** edit a dashboard, add *Grid Rewards* (status) or *Grid Rewards – last 7 days* (a bar per day) and pick the home, or *Grid Rewards – battery plan* (the planned charge level until the end of tomorrow) and pick the battery.
 4. **See the history:** *Settings → Apps → Tibber Grid Rewards* shows the last 100 sessions per home and totals per day. The history and daily totals are kept per Tibber home in the app, so removing and adding the home device again does not lose them.
 
 If your Tibber password changes, open the home device and choose **Repair** to enter the new one.
@@ -143,9 +143,10 @@ lib/                 Logic without Homey dependencies (tested on its own)
   ConnectionPool.js    One login and WebSocket per Tibber account, shared by its homes
   RewardTracker.js     Today, sessions, settlement, day/month rollover
   battery.js           Battery query and parsing
+  planChart.js         The battery plan curve (SVG), for the settings page and widget
 drivers/grid-reward/ The home device (login, subscription, flow cards)
 drivers/flex-device/ Car and battery, fed by the home device
-widgets/grid-rewards/ Dashboard widget
+widgets/             Dashboard widgets: status, last 7 days, battery plan
 settings/            Session history page (served by api.js)
 locales/             Translations (en, sv, no, da, de, nl)
 test/                Tests, with a stub of the homey module in test/helpers/

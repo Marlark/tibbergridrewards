@@ -43,7 +43,6 @@ Inget valt just nu. Förslag: #3 smart styrning, #2 missad ersättning, #13 tids
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
 | 14 | **Batteriet planerar att ladda** | ★★ | M | Flödeskort "Batteriet laddar/laddar ur om X minuter", från tidslinjen som redan hämtas. Kan styra annan förbrukning efter batteriets plan. |
-| 15 | **Batteriets planerade laddnivå** | ★★ | M | Laddnivån per kvart finns i samma svar. Visa nästa dygn som kurva på inställningssidan eller i widgeten. Batteridatan är inte verifierad mot Tibber än. |
 | 25 | **Villkor för batteriets aktivitet** | ★★ | S | Villkor "Batteriets aktivitet är …" med rullgardin över de kända koderna, och ett kort "Batteriet började ladda ur för Grid Rewards". Idag finns bara det generella "aktiviteten ändrades". |
 | 26 | **Aktivitet uppdelad i typ och orsak** | ★★ | S | Koderna följer ett mönster: *Charging/Discharging/Idle* + *ForGridRewards/AtLowPrice/WithSolar…*. Två värden, "Laddar/Laddar ur/Vilar" och "Grid Rewards/Pris/Sol", förenklar flöden, och en ny okänd kod hamnar ändå rätt i typ. |
 | 28 | **Okända koder synliga för användaren** | ★ | S | Nya batterikoder syns idag bara i loggen. Visa dem i batteriets inställningar ("Okända koder: …") med tips om att rapportera dem, så att även användare utan `homey app run` kan hjälpa till. |
@@ -108,3 +107,4 @@ Byggt 2026-11-20:
 - **Data:** historik och dagssummor sparas per hem i appen och överlever att hemmets enhet läggs till igen (#20)
 - **Batteriet:** uppgifterna hämtas ca 10 s efter att Grid Rewards-statusen ändras i stället för upp till 5 min senare (#27)
 - **Stabilitet:** en inloggning och en WebSocket per Tibber-konto, delad av kontots hem (#22)
+- **Batteriet:** kurva över planerad laddnivå och planerad laddning/urladdning till slutet av i morgon, på appens inställningssida och som widget (#15)

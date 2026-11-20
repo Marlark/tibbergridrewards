@@ -51,7 +51,8 @@
     "battery": "Batterij",
     "saved_today": "vandaag bespaard",
     "unavailable": "Geen verbinding met Tibber",
-    "week_title": "Laatste 7 dagen"
+    "week_title": "Laatste 7 dagen",
+    "no_battery": "Voeg een thuisbatterij van Tibber toe om het plan te zien."
   },
   "conn": {
     "connecting": "Verbinden…",
@@ -72,6 +73,12 @@
     "total": "Totaal",
     "min": "min",
     "sessions_count": "sessies",
-    "no_home": "Voeg een Grid Rewards-apparaat voor je woning toe om de geschiedenis te zien."
+    "no_home": "Voeg een Grid Rewards-apparaat voor je woning toe om de geschiedenis te zien.",
+    "plan_title": "Gepland laadniveau",
+    "plan_soc": "Laadniveau",
+    "plan_charge": "Laden",
+    "plan_discharge": "Ontladen",
+    "plan_empty": "Nog geen plan van Tibber. Het wordt elke 5 minuten opgehaald.",
+    "plan_note": "Prognose van Tibber, per kwartier, tot het einde van morgen. Bijgewerkt"
   }
 }

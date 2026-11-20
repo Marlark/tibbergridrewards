@@ -51,7 +51,8 @@
     "battery": "Battery",
     "saved_today": "saved today",
     "unavailable": "No connection to Tibber",
-    "week_title": "Last 7 days"
+    "week_title": "Last 7 days",
+    "no_battery": "Add a home battery from Tibber to see its plan."
   },
   "conn": {
     "connecting": "Connecting…",
@@ -72,6 +73,12 @@
     "total": "Total",
     "min": "min",
     "sessions_count": "sessions",
-    "no_home": "Add a Grid Rewards home device to see the history."
+    "no_home": "Add a Grid Rewards home device to see the history.",
+    "plan_title": "Planned charge level",
+    "plan_soc": "Charge level",
+    "plan_charge": "Charging",
+    "plan_discharge": "Discharging",
+    "plan_empty": "No plan from Tibber yet. It is fetched every 5 minutes.",
+    "plan_note": "Tibber’s forecast, quarter by quarter, until the end of tomorrow. Updated"
   }
 }

@@ -1,0 +1,24 @@
+{
+  "name": {
+    "en": "Grid Rewards – battery plan",
+    "sv": "Grid Rewards – batteriets plan",
+    "no": "Grid Rewards – batteriets plan",
+    "da": "Grid Rewards – batteriets plan",
+    "de": "Grid Rewards – Batterieplan",
+    "nl": "Grid Rewards – batterijplan"
+  },
+  "settings": [],
+  "devices": {
+    "type": "app",
+    "singular": true,
+    "filter": {
+      "capabilities": "battery_next_activity"
+    }
+  },
+  "api": {
+    "getPlan": {
+      "method": "GET",
+      "path": "/"
+    }
+  }
+}

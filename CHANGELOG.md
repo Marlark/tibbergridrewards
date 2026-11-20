@@ -3,6 +3,13 @@
 All notable changes to this app are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the app uses [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Added
+
+- The app settings page shows each battery's planned charge level as a curve, with planned charging and discharging per quarter, until the end of tomorrow (Tibber's forecast, updated every 5 minutes).
+- Dashboard widget *Grid Rewards – battery plan* with the same curve and the current charge level.
+
 ## [0.2.0] – 2026-11-20
 
 ### Changed

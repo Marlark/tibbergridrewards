@@ -9,8 +9,9 @@ const test = require('node:test');
 const assert = require('node:assert');
 const { makeHomey } = require('./helpers/homey-stub');
 const {
-  batteryVariables, parseBattery, activityCode, humanize, BATTERY_QUERY,
+  batteryVariables, parseBattery, parsePlan, activityCode, humanize, BATTERY_QUERY,
 } = require('../lib/battery');
+const history = require('../lib/history');
 const { TibberApiChangedError } = require('../lib/TibberAppClient');
 const FlexDevice = require('../drivers/flex-device/device');
 
@@ -77,13 +78,18 @@ test('parseBattery: savings, current activity, next planned', () => {
     nextPlanned: {
       time: '2026-11-17T13:30:00Z', action: 'discharge', powerW: 2500, stateOfCharge: 81.3,
     },
+    plan: [
+      { time: '2026-11-17T10:00:00Z', soc: null, powerW: 3000, forecast: false },
+      { time: '2026-11-17T10:15:00Z', soc: null, powerW: 40, forecast: true },
+      { time: '2026-11-17T13:30:00Z', soc: 81.3, powerW: -2500, forecast: true },
+    ],
   });
 });
 
 test('parseBattery: tolerates missing parts', () => {
   assert.strictEqual(parseBattery({}), null);
   assert.deepStrictEqual(parseBattery({ me: { home: {} } }), {
-    savingsToday: null, savingsWeek: null, savingsMonth: null, unit: '', activity: null, nextPlanned: null,
+    savingsToday: null, savingsWeek: null, savingsMonth: null, unit: '', activity: null, nextPlanned: null, plan: [],
   });
 });
 
@@ -240,4 +246,57 @@ test('a regular poll and a soon poll never run at the same time', async () => {
   release();
   await first;
   assert.strictEqual(calls, 1);
+});
+
+// --- Planned charge level (#15) ---
+
+test('parsePlan: charge level and power per quarter, sorted, gaps tolerated', () => {
+  assert.deepStrictEqual(parsePlan({
+    energyFlow: { items: [{ kind: 'FORECAST', time: '2026-11-17T10:30:00Z', charged: 0, discharged: 1200.4 }, null] },
+    stateOfCharge: {
+      items: [
+        { kind: 'FORECAST', time: '2026-11-17T10:30:00Z', stateOfCharge: 55.55 },
+        { kind: 'FORECAST', time: '2026-11-17T10:15:00Z', stateOfCharge: 60 },
+        { kind: 'FORECAST', time: '2026-11-17T10:45:00Z', stateOfCharge: null },
+      ],
+    },
+  }), [
+    { time: '2026-11-17T10:15:00Z', soc: 60, powerW: 0, forecast: true },
+    { time: '2026-11-17T10:30:00Z', soc: 55.6, powerW: -1200, forecast: true },
+  ]);
+  assert.deepStrictEqual(parsePlan(undefined), []);
+});
+
+test('the battery keeps its latest plan; the history API shows it in local time', async (t) => {
+  t.mock.method(Date, 'now', () => NOW);
+  let fail = false;
+  const { homey, device } = await batteryDevice(async () => {
+    if (fail) throw new Error('GraphQL: Circuit breaker open');
+    return response();
+  });
+  assert.deepStrictEqual(device.getPlan(), { points: [], updatedAt: null });
+  await device._pollBattery();
+  assert.strictEqual(device.getPlan().points.length, 3);
+  fail = true;
+  await device._pollBattery();
+  assert.strictEqual(device.getPlan().points.length, 3, 'a failed poll keeps the last plan');
+
+  device.getName = () => 'Battery';
+  homey.drivers.registry['flex-device'] = { getDevices: () => [device] };
+  const [b] = history.batteryPlans(homey, 'Europe/Stockholm', 'sv-SE');
+  assert.strictEqual(b.name, 'Battery');
+  assert.strictEqual(b.updated, '11:07');
+  assert.deepStrictEqual(b.points.map((p) => [p.label, p.dayKey, p.soc, p.powerW]), [
+    ['11:00', '2026-11-17', null, 3000],
+    ['11:15', '2026-11-17', null, 40],
+    ['14:30', '2026-11-17', 81.3, -2500],
+  ]);
+  await device.onUninit();
+});
+
+test('a car has no plan on the history page', () => {
+  const homey = makeHomey();
+  const car = { getData: () => ({ id: 'v1', kind: 'vehicle' }), getPlan: () => ({ points: [] }) };
+  homey.drivers.registry['flex-device'] = { getDevices: () => [car] };
+  assert.deepStrictEqual(history.batteryPlans(homey, 'Europe/Stockholm', 'sv-SE'), []);
 });

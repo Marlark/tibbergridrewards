@@ -1,0 +1,104 @@
+<html>
+  <head>
+    <style>
+      :root {
+        --gr-accent: #1fb8cc;
+        --gr-charge: #2bb673;
+        --gr-discharge: #f2994a;
+      }
+      body.homey-widget {
+        padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+        box-sizing: border-box;
+      }
+      .head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--homey-su-2, 8px); }
+      .soc { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .chart { margin-top: var(--homey-su-2, 8px); }
+      .chart svg { width: 100%; height: auto; display: block; font-size: 10px; }
+      .chart .grid { stroke: currentColor; stroke-opacity: 0.15; }
+      .chart .day { stroke: currentColor; stroke-opacity: 0.4; stroke-dasharray: 3 3; }
+      .chart text { fill: currentColor; fill-opacity: 0.7; }
+      .chart .soc { fill: none; stroke: var(--gr-accent); stroke-width: 2; }
+      .chart .area { fill: var(--gr-accent); fill-opacity: 0.12; }
+      .chart .charge { fill: var(--gr-charge); }
+      .chart .discharge { fill: var(--gr-discharge); }
+      .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 12px; opacity: 0.7; margin-top: 4px; }
+      .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 4px; vertical-align: middle; }
+      .muted { opacity: 0.7; }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div id="root" class="homey-text-regular"></div>
+
+    <script type="text/javascript">
+      // The plan is fetched from Tibber every 5 min; look for a new one every minute.
+      const INTERVAL_MS = 60 * 1000;
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[c]));
+      }
+
+      function render(d) {
+        const root = document.getElementById('root');
+        if (d.error) {
+          root.innerHTML = `<p class="muted">${esc(d.error)}</p>`;
+          return;
+        }
+        const L = d.labels;
+        const soc = d.soc == null ? '' : `${Math.round(d.soc)} %`;
+        const body = d.svg
+          ? `<div class="chart">${d.svg}</div>
+             <div class="legend"><span><i style="background:var(--gr-charge)"></i>${esc(L.plan_charge)}</span>
+               <span><i style="background:var(--gr-discharge)"></i>${esc(L.plan_discharge)}</span></div>`
+          : `<p class="muted">${esc(L.plan_empty)}</p>`;
+        root.innerHTML = `
+          <div class="head">
+            <span class="homey-text-medium">${esc(L.plan_title)}</span>
+            <span class="soc" title="${esc(L.plan_soc)}">${esc(soc)}</span>
+          </div>
+          ${body}`;
+      }
+
+      function onHomeyReady(Homey) {
+        let deviceId = '';
+        try {
+          const ids = Homey.getDeviceIds ? Homey.getDeviceIds() : [];
+          deviceId = (ids && ids[0]) || '';
+        } catch (err) { /* fall back to the first battery */ }
+
+        // Auto height, as in the other widgets: measure the content plus the body padding.
+        const root = document.getElementById('root');
+        const measure = () => {
+          const cs = getComputedStyle(document.body);
+          return Math.ceil(root.getBoundingClientRect().height
+            + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom));
+        };
+        let ready = false;
+        let shown = 0;
+        const resize = () => {
+          const h = measure();
+          if (!ready || h === shown) return;
+          shown = h;
+          Promise.resolve(Homey.setHeight(h)).catch(() => {});
+        };
+
+        const load = () => Homey.api('GET', `/?deviceId=${encodeURIComponent(deviceId)}`)
+          .then((d) => render(d))
+          .catch((err) => render({ error: err && err.message ? err.message : String(err) }))
+          .finally(() => {
+            if (!ready) {
+              ready = true;
+              shown = measure();
+              Homey.ready({ height: shown });
+            }
+          });
+
+        if (window.ResizeObserver) new ResizeObserver(resize).observe(root);
+        load();
+        setInterval(load, INTERVAL_MS);
+      }
+    </script>
+  </body>
+</html>
