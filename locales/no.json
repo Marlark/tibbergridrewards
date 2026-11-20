@@ -50,7 +50,8 @@
     "sessions": "økter",
     "battery": "Batteri",
     "saved_today": "spart i dag",
-    "unavailable": "Ingen forbindelse med Tibber"
+    "unavailable": "Ingen forbindelse med Tibber",
+    "week_title": "Siste 7 dager"
   },
   "conn": {
     "connecting": "Kobler til…",

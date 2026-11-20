@@ -3,6 +3,7 @@
 const Homey = require('homey');
 const { TibberAppClient, TibberAuthError } = require('../../lib/TibberAppClient');
 const { crossed } = require('../../lib/unavailable');
+const { accountKey } = require('../../lib/ConnectionPool');
 
 /** Returns a logged-in client, or null on wrong credentials. Other errors are thrown. */
 async function tryLogin(email, password, log) {
@@ -67,7 +68,16 @@ class GridRewardDriver extends Homey.Driver {
       if (!homes.some((h) => h.id === device.getData().id)) {
         throw new Error(this.homey.__('error.home_missing'));
       }
+      // Other homes on the same account share its login: give them the new
+      // credentials too, if the account still has access to them.
+      const oldKey = accountKey(device.getStore().email); // before it is updated
       await device.updateCredentials({ email: username, password });
+      const homeIds = new Set(homes.map((h) => h.id));
+      for (const other of this.getDevices()) {
+        if (other === device || accountKey(other.getStore().email) !== oldKey) continue;
+        if (!homeIds.has(other.getData().id)) continue;
+        await other.updateCredentials({ email: username, password }).catch(this.error);
+      }
       return true;
     });
   }

@@ -3,11 +3,26 @@
 All notable changes to this app are documented here.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the app uses [Semantic Versioning](https://semver.org/).
 
-## [0.1.1] – 2026-11-18
+## [0.2.0] – 2026-11-20
+
+### Changed
+
+- Homes on the same Tibber account share one login and one WebSocket (a subscription per home) instead of one each. Repairing one home also gives the others on the account the new password.
+- Battery details are fetched about 10 seconds after a Grid Rewards status change (at most once a minute), instead of waiting up to 5 minutes. The battery's activity now follows a session straight away.
+- A battery warning is only shown after three failed polls in a row (about 15 minutes). Short outages at Tibber ("Circuit breaker open") are logged but no longer flash a warning. A changed API is still shown at once.
 
 ### Added
 
 - Translations for more battery activities seen on a real battery: charging at a low price, discharging at a high price, and discharging before expected solar power.
+- Flow cards *smart control was turned off* and *turned on or off*, and the condition *smart control is on*, for car and battery.
+- Dashboard widget *Grid Rewards – last 7 days* with a bar per day.
+- Daily totals are saved per home (about a year).
+
+### Fixed
+
+- The session history is kept per Tibber home in the app settings, so it survives removing and adding the home device. History from older versions is moved automatically.
+
+## [0.1.1] – 2026-11-18
 
 ### Changed
 

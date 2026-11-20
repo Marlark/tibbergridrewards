@@ -83,6 +83,10 @@ test('localeFor maps Homey languages to locales', () => {
 test('api.js exports only endpoints declared in the manifest', () => {
   const declared = Object.keys(require('../.homeycompose/app.json').api || {}).sort();
   assert.deepStrictEqual(Object.keys(require('../api')).sort(), declared);
-  const widget = require('../widgets/grid-rewards/widget.compose.json');
-  assert.deepStrictEqual(Object.keys(require('../widgets/grid-rewards/api')).sort(), Object.keys(widget.api).sort());
+  // Every widget's api.js, too (same rule: each export is an endpoint)
+  const widgetsDir = path.join(ROOT, 'widgets');
+  for (const id of fs.readdirSync(widgetsDir)) {
+    const widget = require(path.join(widgetsDir, id, 'widget.compose.json'));
+    assert.deepStrictEqual(Object.keys(require(path.join(widgetsDir, id, 'api'))).sort(), Object.keys(widget.api).sort(), id);
+  }
 });

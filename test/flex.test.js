@@ -136,3 +136,42 @@ test('conditions: plugged in and available', async () => {
   assert.strictEqual(await homey.conditions.flex_available({ device: dev({ grid_reward_state: 'delivering' }) }), true);
   assert.strictEqual(await homey.conditions.flex_available({ device: dev({ grid_reward_state: 'unavailable' }) }), false);
 });
+
+test('smart control turned off fires both cards; turned on fires only the change card', async () => {
+  const { homey, home, flex, sub } = await setup({ flexData: [{ id: 'v1', homeId: 'h1', kind: 'vehicle' }] });
+  const carWith = (smart) => ({ ...car(true, { __typename: 'GridRewardAvailable', kind: 'available' }), isSmartChargingEnabled: smart });
+  sub.emit('data', status([carWith(true), battery]));
+  await home._queue;
+  assert.strictEqual(homey.triggered.filter((t) => t.id.startsWith('flex_smart')).length, 0); // first value: no change yet
+  sub.emit('data', status([carWith(false), battery]));
+  await home._queue;
+  assert.deepStrictEqual(homey.triggered.filter((t) => t.id.startsWith('flex_smart')).map((t) => [t.id, t.tokens]),
+    [['flex_smart_changed', { smart_on: false }], ['flex_smart_turned_off', {}]]);
+  assert.strictEqual(flex[0].getCapabilityValue('flex_smart_enabled'), false);
+  sub.emit('data', status([carWith(true), battery]));
+  await home._queue;
+  assert.deepStrictEqual(homey.triggered.filter((t) => t.id.startsWith('flex_smart')).slice(2).map((t) => [t.id, t.tokens]),
+    [['flex_smart_changed', { smart_on: true }]]);
+});
+
+test('condition: smart control is on', async () => {
+  const homey = makeHomey();
+  await new FlexDeviceDriver({ homey }).onInit();
+  assert.strictEqual(await homey.conditions.flex_smart_is_on({ device: { getCapabilityValue: () => true } }), true);
+  assert.strictEqual(await homey.conditions.flex_smart_is_on({ device: { getCapabilityValue: () => false } }), false);
+});
+
+test('home status change asks the battery to fetch its details soon', async () => {
+  const { home, flex, sub } = await setup({ flexData: [{ id: 'b1', homeId: 'h1', kind: 'battery' }] });
+  const asked = [];
+  flex[0].pollSoon = (why) => asked.push(why);
+  sub.emit('data', status([battery]));
+  await home._queue;
+  sub.emit('data', status([battery])); // same status: no extra fetch
+  await home._queue;
+  sub.emit('data', { ...status([battery]), state: { __typename: 'GridRewardDelivering', reason: 'excess' } });
+  await home._queue;
+  // First update: the battery's own status (none → available) and the home's (unknown → available)
+  // both ask; pollSoon keeps only one pending fetch. Then the session start asks again.
+  assert.deepStrictEqual(asked, ['battery status changed', 'home status changed', 'home status changed']);
+});

@@ -1,7 +1,7 @@
 {
   "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
   "id": "io.github.marlark.tibbergridrewards",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "compatibility": ">=12.3.0",
   "sdk": 3,
   "platforms": [
@@ -302,6 +302,65 @@
               "nl": "Redencode"
             },
             "example": "noVehiclesPluggedIn"
+          }
+        ]
+      },
+      {
+        "id": "flex_smart_turned_off",
+        "title": {
+          "en": "Smart control was turned off",
+          "sv": "Smart styrning stängdes av",
+          "no": "Smartstyring ble slått av",
+          "da": "Smart styring blev slået fra",
+          "de": "Smarte Steuerung wurde ausgeschaltet",
+          "nl": "Slimme sturing is uitgeschakeld"
+        },
+        "hint": {
+          "en": "Grid Rewards needs smart charging (car) or smart mode (battery). Use this to get a notification.",
+          "sv": "Grid Rewards kräver smart laddning (bil) eller smart läge (batteri). Använd kortet för att få en notis.",
+          "no": "Grid Rewards krever smartlading (bil) eller smartmodus (batteri). Bruk kortet for å få et varsel.",
+          "da": "Grid Rewards kræver smart opladning (bil) eller smart tilstand (batteri). Brug kortet til at få en notifikation.",
+          "de": "Grid Rewards braucht smartes Laden (Auto) oder den Smart-Modus (Batterie). Nutze die Karte für eine Benachrichtigung.",
+          "nl": "Grid Rewards heeft slim laden (auto) of slimme modus (batterij) nodig. Gebruik de kaart voor een melding."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_smart_changed",
+        "title": {
+          "en": "Smart control was turned on or off",
+          "sv": "Smart styrning slogs på eller av",
+          "no": "Smartstyring ble slått på eller av",
+          "da": "Smart styring blev slået til eller fra",
+          "de": "Smarte Steuerung wurde ein- oder ausgeschaltet",
+          "nl": "Slimme sturing is in- of uitgeschakeld"
+        },
+        "tokens": [
+          {
+            "name": "smart_on",
+            "type": "boolean",
+            "title": {
+              "en": "Smart control on",
+              "sv": "Smart styrning på",
+              "no": "Smartstyring på",
+              "da": "Smart styring til",
+              "de": "Smarte Steuerung an",
+              "nl": "Slimme sturing aan"
+            },
+            "example": false
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
           }
         ]
       },
@@ -990,6 +1049,24 @@
         ]
       },
       {
+        "id": "flex_smart_is_on",
+        "title": {
+          "en": "Smart control !{{is|is not}} on",
+          "sv": "Smart styrning !{{är|är inte}} på",
+          "no": "Smartstyring !{{er|er ikke}} på",
+          "da": "Smart styring !{{er|er ikke}} slået til",
+          "de": "Smarte Steuerung !{{ist|ist nicht}} an",
+          "nl": "Slimme sturing !{{staat|staat niet}} aan"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
         "id": "is_delivering",
         "title": {
           "en": "A Grid Rewards session !{{is|is not}} active",
@@ -1352,6 +1429,31 @@
         }
       },
       "id": "grid-rewards"
+    },
+    "grid-rewards-week": {
+      "name": {
+        "en": "Grid Rewards – last 7 days",
+        "sv": "Grid Rewards – senaste 7 dagarna",
+        "no": "Grid Rewards – siste 7 dager",
+        "da": "Grid Rewards – seneste 7 dage",
+        "de": "Grid Rewards – letzte 7 Tage",
+        "nl": "Grid Rewards – laatste 7 dagen"
+      },
+      "settings": [],
+      "devices": {
+        "type": "app",
+        "singular": true,
+        "filter": {
+          "capabilities": "grid_reward_today"
+        }
+      },
+      "api": {
+        "getWeek": {
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "id": "grid-rewards-week"
     }
   },
   "capabilities": {

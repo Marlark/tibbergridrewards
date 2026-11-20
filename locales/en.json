@@ -50,7 +50,8 @@
     "sessions": "sessions",
     "battery": "Battery",
     "saved_today": "saved today",
-    "unavailable": "No connection to Tibber"
+    "unavailable": "No connection to Tibber",
+    "week_title": "Last 7 days"
   },
   "conn": {
     "connecting": "Connecting…",

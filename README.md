@@ -15,7 +15,7 @@ Follow your [Tibber Grid Rewards](https://tibber.com) in [Homey](https://homey.a
 - **Statistics**: last session, sessions and delivery time today, sessions this month.
 - **Car and home battery** as their own devices: plugged in, smart control, and for the battery its savings, current activity and next planned charge or discharge.
 - **Flow cards** for sessions, daily and monthly summaries, amounts passed, long unavailability and more.
-- **Dashboard widget** and a **session history** page.
+- **Two dashboard widgets** (status and the last 7 days) and a **session history** page that is kept even if you remove and add the home again.
 - **Six languages**: English, Swedish, Norwegian, Danish, German and Dutch.
 
 ## Requirements
@@ -39,8 +39,8 @@ homey app install     # or: homey app run, to see the log while it runs
 
 1. **Add your home:** *Devices → + → Tibber Grid Rewards → Grid Rewards*. Log in with your Tibber e-mail and password and pick the home(s).
 2. **Add your car and battery (optional):** *Grid Rewards → Car / battery (Grid Rewards)*. The list shows what your home device has received from Tibber, so add the home first.
-3. **Add the widget (optional):** edit a dashboard, add *Grid Rewards* and pick the home.
-4. **See the history:** *Settings → Apps → Tibber Grid Rewards* shows the last 100 sessions per home and totals per day.
+3. **Add a widget (optional):** edit a dashboard, add *Grid Rewards* (status) or *Grid Rewards – last 7 days* (a bar per day) and pick the home.
+4. **See the history:** *Settings → Apps → Tibber Grid Rewards* shows the last 100 sessions per home and totals per day. The history and daily totals are kept per Tibber home in the app, so removing and adding the home device again does not lose them.
 
 If your Tibber password changes, open the home device and choose **Repair** to enter the new one.
 
@@ -73,7 +73,7 @@ The device settings also show the **connection status**: connected, reconnecting
 | Battery activity, e.g. *Charging with solar power* | | ✔ | |
 | Next planned activity, e.g. *Discharge at 14:30 (2.5 kW)* | | ✔ | |
 
-Battery details are fetched every 5 minutes. If that fails, the battery shows a warning but keeps working.
+Battery details are fetched every 5 minutes, and about 10 seconds after a Grid Rewards status change (at most once a minute), so the battery's activity follows a session straight away. If Tibber can't deliver them, the battery keeps its last values; a warning is shown only after about 15 minutes of failures, so Tibber's short outages don't make it flash.
 
 Money is shown in Tibber's currency: SEK, NOK and DKK as *kr*, EUR as *€*.
 
@@ -90,13 +90,14 @@ Money is shown in Tibber's currency: SEK, NOK and DKK as *kr*, EUR as *€*.
 
 | | Cards |
 |---|---|
-| When | Status changed · The car was plugged in or unplugged · The battery activity changed · Unavailable for *X* hours |
-| And | The car is plugged in · Grid Rewards is available · Status is … |
+| When | Status changed · The car was plugged in or unplugged · Smart control was turned off · Smart control was turned on or off · The battery activity changed · Unavailable for *X* hours |
+| And | The car is plugged in · Smart control is on · Grid Rewards is available · Status is … |
 
 Good to know:
 
 - Cards with a reason also have a **reason code** token (e.g. `noVehiclesPluggedIn`). Use it in conditions; it does not change with Homey's language.
 - *Reward passed X* runs once per day or month when the amount is passed. *Unavailable for X hours* runs once per unavailable period.
+- *Smart control was turned off* is worth a notification: Grid Rewards needs smart charging (car) or smart mode (battery).
 - *Session ended* fires up to 3 minutes after the session, because Tibber pays out the last quarter about 40 seconds after it ends. Waiting includes that in the reward.
 
 ## Privacy and risks
@@ -114,6 +115,7 @@ The app logs in like the Tibber mobile app and subscribes to `gridRewardStatus` 
 This is robust where it matters:
 
 - Counters are kept **per home**, so several homes or accounts don't mix.
+- Homes on the same Tibber account share **one login and one WebSocket**, with a subscription per home. Repairing one of them updates the password for the others too.
 - The day rollover uses Homey's time zone and works even if Homey was off at midnight.
 - A small downward correction from Tibber is not mistaken for a new month, and a late month reset is still detected.
 - Reconnects use exponential backoff (5 s → 5 min). The app pings every minute and reconnects if nothing arrives for 3 minutes.
@@ -137,7 +139,8 @@ GitHub Actions runs the tests and `homey app validate --level publish` on every 
 ```
 lib/                 Logic without Homey dependencies (tested on its own)
   TibberAppClient.js   Login and GraphQL over HTTP
-  GridRewardSubscription.js  WebSocket subscription, reconnects, API-change detection
+  GridRewardSubscription.js  WebSocket with one subscription per home, reconnects, API-change detection
+  ConnectionPool.js    One login and WebSocket per Tibber account, shared by its homes
   RewardTracker.js     Today, sessions, settlement, day/month rollover
   battery.js           Battery query and parsing
 drivers/grid-reward/ The home device (login, subscription, flow cards)

@@ -213,3 +213,32 @@ test('a server close is logged with its code before reconnecting', async () => {
   assert.ok(lines.some((l) => l.startsWith('Reconnecting in 5 s')));
   sub.stop();
 });
+
+// --- Several homes on one socket ---
+
+test('several homes: one subscribe per home on connect, data routed by subscription id', async () => {
+  const { sub, ws } = await connected(); // connected() starts with home h1
+  sub.addHome('h2'); // added after connect: subscribes at once
+  const subscribes = ws.sent.filter((m) => m.type === 'subscribe');
+  assert.deepStrictEqual(subscribes.map((m) => [m.id, m.payload.variables.homeId]), [['grid-h1', 'h1'], ['grid-h2', 'h2']]);
+  const got = [];
+  sub.on('data', (status, homeId) => got.push([homeId, status.rewardCurrentMonth]));
+  send(ws, { id: 'grid-h2', type: 'next', payload: { data: { gridRewardStatus: { homeId: 'h2', rewardCurrentMonth: 7 } } } });
+  send(ws, { id: 'grid-h1', type: 'next', payload: { data: { gridRewardStatus: { homeId: 'h1', rewardCurrentMonth: 3 } } } });
+  assert.deepStrictEqual(got, [['h2', 7], ['h1', 3]]);
+  sub.stop();
+});
+
+test('removing a home ends only its subscription; the socket stays for the others', async () => {
+  const { sub, ws } = await connected();
+  sub.addHome('h2');
+  let closed = false;
+  ws.on('close', () => { closed = true; });
+  sub.removeHome('h2');
+  assert.deepStrictEqual(ws.sent.at(-1), { type: 'complete', id: 'grid-h2' });
+  send(ws, { id: 'grid-h2', type: 'complete' }); // the server confirms: no reconnect
+  assert.strictEqual(closed, false);
+  send(ws, { id: 'grid-h1', type: 'complete' }); // a home we still want ended: reconnect
+  assert.strictEqual(closed, true);
+  sub.stop();
+});

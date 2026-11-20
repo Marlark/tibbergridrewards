@@ -55,3 +55,40 @@ test('widget: without a home device it explains what to do', async () => {
   const s = await getStatus({ homey, query: {} });
   assert.match(s.error, /Add a Grid Rewards home device first/);
 });
+
+// --- Last 7 days widget ---
+
+const { getWeek } = require('../widgets/grid-rewards-week/api');
+
+test('week widget: 7 days oldest first, today live, days before the app as null', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-11-20T10:00:00Z') });
+  const homey = makeHomey();
+  const home = device(homey, { id: 'dev-1', data: { id: 'h1' }, caps: { grid_reward_today: 3.5 } });
+  home.getDays = () => [
+    { date: '2026-11-19', reward: 12.25 },
+    { date: '2026-11-18', reward: 8 },
+    { date: '2026-11-10', reward: 99 }, // outside the window
+  ];
+  home.getCurrencyUnit = () => 'kr';
+  homey.drivers.registry['grid-reward'] = { getDevices: () => [home] };
+  const w = await getWeek({ homey, query: { deviceId: 'dev-1' } });
+  assert.deepStrictEqual(w.days.map((d) => d.date),
+    ['2026-11-14', '2026-11-15', '2026-11-16', '2026-11-17', '2026-11-18', '2026-11-19', '2026-11-20']);
+  assert.deepStrictEqual(w.days.map((d) => d.reward), [null, null, null, null, 8, 12.25, 3.5]);
+  assert.deepStrictEqual(w.days.map((d) => d.today), [false, false, false, false, false, false, true]);
+  assert.strictEqual(w.days[6].label, 'Fri'); // en-GB weekday, 2026-11-20 is a Friday
+  assert.strictEqual(w.total, 23.75);
+  assert.strictEqual(w.labels.title, 'Last 7 days');
+});
+
+test('week widget: crosses a month boundary', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: Date.parse('2026-12-02T10:00:00Z') });
+  const homey = makeHomey();
+  const home = device(homey, { id: 'dev-1', data: { id: 'h1' }, caps: {} });
+  home.getDays = () => [];
+  homey.drivers.registry['grid-reward'] = { getDevices: () => [home] };
+  const w = await getWeek({ homey, query: {} });
+  assert.deepStrictEqual(w.days.map((d) => d.date),
+    ['2026-11-26', '2026-11-27', '2026-11-28', '2026-11-29', '2026-11-30', '2026-12-01', '2026-12-02']);
+  assert.strictEqual(w.days[6].reward, 0);
+});

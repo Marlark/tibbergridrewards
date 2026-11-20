@@ -24,18 +24,19 @@ Inget valt just nu. Förslag: #3 smart styrning, #2 missad ersättning, #13 tids
 | 12 | **Total nytta idag** | ★★ | S | Grid Rewards och batteriets besparing ihop: "Idag: 16,64 kr intjänat + 3,21 kr sparat". Ett värde på hemmet och i dagssammanfattningen. |
 | 17 | **Orsaksstatistik** | ★ | S | Andel sessioner och kronor per orsak (överskott, brist, annat) per månad. Datan finns i historiken. |
 | 24 | **Ersättning i går** | ★★ | S | Nytt värde som sätts vid midnatt till gårdagens summa och står still hela dagen. I Insights blir det en trappa med ett steg per dag, så månadsvyn visar varje dags summa direkt. "Ersättning idag" är en sågtand som faller till 0 vid midnatt, och Homey visar längre perioder som medelvärden, så där syns inte dagssumman. Datan finns redan i dagssammanfattningen (`tracker.lastDay`). |
+| 30 | **Tillgänglighet idag** | ★★ | S | Andel av dygnet hemmet varit tillgängligt eller levererat, i procent med Insights. Visar hur stor potentialen var, inte bara vad som betalats ut. |
 
 ## Flow-kort och notiser
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 3 | **Larm när smart styrning stängs av** | ★★★ | S | Grid Rewards kräver smart laddning. Flödeskort "Smart styrning stängdes av" på bil och batteri. Datan (`flex_smart_enabled`) finns redan. |
 | 6 | **Färdig notistext** | ★★ | S | Token i sessions- och dagskorten: "Grid Rewards: 2,53 kr på 50 min (överskott i nätet)". Notisflöden blir ett enda kort. |
 | 7 | **Milstolpar** | ★ | S | "Totalt intjänat passerade 5 000 kr". Samma logik som tröskelkorten, för totalen. |
 | 9 | **Åtgärdskort "Uppdatera nu"** | ★ | S | Hämtar batteriets uppgifter direkt och återansluter om anslutningen hänger. Bra vid felsökning. |
 | 13 | **Tidslinjen utan flöden** | ★★ | S | Inställning "Skriv sessioner i tidslinjen": varje avslutad session och dagens summa i Homeys tidslinje, utan egna flöden. |
 | 18 | **Veckosammanfattning** | ★ | S | Flödeskort söndag kväll med veckans summa, sessioner och jämförelse med förra veckan. Samma mönster som dag och månad. |
 | 21 | **Ny ersättning registrerad** | ★ | S | Trigger när `rewardCurrentMonth` ökar, med token för ökningen i kr. Risk för brus: värdet ändras vid ungefär varannan uppdatering under en session. |
+| 31 | **Rekord** | ★ | S | "Ny rekorddag: 24,10 kr" och "Längsta sessionen hittills", som Flow-kort och i historiken. Datan finns redan i historiken. |
 
 ## Batteriet
 
@@ -43,13 +44,16 @@ Inget valt just nu. Förslag: #3 smart styrning, #2 missad ersättning, #13 tids
 |---|---|---|---|---|
 | 14 | **Batteriet planerar att ladda** | ★★ | M | Flödeskort "Batteriet laddar/laddar ur om X minuter", från tidslinjen som redan hämtas. Kan styra annan förbrukning efter batteriets plan. |
 | 15 | **Batteriets planerade laddnivå** | ★★ | M | Laddnivån per kvart finns i samma svar. Visa nästa dygn som kurva på inställningssidan eller i widgeten. Batteridatan är inte verifierad mot Tibber än. |
+| 25 | **Villkor för batteriets aktivitet** | ★★ | S | Villkor "Batteriets aktivitet är …" med rullgardin över de kända koderna, och ett kort "Batteriet började ladda ur för Grid Rewards". Idag finns bara det generella "aktiviteten ändrades". |
+| 26 | **Aktivitet uppdelad i typ och orsak** | ★★ | S | Koderna följer ett mönster: *Charging/Discharging/Idle* + *ForGridRewards/AtLowPrice/WithSolar…*. Två värden, "Laddar/Laddar ur/Vilar" och "Grid Rewards/Pris/Sol", förenklar flöden, och en ny okänd kod hamnar ändå rätt i typ. |
+| 28 | **Okända koder synliga för användaren** | ★ | S | Nya batterikoder syns idag bara i loggen. Visa dem i batteriets inställningar ("Okända koder: …") med tips om att rapportera dem, så att även användare utan `homey app run` kan hjälpa till. |
+| 29 | **Batteriets dygn** | ★★ | M | Ur aktivitetshistoriken som Tibber redan skickar: hur många timmar batteriet laddade för Grid Rewards, för pris och med sol. Sammanfattning per dag i dagskortet och på historiksidan. |
 
 ## Visning
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
 | 4 | **Bästa tiderna på dygnet** | ★★ | M | Mönster per timme ur historiken på inställningssidan: när sessionerna kommer och vad de ger. Visar när bilen gör mest nytta inkopplad. |
-| 8 | **Widget för senaste 7 dagarna** | ★★ | M | En andra widget med en stapel per dag, från historiken som redan finns. |
 | 10 | **Exportera historik** | ★ | S/M | CSV från inställningssidan, för egna analyser eller kalkylark. |
 
 ## Data och integrationer
@@ -57,13 +61,13 @@ Inget valt just nu. Förslag: #3 smart styrning, #2 missad ersättning, #13 tids
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
 | 19 | **Elpriset som sammanhang** | ★★ | L | Timpris via Tibbers officiella API (kräver egen API-token): "Grid Rewards täckte 8 % av elkostnaden idag". |
-| 20 | **Säkerhetskopia av historiken** | ★ | M | Historiken försvinner om hemmets enhet tas bort och läggs till igen. Export/import, eller spara den i appens inställningar kopplad till hemmets id. |
 
 ## Publicering och stabilitet
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 22 | **En inloggning och anslutning per konto** | ★★ | M | Idag loggar varje hem in och öppnar en egen WebSocket. Dela klient och anslutning per e-post och starta en subscription per hem på samma socket (`graphql-transport-ws` stöder flera id:n). Spelar bara roll med flera hem. |
+| 32 | **Stängningskod i inställningarna** | ★ | S | Senaste anledningen till att anslutningen stängdes (t.ex. *1001 Going away, efter 11 min*) under "Anslutningsstatus", så att felsökning inte kräver loggar. |
+| 33 | **Larm vid instabil anslutning** | ★ | S | Flödeskort när anslutningen brutits fler än *X* gånger på en timme, eller när koden är något annat än 1000/1001. Fångar problem innan data saknas. |
 
 ---
 
@@ -73,7 +77,7 @@ Inget valt just nu. Förslag: #3 smart styrning, #2 missad ersättning, #13 tids
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 25 | | | | |
+| 34 | | | | |
 
 ---
 
@@ -96,3 +100,11 @@ Byggt 2026-11-17 (detaljer i [CHANGELOG.md](../CHANGELOG.md)):
 - **Visning:** översatta orsaker; bilens/batteriets orsak på hemmet; dashboard-widget; anslutningsstatus i enhetens inställningar; valuta från Tibber
 - **Språk:** norska, danska, tyska och nederländska (#16); bör granskas av modersmålstalare före publicering
 - **Stabilitet:** larm när Tibbers API ändras; rätt `compatibility` (`>=12.3.0`); färre skrivningar till Homey (1 502 → 404 per dygn)
+
+Byggt 2026-11-20:
+
+- **Flow-kort:** larm när smart styrning stängs av, och villkor "smart styrning är på" (#3)
+- **Visning:** widget för senaste 7 dagarna (#8)
+- **Data:** historik och dagssummor sparas per hem i appen och överlever att hemmets enhet läggs till igen (#20)
+- **Batteriet:** uppgifterna hämtas ca 10 s efter att Grid Rewards-statusen ändras i stället för upp till 5 min senare (#27)
+- **Stabilitet:** en inloggning och en WebSocket per Tibber-konto, delad av kontots hem (#22)

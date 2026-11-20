@@ -50,7 +50,8 @@
     "sessions": "sessioner",
     "battery": "Batteri",
     "saved_today": "sparat idag",
-    "unavailable": "Ingen kontakt med Tibber"
+    "unavailable": "Ingen kontakt med Tibber",
+    "week_title": "Senaste 7 dagarna"
   },
   "conn": {
     "connecting": "Ansluter…",

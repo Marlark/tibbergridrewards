@@ -10,5 +10,13 @@
     "da": "Udviklerindstillingen \"Optag rådata\" er fjernet. Den bruges nu kun, når appen udvikles.",
     "de": "Die Entwicklereinstellung \"Rohdaten aufzeichnen\" wurde entfernt. Sie wird jetzt nur noch bei der Entwicklung der App verwendet.",
     "nl": "De ontwikkelaarsinstelling \"Ruwe gegevens opnemen\" is verwijderd. Die wordt nu alleen nog gebruikt bij het ontwikkelen van de app."
+  },
+  "0.2.0": {
+    "en": "New widget for the last 7 days. Flow cards when smart control is turned off or on. The session history is kept when you remove and add the home again. More battery activities translated.",
+    "sv": "Ny widget för de senaste 7 dagarna. Flow-kort när smart styrning stängs av eller slås på. Sessionshistoriken finns kvar om du tar bort och lägger till hemmet igen. Fler batteriaktiviteter översatta.",
+    "no": "Ny widget for de siste 7 dagene. Flow-kort når smartstyring slås av eller på. Økthistorikken beholdes hvis du fjerner og legger til hjemmet igjen. Flere batteriaktiviteter oversatt.",
+    "da": "Ny widget for de seneste 7 dage. Flow-kort, når smart styring slås fra eller til. Sessionshistorikken bevares, hvis du fjerner og tilføjer hjemmet igen. Flere batteriaktiviteter oversat.",
+    "de": "Neues Widget für die letzten 7 Tage. Flow-Karten, wenn die smarte Steuerung aus- oder eingeschaltet wird. Der Session-Verlauf bleibt erhalten, wenn du dein Zuhause entfernst und erneut hinzufügst. Weitere Batterieaktivitäten übersetzt.",
+    "nl": "Nieuwe widget voor de laatste 7 dagen. Flow-kaarten wanneer slimme sturing wordt uit- of ingeschakeld. De sessiegeschiedenis blijft bewaard als je je woning verwijdert en opnieuw toevoegt. Meer batterijactiviteiten vertaald."
   }
 }

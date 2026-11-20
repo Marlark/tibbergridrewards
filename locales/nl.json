@@ -50,7 +50,8 @@
     "sessions": "sessies",
     "battery": "Batterij",
     "saved_today": "vandaag bespaard",
-    "unavailable": "Geen verbinding met Tibber"
+    "unavailable": "Geen verbinding met Tibber",
+    "week_title": "Laatste 7 dagen"
   },
   "conn": {
     "connecting": "Verbinden…",

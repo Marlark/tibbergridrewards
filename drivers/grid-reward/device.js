@@ -1,8 +1,8 @@
 'use strict';
 
 const Homey = require('homey');
-const { TibberAppClient, TibberAuthError, TibberApiChangedError } = require('../../lib/TibberAppClient');
-const GridRewardSubscription = require('../../lib/GridRewardSubscription');
+const { TibberAuthError, TibberApiChangedError } = require('../../lib/TibberAppClient');
+const ConnectionPool = require('../../lib/ConnectionPool');
 const {
   parseStatus, parseFlex, applyUpdate, settle, rollDayEvents, statsOf, localDayKey, SETTLE_MS,
 } = require('../../lib/RewardTracker');
@@ -31,6 +31,7 @@ function isRecording() {
 }
 
 const HISTORY_MAX = 100;
+const DAYS_MAX = 400; // daily totals: a bit more than a year
 const CONNECTION_SETTINGS_MS = 60 * 1000; // refresh "last update" in settings at most once a minute
 
 const STATS_CAPABILITIES = [
@@ -44,6 +45,7 @@ class GridRewardDevice extends Homey.Device {
 
   async onInit() {
     this.homeId = this.getData().id;
+    await this._migrateHistory();
     this.tracker = this.getStoreValue('tracker') || {};
     this.lastGridState = this.getCapabilityValue('grid_reward_state') || 'unknown';
     // 'auth' | 'api' | null: why the device is unavailable, if it is.
@@ -89,35 +91,54 @@ class GridRewardDevice extends Homey.Device {
     return this._queue;
   }
 
+  /**
+   * Join the Tibber account's shared login and WebSocket (one per account, see
+   * ConnectionPool). Connection events are account-wide; data is only for our home.
+   */
   _startSubscription() {
     const { email, password } = this.getStore();
-    this.client = new TibberAppClient({ email, password, log: this.log.bind(this) });
-    const sub = new GridRewardSubscription({
-      client: this.client, homeId: this.homeId, homey: this.homey, log: this.log.bind(this),
+    this.account = ConnectionPool.for(this.homey).acquire({
+      email, password, homeId: this.homeId, log: this.log.bind(this),
     });
-    sub.on('data', (status) => this._enqueue(() => this._onStatus(status)));
-    sub.on('connected', () => {
-      // A successful login fixes an auth problem. An API problem is only
-      // fixed when real data arrives again (see _onStatus).
-      if (this.problem === 'auth') this._clearProblem();
-      this._setConnection('connected');
-    });
-    sub.on('disconnected', () => {
-      this.conn.reconnects += 1;
-      this._setConnection('reconnecting');
-    });
-    sub.on('error', (err) => {
-      this.error('Subscription:', err.message);
-      if (err instanceof TibberAuthError) {
-        this._setProblem('auth');
-        this._setConnection('auth');
-      } else if (err instanceof TibberApiChangedError) {
-        this._setProblem('api');
-        this._setConnection('api');
-      }
-    });
+    this.client = this.account.client;
+    const sub = this.account.sub;
+    this._subHandlers = {
+      data: (status, homeId) => {
+        if ((homeId || (status && status.homeId)) !== this.homeId) return; // another home on the account
+        this._enqueue(() => this._onStatus(status));
+      },
+      connected: () => {
+        // A successful login fixes an auth problem. An API problem is only
+        // fixed when real data arrives again (see _onStatus).
+        if (this.problem === 'auth') this._clearProblem();
+        this._setConnection('connected');
+      },
+      disconnected: () => {
+        this.conn.reconnects += 1;
+        this._setConnection('reconnecting');
+      },
+      error: (err) => {
+        this.error('Subscription:', err.message);
+        if (err instanceof TibberAuthError) {
+          this._setProblem('auth');
+          this._setConnection('auth');
+        } else if (err instanceof TibberApiChangedError) {
+          this._setProblem('api');
+          this._setConnection('api');
+        }
+      },
+    };
+    for (const [event, fn] of Object.entries(this._subHandlers)) sub.on(event, fn);
     this.sub = sub;
-    sub.start();
+    // Joined a connection that another home already opened.
+    if (sub.connected) this._setConnection('connected');
+  }
+
+  _stopSubscription() {
+    if (!this.sub) return;
+    for (const [event, fn] of Object.entries(this._subHandlers || {})) this.sub.off(event, fn);
+    ConnectionPool.for(this.homey).release(this.account.key, this.homeId);
+    this.sub = null;
   }
 
   _setProblem(kind) {
@@ -140,7 +161,7 @@ class GridRewardDevice extends Homey.Device {
   async updateCredentials({ email, password }) {
     await this.setStoreValue('email', email);
     await this.setStoreValue('password', password);
-    if (this.sub) this.sub.stop();
+    this._stopSubscription();
     this._startSubscription();
   }
 
@@ -213,7 +234,8 @@ class GridRewardDevice extends Homey.Device {
 
     // Flow triggers
     await this._checkThresholds(result.today, month);
-    if (gridState !== this.lastGridState) {
+    const homeStateChanged = gridState !== this.lastGridState;
+    if (homeStateChanged) {
       this.lastGridState = gridState;
       await this.homey.flow.getDeviceTriggerCard('state_changed')
         .trigger(this, { state: gridState, reason: reason.text, reason_code: reason.code })
@@ -225,7 +247,7 @@ class GridRewardDevice extends Homey.Device {
     this.conn.lastUpdate = Date.now();
     this._publishConnection();
 
-    await this._updateFlexDevices(flex);
+    await this._updateFlexDevices(flex, { homeStateChanged });
   }
 
   async _fireEvents(events, reason = { text: '', code: '' }) {
@@ -238,6 +260,7 @@ class GridRewardDevice extends Homey.Device {
         await this.homey.flow.getDeviceTriggerCard('session_ended')
           .trigger(this, { reward: ev.reward, minutes: ev.minutes }).catch(this.error);
       } else if (ev.type === 'day_ended') {
+        await this._addDay(ev);
         await this.homey.flow.getDeviceTriggerCard('daily_summary')
           .trigger(this, {
             reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, date: ev.date,
@@ -303,18 +326,47 @@ class GridRewardDevice extends Homey.Device {
     await this.unavailWatch.check(gridState, this.lastReason);
   }
 
-  // --- Session history ---
+  // --- Session history and daily totals ---
+  //
+  // Kept in the app's settings under the Tibber home id, not in the device store,
+  // so they survive removing and adding the home device again. They are only
+  // lost if the app itself is uninstalled.
+
+  _key(kind) {
+    return `${kind}:${this.homeId}`;
+  }
+
+  /** Move history saved in the device store by older versions to the app settings. */
+  async _migrateHistory() {
+    const old = this.getStoreValue('history');
+    if (!Array.isArray(old) || !old.length) return;
+    if (!this.homey.settings.get(this._key('history'))) this.homey.settings.set(this._key('history'), old);
+    await this.setStoreValue('history', null);
+  }
 
   /** Finished sessions, newest first. */
   getHistory() {
-    return this.getStoreValue('history') || [];
+    return this.homey.settings.get(this._key('history')) || [];
   }
 
   async _addToHistory(ev) {
     const entry = {
       startedAt: ev.startedAt, endedAt: ev.endedAt, reward: ev.reward, minutes: ev.minutes, reason: ev.reason,
     };
-    await this.setStoreValue('history', [entry, ...this.getHistory()].slice(0, HISTORY_MAX));
+    this.homey.settings.set(this._key('history'), [entry, ...this.getHistory()].slice(0, HISTORY_MAX));
+  }
+
+  /** Daily totals { date, reward, sessions, minutes }, newest first. */
+  getDays() {
+    return this.homey.settings.get(this._key('days')) || [];
+  }
+
+  async _addDay(ev) {
+    const day = {
+      date: ev.date, reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes,
+    };
+    const rest = this.getDays().filter((d) => d.date !== day.date);
+    this.homey.settings.set(this._key('days'), [day, ...rest].slice(0, DAYS_MAX));
   }
 
   // --- Connection status in the device settings ---
@@ -353,7 +405,7 @@ class GridRewardDevice extends Homey.Device {
     return this.getStoreValue('flexDevices') || [];
   }
 
-  async _updateFlexDevices(flex) {
+  async _updateFlexDevices(flex, { homeStateChanged = false } = {}) {
     if (!flex) return;
     if (JSON.stringify(flex) !== JSON.stringify(this.getFlexDevices())) {
       await this.setStoreValue('flexDevices', flex);
@@ -368,6 +420,8 @@ class GridRewardDevice extends Homey.Device {
       if (device.getData().homeId !== this.homeId) continue;
       const f = flex.find((x) => x.id === device.getData().id) || null;
       await device.onFlexStatus(f).catch(this.error);
+      // A session started or ended: show the battery's new activity without waiting 5 min.
+      if (homeStateChanged && device.pollSoon) device.pollSoon('home status changed');
     }
   }
 
@@ -398,7 +452,7 @@ class GridRewardDevice extends Homey.Device {
   }
 
   async onUninit() {
-    if (this.sub) this.sub.stop();
+    this._stopSubscription();
     if (this.dayTimer) this.homey.clearInterval(this.dayTimer);
     if (this.settleTimer) this.homey.clearTimeout(this.settleTimer);
   }

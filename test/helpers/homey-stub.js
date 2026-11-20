@@ -40,6 +40,12 @@ function makeHomey({ timeZone = 'Europe/Stockholm' } = {}) {
         return drivers[id];
       },
     },
+    // Like homey.settings: app-wide, survives removing a device.
+    settings: {
+      values: {},
+      get(key) { return key in this.values ? this.values[key] : null; },
+      set(key, value) { this.values[key] = value; },
+    },
     clock: { getTimezone: () => timeZone },
     i18n: { getLanguage: () => 'en' },
     __: translate,
@@ -117,11 +123,14 @@ class Device {
 }
 
 class Driver {
-  constructor({ homey }) {
+  constructor({ homey, devices = [] }) {
     this.homey = homey;
+    this._devices = devices;
     this.log = () => {};
     this.error = () => {};
   }
+
+  getDevices() { return this._devices; }
 }
 
 class App {}

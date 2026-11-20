@@ -354,3 +354,52 @@ test('currency: SEK, NOK and DKK are shown as kr', () => {
   const { unitFor } = require('../lib/currency');
   assert.deepStrictEqual(['SEK', 'NOK', 'DKK', 'EUR', 'GBP', null].map(unitFor), ['kr', 'kr', 'kr', '€', 'GBP', 'kr']);
 });
+
+// --- History survives removing and adding the home device (#20) ---
+
+test('history and daily totals are kept per home in the app settings, not in the device', async (t) => {
+  t.mock.timers.enable({ apis: ['Date'], now: T0 });
+  const { homey, device, sub, setNow: setNowMock } = await makeHome(t);
+  const setNow = (v) => { setNowMock(v); t.mock.timers.setTime(v); };
+  sub.emit('data', status('GridRewardAvailable', 10));
+  await device._queue;
+  await sessionOn(device, sub, setNow, 10, 40, 10, 11);
+  // Next day: the daily total is stored
+  setNow(Date.parse('2026-11-17T23:00:30Z'));
+  minuteTick(homey);
+  await device._queue;
+  assert.deepStrictEqual(device.getDays(), [{
+    date: '2026-11-17', reward: 1.1, sessions: 1, minutes: 30,
+  }]);
+  assert.strictEqual(device.getStoreValue('history'), undefined);
+  await device.onDeleted();
+
+  // The same Tibber home added again as a new device, on the same Homey
+  subs.length = 0;
+  const again = new GridRewardDevice({ homey, data: { id: 'h1' }, store: { email: 'a@example.com', password: 'pw' } });
+  await again.onInit();
+  assert.strictEqual(again.getHistory().length, 1);
+  assert.strictEqual(again.getHistory()[0].reward, 1.1);
+  assert.strictEqual(again.getDays().length, 1);
+  await again.onUninit();
+});
+
+test('history saved in the device store by an older version is moved to the app settings', async (t) => {
+  const old = [{
+    startedAt: 1, endedAt: 2, reward: 0.5, minutes: 10, reason: 'excess',
+  }];
+  const { homey, device } = await makeHome(t, { store: { email: 'a@example.com', password: 'pw', history: old } });
+  assert.deepStrictEqual(device.getHistory(), old);
+  assert.deepStrictEqual(homey.settings.get('history:h1'), old);
+  assert.strictEqual(device.getStoreValue('history'), null);
+});
+
+test('daily totals: one entry per date, newest first, at most 400', async (t) => {
+  const { device } = await makeHome(t);
+  for (const date of ['2026-11-15', '2026-11-16', '2026-11-16']) {
+    await device._addDay({
+      date, reward: 1, sessions: 1, minutes: 10,
+    });
+  }
+  assert.deepStrictEqual(device.getDays().map((d) => d.date), ['2026-11-16', '2026-11-15']);
+});

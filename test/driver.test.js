@@ -22,11 +22,13 @@ function session() {
   return { handlers, setHandler: (name, fn) => { handlers[name] = fn; } };
 }
 
-function fakeDevice() {
+function fakeDevice(id = 'h1', email = 'a@example.com') {
   return {
     updated: null,
-    getData: () => ({ id: 'h1' }),
-    async updateCredentials(c) { this.updated = c; },
+    store: { email },
+    getData: () => ({ id }),
+    getStore() { return this.store; },
+    async updateCredentials(c) { this.updated = c; this.store = { ...c }; },
   };
 }
 
@@ -82,4 +84,24 @@ test('condition is_delivering reads grid_reward_active', async () => {
   const run = homey.conditions.is_delivering;
   assert.strictEqual(await run({ device: { getCapabilityValue: () => true } }), true);
   assert.strictEqual(await run({ device: { getCapabilityValue: () => false } }), false);
+});
+
+test('repair: other homes on the same account get the new password too', async () => {
+  homes = [{ id: 'h1' }, { id: 'h2' }];
+  try {
+    const repaired = fakeDevice('h1', 'A@example.com');
+    const sibling = fakeDevice('h2', 'a@example.com'); // same account, other case
+    const otherAccount = fakeDevice('h3', 'someone@example.com');
+    const notInAccount = fakeDevice('h9', 'a@example.com'); // the account no longer has this home
+    const driver = new GridRewardDriver({ homey: makeHomey(), devices: [repaired, sibling, otherAccount, notInAccount] });
+    const s = session();
+    await driver.onRepair(s, repaired);
+    assert.strictEqual(await s.handlers.login({ username: 'a@example.com', password: 'right' }), true);
+    assert.deepStrictEqual(repaired.updated, { email: 'a@example.com', password: 'right' });
+    assert.deepStrictEqual(sibling.updated, { email: 'a@example.com', password: 'right' });
+    assert.strictEqual(otherAccount.updated, null);
+    assert.strictEqual(notInAccount.updated, null);
+  } finally {
+    homes = [{ id: 'h1', title: 'Home' }];
+  }
 });

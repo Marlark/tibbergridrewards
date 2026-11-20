@@ -149,3 +149,95 @@ test('no poll while the home device has a login or API problem', async () => {
   await device._pollBattery();
   assert.strictEqual(called, false);
 });
+
+test('temporary errors ("Circuit breaker open"): warning only after 3 in a row, cleared on success', async (t) => {
+  t.mock.method(Date, 'now', () => NOW);
+  let fail = false;
+  const { device } = await batteryDevice(async () => {
+    if (fail) throw new Error('GraphQL: Circuit breaker open; Circuit breaker open');
+    return response();
+  });
+  await device._pollBattery();
+  assert.strictEqual(device.getCapabilityValue('battery_savings_today'), 3.21);
+
+  fail = true;
+  await device._pollBattery();
+  await device._pollBattery();
+  assert.ok(!device.warning, 'no warning after 2 failures');
+  assert.strictEqual(device.getCapabilityValue('battery_savings_today'), 3.21, 'last values are kept');
+  await device._pollBattery();
+  assert.match(device.warning, /Could not read battery details/);
+
+  fail = false;
+  await device._pollBattery();
+  assert.strictEqual(device.warning, null);
+  assert.ok(device.logs.some((l) => /OK again after 3 failed/.test(l)));
+});
+
+test('a single temporary error is only logged', async () => {
+  let calls = 0;
+  const { device } = await batteryDevice(async () => {
+    calls += 1;
+    if (calls === 1) throw new Error('GraphQL: Circuit breaker open');
+    return response();
+  });
+  await device._pollBattery();
+  await device._pollBattery();
+  assert.ok(!device.warning);
+  assert.ok(device.logs.some((l) => /failed \(1 in a row\): GraphQL: Circuit breaker open/.test(l)));
+});
+
+// --- Faster battery update when the Grid Rewards status changes (#27) ---
+
+const flexInfo = (gridState) => ({
+  id: 'b1', kind: 'battery', gridState, reasonCodes: [], pluggedIn: null, smartEnabled: true,
+});
+const soonTimers = (homey) => homey.timers.filter((x) => !x.cleared && x.ms !== 5 * 60 * 1000 && x.ms !== 60 * 1000 && x.ms !== 15 * 1000);
+
+test('battery status change: details are fetched after 10 s, only one pending fetch', async (t) => {
+  let now = NOW;
+  t.mock.method(Date, 'now', () => now);
+  let calls = 0;
+  const { homey, device } = await batteryDevice(async () => { calls += 1; return response(); });
+  await device.onFlexStatus(flexInfo('available'));
+  await device.onFlexStatus(flexInfo('delivering'));
+  await device.onFlexStatus(flexInfo('available'));
+  const pending = soonTimers(homey);
+  assert.strictEqual(pending.length, 1);
+  assert.strictEqual(pending[0].ms, 10 * 1000);
+  pending[0].fn();
+  await new Promise((r) => setImmediate(r));
+  assert.strictEqual(calls, 1);
+  assert.ok(device.logs.some((l) => /Fetching battery details in 10 s \(battery status changed\)/.test(l)));
+});
+
+test('never more than one extra fetch per minute', async (t) => {
+  let now = NOW;
+  t.mock.method(Date, 'now', () => now);
+  const { homey, device } = await batteryDevice(async () => response());
+  await device._pollBattery(); // a regular poll just now
+  now += 20 * 1000;
+  device.pollSoon('test');
+  assert.strictEqual(soonTimers(homey)[0].ms, 40 * 1000); // 60 s after the last poll
+});
+
+test('the car never fetches battery details', async () => {
+  const homey = makeHomey();
+  homey.drivers.registry['grid-reward'] = { getDevices: () => [] };
+  const car = new FlexDevice({ homey, data: { id: 'v1', homeId: 'h1', kind: 'vehicle' } });
+  await car.onInit();
+  car.pollSoon('test');
+  assert.strictEqual(car.pollSoonTimer, undefined);
+  await car.onUninit();
+});
+
+test('a regular poll and a soon poll never run at the same time', async () => {
+  let release;
+  let calls = 0;
+  const { device } = await batteryDevice(() => { calls += 1; return new Promise((r) => { release = () => r(response()); }); });
+  const first = device._pollBattery();
+  await device._pollBattery(); // skipped while the first is running
+  release();
+  await first;
+  assert.strictEqual(calls, 1);
+});

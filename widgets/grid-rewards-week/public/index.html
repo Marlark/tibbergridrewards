@@ -1,0 +1,112 @@
+<html>
+  <head>
+    <style>
+      :root {
+        --gr-accent: #1fb8cc;
+        --gr-bar: rgba(31, 184, 204, 0.55);
+      }
+      body.homey-widget {
+        padding: var(--homey-su-3, 12px) var(--homey-su-4, 16px);
+        box-sizing: border-box;
+      }
+      .head { display: flex; justify-content: space-between; align-items: baseline; gap: var(--homey-su-2, 8px); }
+      .total { font-weight: 600; font-variant-numeric: tabular-nums; white-space: nowrap; }
+      .chart { display: flex; align-items: flex-end; gap: 6px; height: 96px; margin-top: var(--homey-su-3, 12px); }
+      .col { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; min-width: 0; }
+      .val { font-size: 11px; opacity: 0.75; font-variant-numeric: tabular-nums; white-space: nowrap; margin-bottom: 2px; }
+      .bar { width: 100%; max-width: 28px; border-radius: 4px 4px 0 0; background: var(--gr-bar); min-height: 2px; }
+      .col.today .bar { background: var(--gr-accent); }
+      .col.none .bar { background: transparent; border-bottom: 2px dashed rgba(127, 127, 127, 0.4); }
+      .labels { display: flex; gap: 6px; margin-top: 4px; }
+      .labels div { flex: 1; text-align: center; font-size: 12px; opacity: 0.7; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .labels .today { opacity: 1; font-weight: 600; }
+      .error { opacity: 0.7; }
+    </style>
+  </head>
+
+  <body class="homey-widget">
+    <div id="root" class="homey-text-regular"></div>
+
+    <script type="text/javascript">
+      const INTERVAL_MS = 60 * 1000;
+      let UNIT = 'kr';
+
+      function esc(s) {
+        return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
+          '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
+        }[c]));
+      }
+
+      function money(v, decimals = 2) {
+        const n = v.toLocaleString(undefined, { minimumFractionDigits: decimals, maximumFractionDigits: decimals });
+        return UNIT === '€' ? `€${n}` : `${n} ${UNIT}`;
+      }
+
+      function render(d) {
+        const root = document.getElementById('root');
+        if (d.error) {
+          root.innerHTML = `<p class="error">${esc(d.error)}</p>`;
+          return;
+        }
+        UNIT = d.unit || 'kr';
+        const max = Math.max(...d.days.map((x) => x.reward || 0), 0.01);
+        const cols = d.days.map((x) => {
+          const none = x.reward === null;
+          const h = none ? 0 : Math.max(2, Math.round((x.reward / max) * 100));
+          const label = none ? '–' : x.reward.toLocaleString(undefined, { maximumFractionDigits: x.reward < 10 ? 1 : 0 });
+          return `<div class="col${x.today ? ' today' : ''}${none ? ' none' : ''}" title="${esc(x.date)}">
+              <div class="val">${esc(label)}</div>
+              <div class="bar" style="height:${h}%"></div>
+            </div>`;
+        }).join('');
+        const labels = d.days.map((x) => `<div class="${x.today ? 'today' : ''}">${esc(x.today ? d.labels.today : x.label)}</div>`).join('');
+        root.innerHTML = `
+          <div class="head">
+            <span class="homey-text-medium">${esc(d.labels.title)}</span>
+            <span class="total">${money(d.total)}</span>
+          </div>
+          <div class="chart">${cols}</div>
+          <div class="labels">${labels}</div>`;
+      }
+
+      function onHomeyReady(Homey) {
+        let deviceId = '';
+        try {
+          const ids = Homey.getDeviceIds ? Homey.getDeviceIds() : [];
+          deviceId = (ids && ids[0]) || '';
+        } catch (err) { /* fall back to the first home device */ }
+
+        // Auto height, as in the main widget: measure the content plus the body padding.
+        const root = document.getElementById('root');
+        const measure = () => {
+          const cs = getComputedStyle(document.body);
+          return Math.ceil(root.getBoundingClientRect().height
+            + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom));
+        };
+        let ready = false;
+        let shown = 0;
+        const resize = () => {
+          const h = measure();
+          if (!ready || h === shown) return;
+          shown = h;
+          Promise.resolve(Homey.setHeight(h)).catch(() => {});
+        };
+
+        const load = () => Homey.api('GET', `/?deviceId=${encodeURIComponent(deviceId)}`)
+          .then((d) => render(d))
+          .catch((err) => render({ error: err && err.message ? err.message : String(err) }))
+          .finally(() => {
+            if (!ready) {
+              ready = true;
+              shown = measure();
+              Homey.ready({ height: shown });
+            }
+          });
+
+        if (window.ResizeObserver) new ResizeObserver(resize).observe(root);
+        load();
+        setInterval(load, INTERVAL_MS);
+      }
+    </script>
+  </body>
+</html>

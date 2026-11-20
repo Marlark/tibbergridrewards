@@ -231,6 +231,51 @@
           "example": "noVehiclesPluggedIn"
         }
       ]
+    },
+    {
+      "id": "flex_smart_turned_off",
+      "title": {
+        "en": "Smart control was turned off",
+        "sv": "Smart styrning stängdes av",
+        "no": "Smartstyring ble slått av",
+        "da": "Smart styring blev slået fra",
+        "de": "Smarte Steuerung wurde ausgeschaltet",
+        "nl": "Slimme sturing is uitgeschakeld"
+      },
+      "hint": {
+        "en": "Grid Rewards needs smart charging (car) or smart mode (battery). Use this to get a notification.",
+        "sv": "Grid Rewards kräver smart laddning (bil) eller smart läge (batteri). Använd kortet för att få en notis.",
+        "no": "Grid Rewards krever smartlading (bil) eller smartmodus (batteri). Bruk kortet for å få et varsel.",
+        "da": "Grid Rewards kræver smart opladning (bil) eller smart tilstand (batteri). Brug kortet til at få en notifikation.",
+        "de": "Grid Rewards braucht smartes Laden (Auto) oder den Smart-Modus (Batterie). Nutze die Karte für eine Benachrichtigung.",
+        "nl": "Grid Rewards heeft slim laden (auto) of slimme modus (batterij) nodig. Gebruik de kaart voor een melding."
+      }
+    },
+    {
+      "id": "flex_smart_changed",
+      "title": {
+        "en": "Smart control was turned on or off",
+        "sv": "Smart styrning slogs på eller av",
+        "no": "Smartstyring ble slått på eller av",
+        "da": "Smart styring blev slået til eller fra",
+        "de": "Smarte Steuerung wurde ein- oder ausgeschaltet",
+        "nl": "Slimme sturing is in- of uitgeschakeld"
+      },
+      "tokens": [
+        {
+          "name": "smart_on",
+          "type": "boolean",
+          "title": {
+            "en": "Smart control on",
+            "sv": "Smart styrning på",
+            "no": "Smartstyring på",
+            "da": "Smart styring til",
+            "de": "Smarte Steuerung an",
+            "nl": "Slimme sturing aan"
+          },
+          "example": false
+        }
+      ]
     }
   ],
   "conditions": [
@@ -339,6 +384,17 @@
           ]
         }
       ]
+    },
+    {
+      "id": "flex_smart_is_on",
+      "title": {
+        "en": "Smart control !{{is|is not}} on",
+        "sv": "Smart styrning !{{är|är inte}} på",
+        "no": "Smartstyring !{{er|er ikke}} på",
+        "da": "Smart styring !{{er|er ikke}} slået til",
+        "de": "Smarte Steuerung !{{ist|ist nicht}} an",
+        "nl": "Slimme sturing !{{staat|staat niet}} aan"
+      }
     }
   ]
 }

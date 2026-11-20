@@ -10,6 +10,16 @@ const {
   POLL_MS, BATTERY_QUERY, batteryVariables, parseBattery, humanize,
 } = require('../../lib/battery');
 
+// Tibber's battery service has short outages ("Circuit breaker open"). Only show a
+// warning after this many failed polls in a row (5 min apart, so about 15 min).
+const BATTERY_WARN_AFTER = 3;
+
+// When Grid Rewards status changes, fetch battery details soon instead of waiting
+// up to 5 min: after POLL_SOON_DELAY_MS (Tibber needs a moment to update the
+// activity), and never more often than POLL_SOON_MIN_GAP_MS.
+const POLL_SOON_DELAY_MS = 10 * 1000;
+const POLL_SOON_MIN_GAP_MS = 60 * 1000;
+
 const SAVINGS_CAPABILITIES = ['battery_savings_today', 'battery_savings_week', 'battery_savings_month'];
 
 const BATTERY_CAPABILITIES = [
@@ -31,6 +41,7 @@ class FlexDevice extends Homey.Device {
     const { homeId, id, kind } = this.getData();
     this.lastGridState = this.getCapabilityValue('grid_reward_state');
     this.lastPluggedIn = this.hasCapability('flex_plugged_in') ? this.getCapabilityValue('flex_plugged_in') : null;
+    this.lastSmart = this.hasCapability('flex_smart_enabled') ? this.getCapabilityValue('flex_smart_enabled') : null;
     this.lastActivityCode = null;
     this.lastReason = { text: '', code: '' };
     // "Unavailable for X hours", e.g. the car has not been plugged in.
@@ -94,11 +105,15 @@ class FlexDevice extends Homey.Device {
     this.lastReason = { text, code };
     const stateChanged = f.gridState !== this.lastGridState;
     const plugChanged = f.pluggedIn !== null && this.lastPluggedIn !== null && f.pluggedIn !== this.lastPluggedIn;
+    // Grid Rewards needs smart charging / smart mode: tell the user when it changes.
+    const smartChanged = f.smartEnabled !== null && this.lastSmart !== null && f.smartEnabled !== this.lastSmart;
     this.lastGridState = f.gridState;
     if (f.pluggedIn !== null) this.lastPluggedIn = f.pluggedIn;
+    if (f.smartEnabled !== null) this.lastSmart = f.smartEnabled;
     if (silent) return;
 
     if (stateChanged) {
+      this.pollSoon('battery status changed');
       await this.homey.flow.getDeviceTriggerCard('flex_state_changed')
         .trigger(this, { state: f.gridState, reason: text, reason_code: code })
         .catch(this.error);
@@ -107,6 +122,14 @@ class FlexDevice extends Homey.Device {
       await this.homey.flow.getDeviceTriggerCard('flex_plugged_in_changed')
         .trigger(this, { plugged_in: f.pluggedIn })
         .catch(this.error);
+    }
+    if (smartChanged) {
+      await this.homey.flow.getDeviceTriggerCard('flex_smart_changed')
+        .trigger(this, { smart_on: f.smartEnabled })
+        .catch(this.error);
+      if (!f.smartEnabled) {
+        await this.homey.flow.getDeviceTriggerCard('flex_smart_turned_off').trigger(this, {}).catch(this.error);
+      }
     }
     await this._checkUnavailable(f.gridState);
   }
@@ -117,27 +140,55 @@ class FlexDevice extends Homey.Device {
 
   // --- Battery details ---
 
+  /** Fetch battery details soon (battery only). Called when a Grid Rewards status changes. */
+  pollSoon(why) {
+    if (this.getData().kind !== 'battery' || this.pollSoonTimer) return;
+    const sinceLast = Date.now() - (this.lastPollAt || 0);
+    const delay = Math.max(POLL_SOON_DELAY_MS, POLL_SOON_MIN_GAP_MS - sinceLast);
+    this.log(`Fetching battery details in ${Math.round(delay / 1000)} s (${why})`);
+    this.pollSoonTimer = this.homey.setTimeout(() => {
+      this.pollSoonTimer = null;
+      this._pollBattery().catch(this.error);
+    }, delay);
+  }
+
   async _pollBattery() {
     const home = this._home();
     // No home device, or it can't log in / the API changed: it already says so.
     if (!home || !home.client || home.problem) return;
+    // A regular poll and a "soon" poll must not run at the same time.
+    if (this.polling) return;
+    this.polling = true;
+    this.lastPollAt = Date.now();
+    try {
+      await this._pollBatteryNow(home);
+    } finally {
+      this.polling = false;
+    }
+  }
+
+  async _pollBatteryNow(home) {
     const { homeId, id } = this.getData();
 
-    let parsed;
+    let parsed = null;
+    let failure = null;
     try {
       const data = await home.client.query(BATTERY_QUERY, batteryVariables({ homeId, batteryId: id, now: Date.now() }));
       parsed = parseBattery(data);
+      if (!parsed) failure = new Error('No battery data in the response');
     } catch (err) {
-      this.error('Battery details:', err.message);
-      const msg = err instanceof TibberApiChangedError ? 'error.api_changed' : 'error.battery_failed';
-      await this.setWarning(this.homey.__(msg)).catch(this.error);
+      failure = err;
+    }
+    if (failure) {
+      await this._batteryFailed(failure);
       return;
     }
-    if (!parsed) {
-      await this.setWarning(this.homey.__('error.battery_failed')).catch(this.error);
-      return;
+    if (this.batteryFailures || this.batteryWarning) {
+      this.log(`Battery details OK again after ${this.batteryFailures} failed poll(s)`);
+      await this.unsetWarning().catch(this.error);
     }
-    await this.unsetWarning().catch(this.error);
+    this.batteryFailures = 0;
+    this.batteryWarning = false;
     await applyCurrency(this, SAVINGS_CAPABILITIES, parsed.unit);
 
     const activityText = parsed.activity ? this._activityText(parsed.activity.code) : '-';
@@ -156,6 +207,21 @@ class FlexDevice extends Homey.Device {
         .catch(this.error);
     }
     this.lastActivityCode = code;
+  }
+
+  /**
+   * A failed poll keeps the last values. A changed API is shown at once (it will not
+   * fix itself); other errors only after BATTERY_WARN_AFTER failures in a row.
+   */
+  async _batteryFailed(err) {
+    this.batteryFailures = (this.batteryFailures || 0) + 1;
+    const apiChanged = err instanceof TibberApiChangedError;
+    const warn = apiChanged || this.batteryFailures >= BATTERY_WARN_AFTER;
+    this.log(`Battery details failed (${this.batteryFailures} in a row): ${err.message}`);
+    if (!warn || this.batteryWarning) return;
+    this.batteryWarning = true;
+    this.error('Battery details:', err.message);
+    await this.setWarning(this.homey.__(apiChanged ? 'error.api_changed' : 'error.battery_failed')).catch(this.error);
   }
 
   /** Translated activity, or a readable version of an unknown code. */
@@ -185,6 +251,7 @@ class FlexDevice extends Homey.Device {
     if (this.unavailTimer) this.homey.clearInterval(this.unavailTimer);
     if (this.batteryTimer) this.homey.clearInterval(this.batteryTimer);
     if (this.batteryKick) this.homey.clearTimeout(this.batteryKick);
+    if (this.pollSoonTimer) this.homey.clearTimeout(this.pollSoonTimer);
   }
 
   async onDeleted() {

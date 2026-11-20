@@ -1,0 +1,24 @@
+{
+  "name": {
+    "en": "Grid Rewards – last 7 days",
+    "sv": "Grid Rewards – senaste 7 dagarna",
+    "no": "Grid Rewards – siste 7 dager",
+    "da": "Grid Rewards – seneste 7 dage",
+    "de": "Grid Rewards – letzte 7 Tage",
+    "nl": "Grid Rewards – laatste 7 dagen"
+  },
+  "settings": [],
+  "devices": {
+    "type": "app",
+    "singular": true,
+    "filter": {
+      "capabilities": "grid_reward_today"
+    }
+  },
+  "api": {
+    "getWeek": {
+      "method": "GET",
+      "path": "/"
+    }
+  }
+}
