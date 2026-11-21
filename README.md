@@ -13,9 +13,12 @@ Follow your [Tibber Grid Rewards](https://tibber.com) in [Homey](https://homey.a
 - **Live status** of Grid Rewards for each home: available, delivering or unavailable, with the reason (e.g. *Excess power in the grid*, *No car plugged in*).
 - **Earnings** for the current session (with an estimate while it runs), today, yesterday, this month and all time, logged to Insights.
 - **Statistics**: last session, sessions and delivery time today, sessions this month, how much of the day the home was available, and records (best day, best session, longest session).
-- **Car and home battery** as their own devices: what each one earned today, this month and in total, its sessions and share, how much of the day it was available, records, plugged in, smart control, a plug-in reminder and a check against your charger for the car, the battery's hours for Grid Rewards, price and solar and its energy in and out, and for the battery its savings, current activity and next planned charge or discharge.
-- **Flow cards** for sessions, daily and monthly summaries, amounts passed, long unavailability and more.
-- **Three dashboard widgets** (status, the last 7 days and the battery plan) and a **session history** page that is kept even if you remove and add the home again. The history page also shows each battery’s planned charge level, and exports sessions or daily totals as CSV.
+- **Car and home battery** as their own devices, each with what it earned (today, this month, in total), its sessions, its share of the month, how much of the day it was available, and its records.
+  - **Car**: plugged in, smart charging, a daily plug-in reminder, and a check against your charger that warns when Tibber has lost contact with the car.
+  - **Battery**: savings, current activity, next planned charge or discharge, the planned charge level until the end of tomorrow, and its day: hours for Grid Rewards, price and solar, and energy in and out.
+- **Flow cards** for sessions, daily and monthly summaries, amounts passed, records, long unavailability, the car's plug-in state and the battery's day.
+- **Three dashboard widgets**: status, the last 7 days and the battery plan. They update as soon as something changes.
+- **History page** in the app settings: every session with its reason, device and Tibber's settlement, totals per day and per reason, records, the battery's plan and days, and CSV export. It is kept even if you remove and add the home again.
 - **Six languages**: English, Swedish, Norwegian, Danish, German and Dutch.
 
 ## Requirements
@@ -40,7 +43,8 @@ homey app install     # or: homey app run, to see the log while it runs
 1. **Add your home:** *Devices → + → Tibber Grid Rewards → Grid Rewards*. Log in with your Tibber e-mail and password and pick the home(s).
 2. **Add your car and battery (optional):** *Grid Rewards → Car / battery (Grid Rewards)*. The list shows what your home device has received from Tibber, so add the home first.
 3. **Add a widget (optional):** edit a dashboard, add *Grid Rewards* (status) or *Grid Rewards – last 7 days* (a bar per day) and pick the home, or *Grid Rewards – battery plan* (the planned charge level until the end of tomorrow) and pick the battery.
-4. **See the history:** *Settings → Apps → Tibber Grid Rewards* shows the last 100 sessions per home and totals per day. The history and daily totals are kept per Tibber home in the app, so removing and adding the home device again does not lose them.
+4. **Set up the car (optional):** in the car's settings, turn on the plug-in reminder and pick a time. For the charger check, make a flow with your charger's or car's own card (e.g. *car connected* / *car disconnected*) and the action card *The charger says the car is plugged in / unplugged*.
+5. **See the history:** *Settings → Apps → Tibber Grid Rewards* shows, per home, the last 100 sessions (with reason, device and settlement, filterable per car or battery), totals per day and per reason, and records. For each battery it shows the planned charge level and its days. Sessions and daily totals can be downloaded or copied as CSV. Everything is kept per Tibber home in the app, so removing and adding the home device again does not lose it.
 
 If your Tibber password changes, open the home device and choose **Repair** to enter the new one.
 
@@ -53,12 +57,16 @@ If your Tibber password changes, open the home device and choose **Repair** to e
 | Grid Rewards status | Available, delivering, unavailable or unknown | |
 | Session active | A session is in progress | ✔ |
 | Reason | Why, e.g. *Excess power in the grid*. When the home is unavailable, the car's or battery's reason is shown too. | |
-| Current session | Earned in the session in progress | ✔ |
+| Current session | Earned in the session in progress, as reported by Tibber | ✔ |
+| Session (estimate) | During a session: Tibber's figure, or the minutes so far × the usual reward per minute for that reason if that is more (Tibber reports with a delay) | ✔ |
 | Reward today / this month | This month comes straight from Tibber | ✔ |
+| Reward yesterday | Set at midnight and unchanged all day, so Insights shows each day's total as one step | ✔ |
 | Total reward | All time | ✔ |
 | Last session | Earned in the last finished session | ✔ |
 | Sessions today / this month | Number of finished sessions | ✔ |
 | Delivery time today | Minutes delivered today | ✔ |
+| Available today | Part of the day (%) the home was available or delivering, of the time Homey observed | ✔ |
+| Updated | Time of the last update from Tibber. Only when turned on in the device settings, because it is written on every update | |
 
 The device settings also show the **connection status**: connected, reconnecting, login failed or *Tibber has changed its API*, the last update from Tibber and the number of reconnects.
 
@@ -67,13 +75,25 @@ The device settings also show the **connection status**: connected, reconnecting
 | Value | Car | Battery | Insights |
 |---|:---:|:---:|:---:|
 | Grid Rewards status and reason | ✔ | ✔ | |
+| Earned today / this month / in total | ✔ | ✔ | ✔ |
+| Share of what the car and battery earned this month (%) | ✔ | ✔ | ✔ |
+| Sessions today / this month, delivery time today | ✔ | ✔ | ✔ |
+| Available today (%) | ✔ | ✔ | ✔ |
 | Smart control on | ✔ | ✔ | ✔ |
 | Plugged in | ✔ | | ✔ |
 | Savings today / this week / this month | | ✔ | ✔ |
 | Battery activity, e.g. *Charging with solar power* | | ✔ | |
 | Next planned activity, e.g. *Discharge at 14:30 (2.5 kW)* | | ✔ | |
+| Grid Rewards / price control / solar today (hours charging or discharging) | | ✔ | ✔ |
+| Charged / discharged today (kWh) | | ✔ | ✔ |
+
+Tibber only reports the reward for the whole home, so each session is credited to the car or battery that delivered during it (see [How it works](#how-it-works)).
 
 Battery details are fetched every 5 minutes, and about 10 seconds after a Grid Rewards status change (at most once a minute), so the battery's activity follows a session straight away. If Tibber can't deliver them, the battery keeps its last values; a warning is shown only after about 15 minutes of failures, so Tibber's short outages don't make it flash.
+
+The battery's kWh assume that Tibber reports average power (W) per quarter. That is not yet verified against a real battery; if the figures look 4 times too high or too low, please open an issue.
+
+**Car settings:** a daily *plug-in reminder* at a time you choose (a notification and a flow card, only if the car is not plugged in), and the *charger check*: report your charger's state with the action card *The charger says the car is …*; if it says plugged in but Tibber sees no car for 10 minutes, the car shows a warning. The settings show what the charger last reported.
 
 Money is shown in Tibber's currency: SEK, NOK and DKK as *kr*, EUR as *€*.
 
@@ -83,15 +103,18 @@ Money is shown in Tibber's currency: SEK, NOK and DKK as *kr*, EUR as *€*.
 
 | | Cards |
 |---|---|
-| When | Status changed · Session started · Session ended (reward, duration) · Daily summary at midnight · Monthly summary when a new month starts · Reward today / this month passed *X* · Unavailable for *X* hours |
+| When | Status changed · Session started · Session ended (reward, duration) · Daily summary at midnight · Monthly summary when a new month starts · Reward today / this month passed *X* · Unavailable for *X* hours · A new record was set |
 | And | A session is active · Status is … · Reward today is above *X* |
 
 **Car and battery**
 
 | | Cards |
 |---|---|
-| When | Status changed · The car was plugged in or unplugged · Smart control was turned off · Smart control was turned on or off · The battery activity changed · Unavailable for *X* hours |
+| When | Status changed · Session ended (the device's share) · A new record was set · Smart control was turned off · Smart control was turned on or off · Unavailable for *X* hours |
+| When, car | The car was plugged in or unplugged · Reminder: the car is not plugged in · The charger and Tibber disagree |
+| When, battery | The battery activity changed · The battery's day (after midnight: hours per reason, kWh, savings) |
 | And | The car is plugged in · Smart control is on · Grid Rewards is available · Status is … |
+| Then, car | The charger says the car is plugged in / unplugged |
 
 Good to know:
 
@@ -121,7 +144,7 @@ This is robust where it matters:
 - A small downward correction from Tibber is not mistaken for a new month, and a late month reset is still detected.
 - Reconnects use exponential backoff (5 s → 5 min). The app pings every minute and reconnects if nothing arrives for 3 minutes.
 - After a wrong password, login is retried only every 6 hours, to avoid locking the account.
-- Values are only written to Homey when they change: on a real day 404 writes instead of 1,502.
+- Values are only written to Homey when they change: on a real day about 500 writes to the home device instead of 1,500.
 
 Thanks to [JohNan/homeassistant-tibber_grid_rewards](https://github.com/JohNan/homeassistant-tibber_grid_rewards), whose work showed how Tibber's app API is used.
 
