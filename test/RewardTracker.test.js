@@ -33,7 +33,10 @@ test('session: start, live amount and end with reward and duration', () => {
   assert.deepStrictEqual(brief(r.events), []);
   assert.strictEqual(r.sessionReward, 0);
   r = applyUpdate(r.state, { month: 41.6, gridState: 'available', dayKey: '2026-11-16', now: T0 + 15 * 60000 + 40000 });
-  assert.deepStrictEqual(brief(r.events), [{ type: 'session_ended', reward: 1.6, minutes: 15 }]);
+  // The settlement added 0.10 kr, 40 s after the end (#56).
+  assert.deepStrictEqual(brief(r.events), [{
+    type: 'session_ended', reward: 1.6, minutes: 15, settled: 0.1, settledAfter: 40,
+  }]);
   assert.deepStrictEqual(r.state.lastSession, {
     reward: 1.6, minutes: 15, startedAt: T0, endedAt: T0 + 15 * 60000, reason: '',
   });
@@ -143,7 +146,9 @@ test('a new session started before the settlement does not count it twice', () =
   r = up(r.state, 12, 'delivering', T0 + 15 * 60000 + 8000); // new session, settlement not here yet
   assert.deepStrictEqual(brief(r.events), [{ type: 'session_started' }]);
   r = up(r.state, 12.2, 'delivering', T0 + 15 * 60000 + 40000); // settlement of the first
-  assert.deepStrictEqual(brief(r.events), [{ type: 'session_ended', reward: 2.2, minutes: 15 }]);
+  assert.deepStrictEqual(brief(r.events), [{
+    type: 'session_ended', reward: 2.2, minutes: 15, settled: 0.2, settledAfter: 40,
+  }]);
   assert.strictEqual(r.sessionReward, 0);
   r = up(r.state, 12.5, 'delivering', T0 + 25 * 60000);
   assert.strictEqual(r.sessionReward, 0.3);

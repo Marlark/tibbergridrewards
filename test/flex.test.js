@@ -77,7 +77,9 @@ test('pairing lists car and battery with the right capabilities', async () => {
       data: { id: 'b1', homeId: 'h1', kind: 'battery' },
       capabilities: ['grid_reward_state', 'grid_reward_reason', ...EARNED, 'flex_smart_enabled',
         'battery_savings_today', 'battery_savings_week', 'battery_savings_month',
-        'battery_activity', 'battery_next_activity'],
+        'battery_activity', 'battery_next_activity',
+        'battery_hours_grid_rewards', 'battery_hours_price', 'battery_hours_solar',
+        'battery_charged_today', 'battery_discharged_today'],
       icon: '/battery.svg',
     },
   ]);

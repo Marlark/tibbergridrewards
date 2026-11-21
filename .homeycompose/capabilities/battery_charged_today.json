@@ -1,0 +1,25 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Charged today",
+    "sv": "Laddat idag",
+    "no": "Ladet i dag",
+    "da": "Opladet i dag",
+    "de": "Heute geladen",
+    "nl": "Vandaag geladen"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kWh",
+    "sv": "kWh",
+    "no": "kWh",
+    "da": "kWh",
+    "de": "kWh",
+    "nl": "kWh"
+  },
+  "insights": true,
+  "icon": "/assets/battery.svg"
+}

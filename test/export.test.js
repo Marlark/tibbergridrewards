@@ -36,7 +36,7 @@ test('sessions: all homes, oldest first, local times, translated reasons', (t) =
   const homey = setup([
     home('Villa', {
       sessions: [{
-        startedAt: Date.parse('2026-11-19T07:00:00Z'), endedAt: Date.parse('2026-11-19T07:30:00Z'), reward: 1.5, minutes: 30, reason: 'excess', flex: ['v1'],
+        startedAt: Date.parse('2026-11-19T07:00:00Z'), endedAt: Date.parse('2026-11-19T07:30:00Z'), reward: 1.5, minutes: 30, reason: 'excess', flex: ['v1'], settled: 0.12, settledAfter: 40,
       }],
       flexName: (id) => (id === 'v1' ? 'Car' : id),
     }),
@@ -51,9 +51,9 @@ test('sessions: all homes, oldest first, local times, translated reasons', (t) =
   assert.strictEqual(r.rows, 2);
   assert.ok(r.csv.startsWith('﻿'), 'BOM so Excel reads UTF-8');
   const [head, first, second] = lines(r.csv);
-  assert.strictEqual(head, 'Home,Device,Started,Ended,Minutes,Reward,Currency,Reason');
-  assert.match(first, /^Cabin,,2026-11-18 23:45,2026-11-19 00:15,30,0\.46,kr,"/); // Stockholm, crosses midnight
-  assert.strictEqual(second, 'Villa,Car,2026-11-19 08:00,2026-11-19 08:30,30,1.50,kr,Excess power in the grid');
+  assert.strictEqual(head, 'Home,Device,Started,Ended,Minutes,Reward,Settlement,Currency,Reason');
+  assert.match(first, /^Cabin,,2026-11-18 23:45,2026-11-19 00:15,30,0\.46,,kr,"/); // Stockholm, crosses midnight
+  assert.strictEqual(second, 'Villa,Car,2026-11-19 08:00,2026-11-19 08:30,30,1.50,0.12,kr,Excess power in the grid');
 });
 
 test('daily totals: Swedish uses ";" and a decimal comma', (t) => {

@@ -7,7 +7,8 @@
  */
 
 const { localDayKey } = require('../../lib/RewardTracker');
-const { localeFor } = require('../../lib/i18n');
+const { localeFor, dateFormat } = require('../../lib/i18n');
+const { homesOf } = require('../../lib/devices');
 
 const DAY_MS = 24 * 3600 * 1000;
 
@@ -18,13 +19,6 @@ function lastDates(today, n) {
   return Array.from({ length: n }, (_, i) => new Date(base - (n - 1 - i) * DAY_MS).toISOString().slice(0, 10));
 }
 
-function homesOf(homey) {
-  try {
-    return homey.drivers.getDriver('grid-reward').getDevices();
-  } catch (err) {
-    return [];
-  }
-}
 
 async function getWeek({ homey, query = {} }) {
   const homes = homesOf(homey);
@@ -32,7 +26,7 @@ async function getWeek({ homey, query = {} }) {
   if (!home) return { error: homey.__('error.no_home_device') };
 
   const today = localDayKey(new Date(), homey.clock.getTimezone());
-  const weekday = new Intl.DateTimeFormat(localeFor(homey.i18n.getLanguage()), { weekday: 'short', timeZone: 'UTC' });
+  const weekday = dateFormat(localeFor(homey.i18n.getLanguage()), { weekday: 'short', timeZone: 'UTC' });
   const byDate = Object.fromEntries(home.getDays().map((d) => [d.date, d]));
   const todayValue = home.hasCapability('grid_reward_today') ? home.getCapabilityValue('grid_reward_today') : null;
 

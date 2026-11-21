@@ -3,53 +3,66 @@
 const Homey = require('homey');
 const { TibberAuthError, TibberApiChangedError } = require('../../lib/TibberAppClient');
 const ConnectionPool = require('../../lib/ConnectionPool');
+const HomeStore = require('../../lib/HomeStore');
+const { flexDevicesOf } = require('../../lib/devices');
 const {
   parseStatus, parseFlex, applyUpdate, settle, rollDayEvents, statsOf, localDayKey, SETTLE_MS,
 } = require('../../lib/RewardTracker');
 const { reasonText } = require('../../lib/reasons');
-const { localeFor } = require('../../lib/i18n');
-const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
-const { splitSession, liveShares, earningsOf } = require('../../lib/flexEarnings');
+const { localeFor, dateFormat } = require('../../lib/i18n');
+const {
+  setIfChanged, applyCurrency, UnavailableWatch, isRecording, notifyWidgets,
+} = require('../../lib/deviceUtils');
 const { AvailabilityWatch } = require('../../lib/availability');
-const records = require('../../lib/records');
+const reasonStats = require('../../lib/reasonStats');
 
 // Capabilities shown in money; their unit follows Tibber's rewardCurrency.
 const MONEY_CAPABILITIES = [
   'grid_reward_session',
+  'grid_reward_session_estimate',
+  'grid_reward_yesterday',
   'grid_reward_today',
   'grid_reward_month',
   'grid_reward_all_time',
   'grid_reward_last_session',
 ];
 
-/**
- * Record raw updates only during development: `homey app run` sets DEBUG=1, a
- * published app never does. Turn it off with "RECORD_RAW": "0" in env.json.
- */
-function isRecording() {
-  if (process.env.DEBUG !== '1') return false;
-  // Homey.env warns when an unset variable is read, so check the key first.
-  const env = Homey.env || {};
-  return !Object.keys(env).includes('RECORD_RAW') || env.RECORD_RAW !== '0';
-}
-
-const HISTORY_MAX = 100;
-const DAYS_MAX = 400; // daily totals: a bit more than a year
 const CONNECTION_SETTINGS_MS = 60 * 1000; // refresh "last update" in settings at most once a minute
+const ESTIMATE_EVERY_MS = 5 * 60 * 1000; // between updates from Tibber (fewer Insights writes)
 
+// Added to home devices paired with an older version.
 const STATS_CAPABILITIES = [
   'grid_reward_last_session',
   'grid_reward_sessions_today',
   'grid_reward_minutes_today',
   'grid_reward_sessions_month',
   'grid_reward_availability',
+  'grid_reward_yesterday',
+  'grid_reward_session_estimate',
 ];
 
+// "Updated" as a value on the device is optional (setting show_updated): it is
+// written on every update from Tibber, about 150 times a day. The widget and the
+// connection status show the time anyway, without any writes.
+const UPDATED_CAPABILITY = 'grid_reward_updated';
+
+/**
+ * A Tibber home. Receives Grid Rewards status over the account's shared
+ * WebSocket, keeps today/session/month figures (lib/RewardTracker.js), fires the
+ * flow cards and forwards car/battery status to their devices. What is kept in
+ * the app settings (history, daily totals, records, …) is in lib/HomeStore.js.
+ */
 class GridRewardDevice extends Homey.Device {
 
   async onInit() {
     this.homeId = this.getData().id;
-    await this._migrateHistory();
+    this.store = new HomeStore({
+      settings: this.homey.settings, homeId: this.homeId, monthOf: (ms) => this._monthOf(ms),
+    });
+    // Older versions kept the history in the device store.
+    this.store.init({ oldHistory: this.getStoreValue('history') });
+    if (Array.isArray(this.getStoreValue('history'))) await this.setStoreValue('history', null);
+
     this.tracker = this.getStoreValue('tracker') || {};
     this.lastGridState = this.getCapabilityValue('grid_reward_state') || 'unknown';
     // 'auth' | 'api' | null: why the device is unavailable, if it is.
@@ -76,13 +89,14 @@ class GridRewardDevice extends Homey.Device {
     // so quick successive updates can't interleave (e.g. double state_changed).
     this._queue = Promise.resolve();
 
-    // Devices paired with an older version lack the newer capabilities.
     for (const cap of STATS_CAPABILITIES) {
       if (!this.hasCapability(cap)) await this.addCapability(cap).catch(this.error);
     }
 
+    await this._applyShowUpdated(this.getSetting('show_updated') === true);
+
     this.availability = new AvailabilityWatch(this);
-    this._seedRecords();
+    await this._initYesterday();
 
     this._startSubscription();
 
@@ -97,6 +111,8 @@ class GridRewardDevice extends Homey.Device {
     this._queue = this._queue.then(job).catch((err) => this.error(err));
     return this._queue;
   }
+
+  // --- Connection ---
 
   /**
    * Join the Tibber account's shared login and WebSocket (one per account, see
@@ -172,43 +188,33 @@ class GridRewardDevice extends Homey.Device {
     this._startSubscription();
   }
 
+  // --- Time ---
+
   _dayKey() {
     return localDayKey(new Date(), this.homey.clock.getTimezone());
   }
 
+  _monthOf(ms) {
+    return localDayKey(new Date(ms), this.homey.clock.getTimezone()).slice(0, 7);
+  }
+
+  // --- Updates ---
+
   async _tickDay() {
     await this._checkUnavailable(this.lastGridState);
     await this.availability.update(this.lastGridState, this._dayKey());
+    if (Date.now() - (this.estimateAt || 0) >= ESTIMATE_EVERY_MS) await this._updateEstimate();
     const key = this._dayKey();
     if (this.tracker.dayKey === key) return;
     const result = rollDayEvents(this.tracker, key);
     this.tracker = result.state;
     await this._saveTracker();
     await this.setCapabilityValue('grid_reward_today', 0);
-    await this._publishStats();
-    await this._fireEvents(result.events);
-    await this._publishFlexEarnings();
-  }
-
-  async _saveTracker() {
-    const json = JSON.stringify(this.tracker);
-    if (json === this._savedTracker) return;
-    await this.setStoreValue('tracker', this.tracker);
-    this._savedTracker = json;
-  }
-
-  async _publishStats() {
-    const st = statsOf(this.tracker, this._dayKey());
-    await setIfChanged(this, {
-      grid_reward_last_session: st.lastSessionReward,
-      grid_reward_sessions_today: st.sessionsToday,
-      grid_reward_minutes_today: st.minutesToday,
-      grid_reward_sessions_month: st.sessionsMonth,
-    });
+    await this._afterChange(result.events);
   }
 
   async _onStatus(status) {
-    if (isRecording()) {
+    if (isRecording(Homey.env)) {
       // One JSON line per update; extract with tools/extract-recording.js
       this.log('[REC]', JSON.stringify({ t: Date.now(), tz: this.homey.clock.getTimezone(), status }));
     }
@@ -240,10 +246,10 @@ class GridRewardDevice extends Homey.Device {
       grid_reward_today: result.today,
       grid_reward_all_time: allTime,
     });
-    await this._publishStats();
     await applyCurrency(this, MONEY_CAPABILITIES, currency);
-
     await this.availability.update(gridState, this._dayKey());
+    await this._updateEstimate();
+    await this._setUpdated();
 
     // Flow triggers
     await this._checkThresholds(result.today, month);
@@ -254,39 +260,61 @@ class GridRewardDevice extends Homey.Device {
         .trigger(this, { state: gridState, reason: reason.text, reason_code: reason.code })
         .catch(this.error);
     }
-    await this._fireEvents(result.events, reason);
     this._scheduleSettle();
     await this._checkUnavailable(gridState);
     this.conn.lastUpdate = Date.now();
     this._publishConnection();
 
     await this._updateFlexDevices(flex, { homeStateChanged });
+    await this._afterChange(result.events, reason);
+  }
+
+  /** After the tracker changed: statistics, flow cards, cars/batteries and widgets. */
+  async _afterChange(events, reason) {
+    await this._publishStats();
+    await this._fireEvents(events, reason);
     await this._publishFlexEarnings();
+    notifyWidgets(this.homey);
+  }
+
+  async _saveTracker() {
+    const json = JSON.stringify(this.tracker);
+    if (json === this._savedTracker) return;
+    await this.setStoreValue('tracker', this.tracker);
+    this._savedTracker = json;
+  }
+
+  async _publishStats() {
+    const st = statsOf(this.tracker, this._dayKey());
+    await setIfChanged(this, {
+      grid_reward_last_session: st.lastSessionReward,
+      grid_reward_sessions_today: st.sessionsToday,
+      grid_reward_minutes_today: st.minutesToday,
+      grid_reward_sessions_month: st.sessionsMonth,
+    });
   }
 
   async _fireEvents(events, reason = { text: '', code: '' }) {
+    const card = (id) => this.homey.flow.getDeviceTriggerCard(id);
     for (const ev of events) {
       if (ev.type === 'session_started') {
-        await this.homey.flow.getDeviceTriggerCard('session_started')
-          .trigger(this, { reason: reason.text, reason_code: reason.code }).catch(this.error);
+        await card('session_started').trigger(this, { reason: reason.text, reason_code: reason.code }).catch(this.error);
       } else if (ev.type === 'session_ended') {
-        await this._addToHistory(ev);
+        this.store.addSession(ev);
         await this._creditFlexDevices(ev);
-        await this._recordSession(ev);
-        await this.homey.flow.getDeviceTriggerCard('session_ended')
-          .trigger(this, { reward: ev.reward, minutes: ev.minutes }).catch(this.error);
+        await this._fireRecords(this.store.recordSession(ev));
+        await card('session_ended').trigger(this, { reward: ev.reward, minutes: ev.minutes }).catch(this.error);
       } else if (ev.type === 'day_ended') {
-        await this._addDay(ev);
-        await this._recordDay(ev);
-        await this.homey.flow.getDeviceTriggerCard('daily_summary')
-          .trigger(this, {
-            reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, date: ev.date,
-          }).catch(this.error);
+        this.store.addDay(ev);
+        await setIfChanged(this, { grid_reward_yesterday: ev.reward });
+        await this._fireRecords(this.store.recordDay(ev));
+        await card('daily_summary').trigger(this, {
+          reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, date: ev.date,
+        }).catch(this.error);
       } else if (ev.type === 'month_ended') {
-        await this.homey.flow.getDeviceTriggerCard('monthly_summary')
-          .trigger(this, {
-            reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, month: ev.month,
-          }).catch(this.error);
+        await card('monthly_summary').trigger(this, {
+          reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes, month: ev.month,
+        }).catch(this.error);
       }
     }
   }
@@ -330,61 +358,105 @@ class GridRewardDevice extends Homey.Device {
     }
   }
 
-  // --- Currency ---
+  // --- Values: yesterday (#24), estimate (#44), last update (#57) ---
+
+  /**
+   * "Reward yesterday" stays the same all day, so Insights shows one step per day
+   * with that day's total. At start-up, take it from the saved daily totals.
+   */
+  async _initYesterday() {
+    if (!this.hasCapability('grid_reward_yesterday')) return;
+    const yesterday = localDayKey(new Date(Date.now() - 24 * 3600 * 1000), this.homey.clock.getTimezone());
+    const day = this.getDays().find((d) => d.date === yesterday);
+    await setIfChanged(this, { grid_reward_yesterday: day ? day.reward : null });
+  }
+
+  /** While a session runs: Tibber's figure so far, or minutes × the usual rate if more. */
+  async _updateEstimate() {
+    this.estimateAt = Date.now();
+    const t = this.tracker;
+    let value = null;
+    if (t.session) {
+      const minutes = (Date.now() - t.session.startedAt) / 60000;
+      const reported = Math.max(0, (t.lastMonth ?? 0) - t.session.startMonth);
+      const rate = reasonStats.ratePerMinute(this.getHistory(), t.session.reason);
+      value = reasonStats.estimate({ sessionReward: reported, minutes, rate });
+    }
+    // No session: clear it (setIfChanged skips null).
+    if (value === null && this.hasCapability('grid_reward_session_estimate')
+      && this.getCapabilityValue('grid_reward_session_estimate') !== null) {
+      await this.setCapabilityValue('grid_reward_session_estimate', null).catch(this.error);
+    }
+    await setIfChanged(this, { grid_reward_session_estimate: value });
+  }
+
+  /** Time of the latest update from Tibber, e.g. "10:07", or null before the first one. */
+  getUpdatedTime() {
+    if (!this.conn || !this.conn.lastUpdate) return null;
+    return dateFormat(localeFor(this.homey.i18n.getLanguage()), {
+      timeZone: this.homey.clock.getTimezone(), hour: '2-digit', minute: '2-digit',
+    }).format(new Date(this.conn.lastUpdate));
+  }
+
+  /** The "Updated" value, only when the user turned it on. */
+  async _setUpdated() {
+    if (!this.hasCapability(UPDATED_CAPABILITY)) return;
+    this.conn.lastUpdate = Date.now();
+    await setIfChanged(this, { [UPDATED_CAPABILITY]: this.getUpdatedTime() });
+  }
+
+  async _applyShowUpdated(show) {
+    if (show && !this.hasCapability(UPDATED_CAPABILITY)) {
+      await this.addCapability(UPDATED_CAPABILITY).catch(this.error);
+    } else if (!show && this.hasCapability(UPDATED_CAPABILITY)) {
+      await this.removeCapability(UPDATED_CAPABILITY).catch(this.error);
+    }
+  }
+
+  async onSettings({ newSettings, changedKeys }) {
+    if (changedKeys.includes('show_updated')) await this._applyShowUpdated(newSettings.show_updated === true);
+  }
 
   /** Display unit for money, e.g. for the widget and the history page. */
   getCurrencyUnit() {
     return this.getStoreValue('currencyUnit') || 'kr';
   }
 
-  // --- Unavailable for a long time ---
-
   async _checkUnavailable(gridState) {
     await this.unavailWatch.check(gridState, this.lastReason);
   }
 
-  // --- Session history and daily totals ---
-  //
-  // Kept in the app's settings under the Tibber home id, not in the device store,
-  // so they survive removing and adding the home device again. They are only
-  // lost if the app itself is uninstalled.
-
-  _key(kind) {
-    return `${kind}:${this.homeId}`;
-  }
-
-  /** Move history saved in the device store by older versions to the app settings. */
-  async _migrateHistory() {
-    const old = this.getStoreValue('history');
-    if (!Array.isArray(old) || !old.length) return;
-    if (!this.homey.settings.get(this._key('history'))) this.homey.settings.set(this._key('history'), old);
-    await this.setStoreValue('history', null);
-  }
+  // --- Saved per home (lib/HomeStore.js), used by the settings page, widgets and export ---
 
   /** Finished sessions, newest first. */
   getHistory() {
-    return this.homey.settings.get(this._key('history')) || [];
-  }
-
-  async _addToHistory(ev) {
-    const entry = {
-      startedAt: ev.startedAt, endedAt: ev.endedAt, reward: ev.reward, minutes: ev.minutes, reason: ev.reason,
-      ...(ev.flex ? { flex: ev.flex } : {}),
-    };
-    this.homey.settings.set(this._key('history'), [entry, ...this.getHistory()].slice(0, HISTORY_MAX));
+    return this.store.getHistory();
   }
 
   /** Daily totals { date, reward, sessions, minutes }, newest first. */
   getDays() {
-    return this.homey.settings.get(this._key('days')) || [];
+    return this.store.getDays();
   }
 
-  async _addDay(ev) {
-    const day = {
-      date: ev.date, reward: ev.reward, sessions: ev.sessions, minutes: ev.minutes,
-    };
-    const rest = this.getDays().filter((d) => d.date !== day.date);
-    this.homey.settings.set(this._key('days'), [day, ...rest].slice(0, DAYS_MAX));
+  /** { home: rec, [flexId]: rec } */
+  getRecords() {
+    return this.store.getRecords();
+  }
+
+  /** { 'YYYY-MM': { reason: { sessions, reward, minutes } } } */
+  getReasonStats() {
+    return this.store.getReasonStats();
+  }
+
+  async _fireRecords(found) {
+    for (const b of found) {
+      const tokens = { record: this.homey.__(`records.${b.type}`), value: b.value, previous: b.previous };
+      this.log(`New record${b.id ? ` for ${b.id}` : ''}: ${b.type} ${b.previous} -> ${b.value}`);
+      const device = b.id ? this._flexDevicesOfHome().find((d) => d.getData().id === b.id) : this;
+      if (!device) continue; // a car/battery without a device in Homey
+      await this.homey.flow.getDeviceTriggerCard(b.id ? 'flex_record_broken' : 'record_broken')
+        .trigger(device, tokens).catch(this.error);
+    }
   }
 
   // --- Connection status in the device settings ---
@@ -399,7 +471,7 @@ class GridRewardDevice extends Homey.Device {
   _formatTime(ms) {
     if (!ms) return '–';
     const lang = localeFor(this.homey.i18n.getLanguage());
-    return new Intl.DateTimeFormat(lang, {
+    return dateFormat(lang, {
       timeZone: this.homey.clock.getTimezone(), dateStyle: 'short', timeStyle: 'medium',
     }).format(new Date(ms));
   }
@@ -423,23 +495,58 @@ class GridRewardDevice extends Homey.Device {
     return this.getStoreValue('flexDevices') || [];
   }
 
+  _flexDevicesOfHome() {
+    return flexDevicesOf(this.homey, this.homeId);
+  }
+
+  /** Name of a car/battery: as the user named its device, or as Tibber names it. */
+  flexName(flexId) {
+    const paired = this._flexDevicesOfHome().find((d) => d.getData().id === flexId);
+    if (paired && paired.getName) return paired.getName();
+    const f = this.getFlexDevices().find((x) => x.id === flexId);
+    return f ? (f.name || f.make || f.kind) : flexId;
+  }
+
+  /** What a car/battery of this home earned (lib/flexEarnings.js earningsOf), including the running session. */
+  getFlexEarnings(flexId) {
+    return this.store.flexEarnings(flexId, this._dayKey(), this.tracker);
+  }
+
   async _updateFlexDevices(flex, { homeStateChanged = false } = {}) {
     if (!flex) return;
     if (JSON.stringify(flex) !== JSON.stringify(this.getFlexDevices())) {
       await this.setStoreValue('flexDevices', flex);
     }
-    let devices = [];
-    try {
-      devices = this.homey.drivers.getDriver('flex-device').getDevices();
-    } catch (err) {
-      return; // driver not ready yet
-    }
-    for (const device of devices) {
-      if (device.getData().homeId !== this.homeId) continue;
+    for (const device of this._flexDevicesOfHome()) {
       const f = flex.find((x) => x.id === device.getData().id) || null;
       await device.onFlexStatus(f).catch(this.error);
       // A session started or ended: show the battery's new activity without waiting 5 min.
       if (homeStateChanged && device.pollSoon) device.pollSoon('home status changed');
+    }
+  }
+
+  /** A session ended: give its reward to the cars/batteries that delivered during it. */
+  async _creditFlexDevices(ev) {
+    if (!ev.flex || !ev.flex.length) return;
+    // The same day as the home's "today": a settlement after midnight counts in the new day.
+    this.store.creditFlex(ev, this._dayKey());
+    const share = Math.round((ev.reward / ev.flex.length) * 100) / 100;
+    for (const device of this._flexDevicesOfHome()) {
+      if (!ev.flex.includes(device.getData().id) || !device.onSessionEnded) continue;
+      await device.onSessionEnded({
+        reward: share,
+        minutes: ev.minutes,
+        earnedToday: this.getFlexEarnings(device.getData().id).today,
+        shared: ev.flex.length > 1,
+      }).catch(this.error);
+    }
+  }
+
+  async _publishFlexEarnings() {
+    const unit = this.getCurrencyUnit();
+    for (const device of this._flexDevicesOfHome()) {
+      if (!device.onEarnings) continue;
+      await device.onEarnings(this.getFlexEarnings(device.getData().id), unit).catch(this.error);
     }
   }
 
@@ -465,126 +572,7 @@ class GridRewardDevice extends Homey.Device {
     }
     this.tracker = result.state;
     await this._saveTracker();
-    await this._publishStats();
-    await this._fireEvents(result.events);
-    await this._publishFlexEarnings();
-  }
-
-  // --- What each car/battery earned (lib/flexEarnings.js) ---
-
-  /** What a car/battery of this home earned (lib/flexEarnings.js earningsOf), including the running session. */
-  getFlexEarnings(flexId) {
-    const store = this.homey.settings.get(this._key('flexearn')) || {};
-    return earningsOf(store, flexId, this._dayKey(), liveShares(this.tracker));
-  }
-
-  /** Name of a car/battery: as the user named its device, or as Tibber names it. */
-  flexName(flexId) {
-    const paired = this._flexDevicesOfHome().find((d) => d.getData().id === flexId);
-    if (paired && paired.getName) return paired.getName();
-    const f = this.getFlexDevices().find((x) => x.id === flexId);
-    return f ? (f.name || f.make || f.kind) : flexId;
-  }
-
-  // --- Records (lib/records.js) ---
-
-  /** { home: rec, [flexId]: rec } */
-  getRecords() {
-    return this.homey.settings.get(this._key('records')) || {};
-  }
-
-  /** First start with records: take them from the saved history, without triggers. */
-  _seedRecords() {
-    if (this.homey.settings.get(this._key('records'))) return;
-    const sessions = this.getHistory();
-    const all = { home: records.seed({ sessions, days: this.getDays() }) };
-    for (const id of new Set(sessions.flatMap((s) => s.flex || []))) {
-      all[id] = records.seed({ sessions, flexId: id });
-    }
-    this.homey.settings.set(this._key('records'), all);
-  }
-
-  async _recordSession(ev) {
-    const all = { ...this.getRecords() };
-    const found = [];
-    const home = records.onSession(all.home, ev);
-    all.home = home.rec;
-    found.push(...home.broken.map((b) => ({ ...b, id: null })));
-    for (const id of ev.flex || []) {
-      const r = records.onSession(all[id], { ...ev, reward: ev.reward / ev.flex.length });
-      all[id] = r.rec;
-      found.push(...r.broken.map((b) => ({ ...b, id })));
-    }
-    this.homey.settings.set(this._key('records'), all);
-    await this._fireRecords(found);
-  }
-
-  async _recordDay(ev) {
-    const all = { ...this.getRecords() };
-    const found = [];
-    const home = records.onDay(all.home, ev);
-    all.home = home.rec;
-    found.push(...home.broken.map((b) => ({ ...b, id: null })));
-    // Each car/battery's total for the day that ended.
-    const earned = this.homey.settings.get(this._key('flexearn')) || {};
-    for (const [id, e] of Object.entries(earned)) {
-      if (e.dayKey !== ev.date) continue;
-      const r = records.onDay(all[id], { reward: e.today, date: ev.date });
-      all[id] = r.rec;
-      found.push(...r.broken.map((b) => ({ ...b, id })));
-    }
-    this.homey.settings.set(this._key('records'), all);
-    await this._fireRecords(found);
-  }
-
-  async _fireRecords(found) {
-    for (const b of found) {
-      const tokens = { record: this.homey.__(`records.${b.type}`), value: b.value, previous: b.previous };
-      this.log(`New record${b.id ? ` for ${b.id}` : ''}: ${b.type} ${b.previous} -> ${b.value}`);
-      if (!b.id) {
-        await this.homey.flow.getDeviceTriggerCard('record_broken').trigger(this, tokens).catch(this.error);
-        continue;
-      }
-      const device = this._flexDevicesOfHome().find((d) => d.getData().id === b.id);
-      if (device) {
-        await this.homey.flow.getDeviceTriggerCard('flex_record_broken').trigger(device, tokens).catch(this.error);
-      }
-    }
-  }
-
-  _flexDevicesOfHome() {
-    try {
-      return this.homey.drivers.getDriver('flex-device').getDevices()
-        .filter((d) => d.getData().homeId === this.homeId);
-    } catch (err) {
-      return []; // driver not ready yet
-    }
-  }
-
-  /** A session ended: give its reward to the cars/batteries that delivered during it. */
-  async _creditFlexDevices(ev) {
-    if (!ev.flex || !ev.flex.length) return;
-    // The same day as the home's "today": a settlement after midnight counts in the new day.
-    const dayKey = this._dayKey();
-    const key = this._key('flexearn');
-    this.homey.settings.set(key, splitSession(this.homey.settings.get(key) || {}, ev, dayKey));
-    const share = Math.round((ev.reward / ev.flex.length) * 100) / 100;
-    for (const device of this._flexDevicesOfHome()) {
-      if (!ev.flex.includes(device.getData().id) || !device.onSessionEnded) continue;
-      const earnedToday = this.getFlexEarnings(device.getData().id).today;
-      await device.onSessionEnded({
-        reward: share, minutes: ev.minutes, earnedToday, shared: ev.flex.length > 1,
-      })
-        .catch(this.error);
-    }
-  }
-
-  async _publishFlexEarnings() {
-    const unit = this.getCurrencyUnit();
-    for (const device of this._flexDevicesOfHome()) {
-      if (!device.onEarnings) continue;
-      await device.onEarnings(this.getFlexEarnings(device.getData().id), unit).catch(this.error);
-    }
+    await this._afterChange(result.events);
   }
 
   async onUninit() {

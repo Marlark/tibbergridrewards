@@ -52,7 +52,9 @@
     "saved_today": "saved today",
     "unavailable": "No connection to Tibber",
     "week_title": "Last 7 days",
-    "no_battery": "Add a home battery from Tibber to see its plan."
+    "no_battery": "Add a home battery from Tibber to see its plan.",
+    "updated": "Updated",
+    "estimate": "est."
   },
   "conn": {
     "connecting": "Connecting…",
@@ -91,7 +93,18 @@
     "export_copy_failed": "Could not copy. Try Download instead.",
     "device": "Device",
     "all_devices": "All cars and batteries",
-    "records": "Records"
+    "records": "Records",
+    "battery_days": "The battery’s days",
+    "bd_gr": "Grid Rewards",
+    "bd_price": "Price",
+    "bd_solar": "Solar",
+    "bd_charged": "Charged",
+    "bd_discharged": "Discharged",
+    "bd_savings": "Saved",
+    "today": "Today",
+    "settled": "Added by Tibber’s settlement after the session ended",
+    "reasons_title": "Per reason",
+    "share": "Share"
   },
   "export": {
     "home": "Home",
@@ -103,11 +116,18 @@
     "reward": "Reward",
     "currency": "Currency",
     "reason": "Reason",
-    "device": "Device"
+    "device": "Device",
+    "settled": "Settlement"
   },
   "records": {
     "bestDay": "Best day",
     "bestSession": "Best session",
     "longestSession": "Longest session"
+  },
+  "car": {
+    "notify": "Plug in __name__: it is not plugged in, and it only earns Grid Rewards when it is.",
+    "warn": "The charger says the car is plugged in, but Tibber sees no car. Check the car in the Tibber app.",
+    "plugged": "Plugged in (__time__)",
+    "unplugged": "Unplugged (__time__)"
   }
 }

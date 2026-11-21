@@ -1,0 +1,25 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Price control today",
+    "sv": "Prisstyrning idag",
+    "no": "Prisstyring i dag",
+    "da": "Prisstyring i dag",
+    "de": "Preissteuerung heute",
+    "nl": "Prijssturing vandaag"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 1,
+  "units": {
+    "en": "h",
+    "sv": "h",
+    "no": "h",
+    "da": "h",
+    "de": "h",
+    "nl": "h"
+  },
+  "insights": true,
+  "icon": "/assets/battery.svg"
+}

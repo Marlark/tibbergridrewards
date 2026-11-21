@@ -37,6 +37,7 @@
     "url": "https://github.com/Marlark/tibbergridrewards/issues"
   },
   "source": "https://github.com/Marlark/tibbergridrewards",
+  "homeyCommunityTopicId": 162451,
   "brandColor": "#0F2742",
   "api": {
     "getHistory": {

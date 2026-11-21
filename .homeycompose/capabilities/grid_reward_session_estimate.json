@@ -1,0 +1,20 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Session (estimate)",
+    "sv": "Session (uppskattning)",
+    "no": "Økt (anslag)",
+    "da": "Session (skøn)",
+    "de": "Session (Schätzung)",
+    "nl": "Sessie (schatting)"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

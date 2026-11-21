@@ -2,11 +2,16 @@
 
 const Homey = require('homey');
 const { reasonText } = require('../../lib/reasons');
-const { localeFor } = require('../../lib/i18n');
-const { setIfChanged, applyCurrency, UnavailableWatch } = require('../../lib/deviceUtils');
+const { localeFor, dateFormat } = require('../../lib/i18n');
+const {
+  setIfChanged, applyCurrency, UnavailableWatch, isRecording, notifyWidgets,
+} = require('../../lib/deviceUtils');
+const { dayStats, startOfLocalDay } = require('../../lib/batteryDay');
 const { TibberApiChangedError } = require('../../lib/TibberAppClient');
 const { localDayKey } = require('../../lib/RewardTracker');
+const { homeById } = require('../../lib/devices');
 const { AvailabilityWatch } = require('../../lib/availability');
+const { reminderDue, mismatchStep } = require('../../lib/carChecks');
 const {
   POLL_MS, BATTERY_QUERY, batteryVariables, parseBattery, humanize,
 } = require('../../lib/battery');
@@ -41,7 +46,14 @@ const BATTERY_CAPABILITIES = [
   'battery_savings_month',
   'battery_activity',
   'battery_next_activity',
+  'battery_hours_grid_rewards',
+  'battery_hours_price',
+  'battery_hours_solar',
+  'battery_charged_today',
+  'battery_discharged_today',
 ];
+
+const BATTERY_DAYS_MAX = 400; // a bit more than a year
 
 /**
  * A car or battery. Grid Rewards status comes from its home's device via
@@ -92,13 +104,7 @@ class FlexDevice extends Homey.Device {
   }
 
   _home() {
-    const { homeId } = this.getData();
-    try {
-      return this.homey.drivers.getDriver('grid-reward').getDevices()
-        .find((d) => d.getData().id === homeId) || null;
-    } catch (err) {
-      return null; // driver not ready
-    }
+    return homeById(this.homey, this.getData().homeId);
   }
 
   /**
@@ -132,6 +138,7 @@ class FlexDevice extends Homey.Device {
     if (f.pluggedIn !== null) this.lastPluggedIn = f.pluggedIn;
     if (f.smartEnabled !== null) this.lastSmart = f.smartEnabled;
     if (silent) return;
+    if (plugChanged) await this._carChecks();
 
     if (stateChanged) {
       this.pollSoon('battery status changed');
@@ -179,6 +186,63 @@ class FlexDevice extends Homey.Device {
   async _minuteTick() {
     await this._checkUnavailable(this.lastGridState);
     await this.availability.update(this.lastGridState, this._dayKey());
+    await this._carChecks();
+  }
+
+  // --- Car: plug-in reminder (#74) and check against the charger (#72) ---
+
+  /** From the flow card "The charger says the car is …". */
+  async onChargerReported(plugged) {
+    if (this.getData().kind !== 'vehicle') return;
+    const at = Date.now();
+    await this.setStoreValue('charger', { plugged, at });
+    const time = dateFormat(localeFor(this.homey.i18n.getLanguage()), {
+      timeZone: this.homey.clock.getTimezone(), hour: '2-digit', minute: '2-digit',
+    }).format(new Date(at));
+    await this.setSettings({ charger_state: this.homey.__(plugged ? 'car.plugged' : 'car.unplugged', { time }) })
+      .catch(this.error);
+    await this._carChecks();
+  }
+
+  /** Minutes since local midnight. */
+  _minuteOfDay() {
+    const parts = Object.fromEntries(dateFormat('en-GB', {
+      timeZone: this.homey.clock.getTimezone(), hour: '2-digit', minute: '2-digit', hourCycle: 'h23',
+    }).formatToParts(new Date(Date.now())).map((p) => [p.type, p.value]));
+    return Number(parts.hour) * 60 + Number(parts.minute);
+  }
+
+  async _carChecks() {
+    if (this.getData().kind !== 'vehicle') return;
+    const dayKey = this._dayKey();
+    if (reminderDue({
+      enabled: this.getSetting('reminder_enabled'),
+      time: this.getSetting('reminder_time'),
+      dayKey,
+      minuteOfDay: this._minuteOfDay(),
+      lastDay: this.getStoreValue('reminderDay'),
+      pluggedIn: this.lastPluggedIn,
+    })) {
+      await this.setStoreValue('reminderDay', dayKey);
+      this.log('Plug-in reminder: the car is not plugged in');
+      await this.homey.notifications.createNotification({ excerpt: this.homey.__('car.notify', { name: this.getName() }) })
+        .catch(this.error);
+      await this.homey.flow.getDeviceTriggerCard('flex_plug_reminder').trigger(this, {}).catch(this.error);
+    }
+
+    const charger = this.getStoreValue('charger');
+    const r = mismatchStep(this.mismatch, {
+      chargerPlugged: charger ? charger.plugged : null, tibberPlugged: this.lastPluggedIn, now: Date.now(),
+    });
+    this.mismatch = r.state;
+    if (r.started) {
+      this.log('The charger says plugged in, but Tibber sees no car');
+      await this.setWarning(this.homey.__('car.warn')).catch(this.error);
+      await this.homey.flow.getDeviceTriggerCard('flex_plug_mismatch').trigger(this, {}).catch(this.error);
+    } else if (r.ended) {
+      this.log('The charger and Tibber agree again');
+      await this.unsetWarning().catch(this.error);
+    }
   }
 
   _dayKey() {
@@ -223,9 +287,17 @@ class FlexDevice extends Homey.Device {
 
     let parsed = null;
     let failure = null;
+    const now = Date.now();
+    const dayStart = startOfLocalDay(now, this.homey.clock.getTimezone());
     try {
-      const data = await home.client.query(BATTERY_QUERY, batteryVariables({ homeId, batteryId: id, now: Date.now() }));
-      parsed = parseBattery(data);
+      const data = await home.client.query(BATTERY_QUERY, batteryVariables({
+        homeId, batteryId: id, now, dayStart,
+      }));
+      if (isRecording(Homey.env)) {
+        // To check units and new activity codes against a real battery (tools/extract-recording.js).
+        this.log('[REC-BATTERY]', JSON.stringify({ t: now, tz: this.homey.clock.getTimezone(), data }));
+      }
+      parsed = parseBattery(data, { now });
       if (!parsed) failure = new Error('No battery data in the response');
     } catch (err) {
       failure = err;
@@ -253,6 +325,9 @@ class FlexDevice extends Homey.Device {
       battery_next_activity: this._nextText(parsed.nextPlanned),
     });
 
+    await this._updateBatteryDay(parsed, { now, dayStart });
+    notifyWidgets(this.homey);
+
     const code = parsed.activity ? parsed.activity.code : '';
     if (this.lastActivityCode !== null && code !== this.lastActivityCode) {
       await this.homey.flow.getDeviceTriggerCard('battery_activity_changed')
@@ -260,6 +335,60 @@ class FlexDevice extends Homey.Device {
         .catch(this.error);
     }
     this.lastActivityCode = code;
+  }
+
+  // --- The battery's day (#29, #48) ---
+
+  _batteryDaysKey() {
+    const { homeId, id } = this.getData();
+    return `batterydays:${homeId}:${id}`;
+  }
+
+  /** Finished days { date, hours, kwh, savings }, newest first, and today so far. */
+  getBatteryDays() {
+    const today = this.getStoreValue('batteryDay');
+    const done = this.homey.settings.get(this._batteryDaysKey()) || [];
+    return { today: today || null, days: done };
+  }
+
+  async _updateBatteryDay(parsed, { now, dayStart }) {
+    const tz = this.homey.clock.getTimezone();
+    const dayKey = localDayKey(new Date(dayStart + 12 * 3600 * 1000), tz);
+    const dayEnd = startOfLocalDay(dayStart + 26 * 3600 * 1000, tz);
+    const stats = dayStats({
+      intervals: parsed.intervals, flow: parsed.actual, dayStart, dayEnd, now,
+    });
+    const today = {
+      date: dayKey, hours: stats.hours, kwh: stats.kwh, savings: parsed.savingsToday,
+    };
+
+    // A new day: the last figures of the previous one are final.
+    const prev = this.getStoreValue('batteryDay');
+    if (prev && prev.date && prev.date !== dayKey) await this._finishBatteryDay(prev);
+    if (JSON.stringify(prev) !== JSON.stringify(today)) await this.setStoreValue('batteryDay', today);
+
+    await setIfChanged(this, {
+      battery_hours_grid_rewards: stats.hours.gridRewards,
+      battery_hours_price: stats.hours.price,
+      battery_hours_solar: stats.hours.solar,
+      battery_charged_today: stats.kwh.charged,
+      battery_discharged_today: stats.kwh.discharged,
+    });
+  }
+
+  async _finishBatteryDay(day) {
+    const key = this._batteryDaysKey();
+    const rest = (this.homey.settings.get(key) || []).filter((d) => d.date !== day.date);
+    this.homey.settings.set(key, [day, ...rest].slice(0, BATTERY_DAYS_MAX));
+    await this.homey.flow.getDeviceTriggerCard('battery_daily_summary').trigger(this, {
+      date: day.date,
+      hours_grid_rewards: day.hours.gridRewards,
+      hours_price: day.hours.price,
+      hours_solar: day.hours.solar,
+      charged_kwh: day.kwh.charged,
+      discharged_kwh: day.kwh.discharged,
+      savings: typeof day.savings === 'number' ? day.savings : 0,
+    }).catch(this.error);
   }
 
   /** The latest planned charge level (#15), for the settings page. */
@@ -297,7 +426,7 @@ class FlexDevice extends Homey.Device {
     const tz = this.homey.clock.getTimezone();
     const when = new Date(next.time);
     const lang = localeFor(this.homey.i18n.getLanguage());
-    const time = new Intl.DateTimeFormat(lang, { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(when);
+    const time = dateFormat(lang, { timeZone: tz, hour: '2-digit', minute: '2-digit' }).format(when);
     const tomorrow = localDayKey(when, tz) !== localDayKey(new Date(), tz);
     const power = (next.powerW / 1000).toLocaleString(lang, { maximumFractionDigits: 1 });
     return this.homey.__(tomorrow ? 'battery.next_tomorrow' : 'battery.next', {

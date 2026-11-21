@@ -397,7 +397,7 @@ test('history saved in the device store by an older version is moved to the app 
 test('daily totals: one entry per date, newest first, at most 400', async (t) => {
   const { device } = await makeHome(t);
   for (const date of ['2026-11-15', '2026-11-16', '2026-11-16']) {
-    await device._addDay({
+    device.store.addDay({
       date, reward: 1, sessions: 1, minutes: 10,
     });
   }

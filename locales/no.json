@@ -52,7 +52,9 @@
     "saved_today": "spart i dag",
     "unavailable": "Ingen forbindelse med Tibber",
     "week_title": "Siste 7 dager",
-    "no_battery": "Legg til et hjemmebatteri fra Tibber for å se planen."
+    "no_battery": "Legg til et hjemmebatteri fra Tibber for å se planen.",
+    "updated": "Oppdatert",
+    "estimate": "anslått"
   },
   "conn": {
     "connecting": "Kobler til…",
@@ -91,7 +93,18 @@
     "export_copy_failed": "Kunne ikke kopiere. Prøv Last ned i stedet.",
     "device": "Enhet",
     "all_devices": "Alle biler og batterier",
-    "records": "Rekorder"
+    "records": "Rekorder",
+    "battery_days": "Batteriets dager",
+    "bd_gr": "Grid Rewards",
+    "bd_price": "Pris",
+    "bd_solar": "Sol",
+    "bd_charged": "Ladet",
+    "bd_discharged": "Utladet",
+    "bd_savings": "Spart",
+    "today": "I dag",
+    "settled": "Lagt til av Tibbers avregning etter at økten sluttet",
+    "reasons_title": "Per årsak",
+    "share": "Andel"
   },
   "export": {
     "home": "Hjem",
@@ -103,11 +116,18 @@
     "reward": "Godtgjørelse",
     "currency": "Valuta",
     "reason": "Årsak",
-    "device": "Enhet"
+    "device": "Enhet",
+    "settled": "Avregning"
   },
   "records": {
     "bestDay": "Beste dag",
     "bestSession": "Beste økt",
     "longestSession": "Lengste økt"
+  },
+  "car": {
+    "notify": "Koble til __name__: den er ikke tilkoblet, og den tjener Grid Rewards bare når den er det.",
+    "warn": "Laderen sier at bilen er tilkoblet, men Tibber ser ingen bil. Sjekk bilen i Tibber-appen.",
+    "plugged": "Tilkoblet (__time__)",
+    "unplugged": "Frakoblet (__time__)"
   }
 }

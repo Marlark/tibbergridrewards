@@ -52,7 +52,9 @@
     "saved_today": "heute gespart",
     "unavailable": "Keine Verbindung zu Tibber",
     "week_title": "Letzte 7 Tage",
-    "no_battery": "Füge eine Heimbatterie von Tibber hinzu, um ihren Plan zu sehen."
+    "no_battery": "Füge eine Heimbatterie von Tibber hinzu, um ihren Plan zu sehen.",
+    "updated": "Aktualisiert",
+    "estimate": "geschätzt"
   },
   "conn": {
     "connecting": "Verbinde…",
@@ -91,7 +93,18 @@
     "export_copy_failed": "Kopieren nicht möglich. Versuche stattdessen Herunterladen.",
     "device": "Gerät",
     "all_devices": "Alle Autos und Batterien",
-    "records": "Rekorde"
+    "records": "Rekorde",
+    "battery_days": "Die Tage der Batterie",
+    "bd_gr": "Grid Rewards",
+    "bd_price": "Preis",
+    "bd_solar": "Sonne",
+    "bd_charged": "Geladen",
+    "bd_discharged": "Entladen",
+    "bd_savings": "Gespart",
+    "today": "Heute",
+    "settled": "Von der Abrechnung von Tibber nach Ende der Session hinzugefügt",
+    "reasons_title": "Nach Grund",
+    "share": "Anteil"
   },
   "export": {
     "home": "Zuhause",
@@ -103,11 +116,18 @@
     "reward": "Vergütung",
     "currency": "Währung",
     "reason": "Grund",
-    "device": "Gerät"
+    "device": "Gerät",
+    "settled": "Abrechnung"
   },
   "records": {
     "bestDay": "Bester Tag",
     "bestSession": "Beste Session",
     "longestSession": "Längste Session"
+  },
+  "car": {
+    "notify": "Schließe __name__ an: Es ist nicht angeschlossen und verdient Grid Rewards nur, wenn es angeschlossen ist.",
+    "warn": "Die Wallbox meldet, das Auto ist angeschlossen, aber Tibber sieht kein Auto. Prüfe das Auto in der Tibber-App.",
+    "plugged": "Angeschlossen (__time__)",
+    "unplugged": "Abgesteckt (__time__)"
   }
 }

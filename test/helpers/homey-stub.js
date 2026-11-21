@@ -47,6 +47,11 @@ function makeHomey({ timeZone = 'Europe/Stockholm' } = {}) {
       set(key, value) { this.values[key] = value; },
     },
     clock: { getTimezone: () => timeZone },
+    // homey.api.realtime: events for the dashboard widgets
+    api: {
+      events: [],
+      realtime(event, data) { this.events.push({ event, data }); },
+    },
     i18n: { getLanguage: () => 'en' },
     __: translate,
     setInterval(fn, ms) { const t = { fn, ms, cleared: false }; timers.push(t); return t; },
@@ -67,6 +72,9 @@ function makeHomey({ timeZone = 'Europe/Stockholm' } = {}) {
       }),
       getConditionCard: (id) => ({
         registerRunListener: (fn) => { conditions[id] = fn; },
+      }),
+      getActionCard: (id) => ({
+        registerRunListener: (fn) => { conditions[`action:${id}`] = fn; },
       }),
     },
   };
@@ -107,11 +115,23 @@ class Device {
 
   async setCapabilityValue(k, v) { await tick(); this._caps[k] = v; }
 
-  hasCapability(k) { return !this._capList || this._capList.includes(k); }
+  hasCapability(k) {
+    if (this._removed && this._removed.has(k)) return false;
+    return !this._capList || this._capList.includes(k);
+  }
 
   async setCapabilityOptions(k, o) { this.capabilityOptions = { ...this.capabilityOptions, [k]: o }; }
 
-  async addCapability(k) { if (this._capList && !this._capList.includes(k)) this._capList.push(k); }
+  async addCapability(k) {
+    if (this._removed) this._removed.delete(k);
+    if (this._capList && !this._capList.includes(k)) this._capList.push(k);
+  }
+
+  async removeCapability(k) {
+    if (this._capList) this._capList = this._capList.filter((c) => c !== k);
+    else this._removed = new Set([...(this._removed || []), k]);
+    delete this._caps[k];
+  }
 
   async setWarning(msg) { this.warning = msg; }
 

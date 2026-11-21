@@ -7,24 +7,17 @@
  * the widget page itself needs no locale files.
  */
 
-function devicesOf(homey, driverId) {
-  try {
-    return homey.drivers.getDriver(driverId).getDevices();
-  } catch (err) {
-    return [];
-  }
-}
+const { homesOf, flexDevicesOf } = require('../../lib/devices');
 
 const cap = (device, id) => (device.hasCapability(id) ? device.getCapabilityValue(id) : null);
 
 async function getStatus({ homey, query = {} }) {
-  const homes = devicesOf(homey, 'grid-reward');
+  const homes = homesOf(homey);
   const home = homes.find((d) => d.getId && d.getId() === query.deviceId) || homes[0];
   if (!home) return { error: homey.__('error.no_home_device') };
 
   const state = cap(home, 'grid_reward_state') || 'unknown';
-  const battery = devicesOf(homey, 'flex-device')
-    .find((d) => d.getData().kind === 'battery' && d.getData().homeId === home.getData().id);
+  const battery = flexDevicesOf(homey, home.getData().id).find((d) => d.getData().kind === 'battery');
 
   return {
     name: home.getName ? home.getName() : '',
@@ -37,6 +30,8 @@ async function getStatus({ homey, query = {} }) {
     today: cap(home, 'grid_reward_today'),
     month: cap(home, 'grid_reward_month'),
     session: cap(home, 'grid_reward_session'),
+    estimate: cap(home, 'grid_reward_session_estimate'),
+    updated: home.getUpdatedTime ? home.getUpdatedTime() : null,
     lastSession: cap(home, 'grid_reward_last_session'),
     sessionsToday: cap(home, 'grid_reward_sessions_today'),
     minutesToday: cap(home, 'grid_reward_minutes_today'),
@@ -53,6 +48,8 @@ async function getStatus({ homey, query = {} }) {
       battery: homey.__('widget.battery'),
       savedToday: homey.__('widget.saved_today'),
       unavailable: homey.__('widget.unavailable'),
+      updated: homey.__('widget.updated'),
+      estimate: homey.__('widget.estimate'),
     },
   };
 }

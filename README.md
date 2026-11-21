@@ -11,9 +11,9 @@ Follow your [Tibber Grid Rewards](https://tibber.com) in [Homey](https://homey.a
 ## Features
 
 - **Live status** of Grid Rewards for each home: available, delivering or unavailable, with the reason (e.g. *Excess power in the grid*, *No car plugged in*).
-- **Earnings** for the current session, today, this month and all time, logged to Insights.
+- **Earnings** for the current session (with an estimate while it runs), today, yesterday, this month and all time, logged to Insights.
 - **Statistics**: last session, sessions and delivery time today, sessions this month, how much of the day the home was available, and records (best day, best session, longest session).
-- **Car and home battery** as their own devices: what each one earned today, this month and in total, its sessions and share, how much of the day it was available, records, plugged in, smart control, and for the battery its savings, current activity and next planned charge or discharge.
+- **Car and home battery** as their own devices: what each one earned today, this month and in total, its sessions and share, how much of the day it was available, records, plugged in, smart control, a plug-in reminder and a check against your charger for the car, the battery's hours for Grid Rewards, price and solar and its energy in and out, and for the battery its savings, current activity and next planned charge or discharge.
 - **Flow cards** for sessions, daily and monthly summaries, amounts passed, long unavailability and more.
 - **Three dashboard widgets** (status, the last 7 days and the battery plan) and a **session history** page that is kept even if you remove and add the home again. The history page also shows each battery’s planned charge level, and exports sessions or daily totals as CSV.
 - **Six languages**: English, Swedish, Norwegian, Danish, German and Dutch.
@@ -139,6 +139,8 @@ GitHub Actions runs the tests and `homey app validate --level publish` on every 
 
 ```
 lib/                 Logic without Homey dependencies (tested on its own)
+  HomeStore.js         What is kept per home in the app settings (history, days, records, …)
+  devices.js           Finding the home, car and battery devices
   TibberAppClient.js   Login and GraphQL over HTTP
   GridRewardSubscription.js  WebSocket with one subscription per home, reconnects, API-change detection
   ConnectionPool.js    One login and WebSocket per Tibber account, shared by its homes
@@ -149,6 +151,9 @@ lib/                 Logic without Homey dependencies (tested on its own)
   flexEarnings.js      What each car/battery earned, from the sessions it delivered in
   availability.js      "Available today" in %
   records.js           Best day, best session, longest session
+  carChecks.js         Plug-in reminder and check against the charger
+  batteryDay.js        The battery's day: hours per reason, energy in and out
+  reasonStats.js       Sessions per reason, and the estimate of a running session
 drivers/grid-reward/ The home device (login, subscription, flow cards)
 drivers/flex-device/ Car and battery, fed by the home device
 widgets/             Dashboard widgets: status, last 7 days, battery plan
@@ -171,7 +176,7 @@ New battery activity codes are logged as `Unknown battery activity "…"` and sh
 To see exactly what Tibber sends, and to turn it into a test:
 
 1. Run the app and save the log: `homey app run | tee run.log`. During `homey app run` every update from Tibber is logged as a `[REC]` line; a published app never does this. To run without it, put `{ "RECORD_RAW": "0" }` in `env.json` (ignored by git).
-2. Extract the recording: `node tools/extract-recording.js run.log > recordings/my-day.jsonl`
+2. Extract the recording: `node tools/extract-recording.js run.log > recordings/my-day.jsonl`. The battery's responses are logged as `[REC-BATTERY]` lines; extract them with `--battery`.
 3. Replay it: `node tools/replay.js recordings/my-day.jsonl` prints every update and lists impossible values.
 4. To keep it as a test, anonymise it first: `node tools/anonymize-recording.js recordings/my-day.jsonl > test/fixtures/my-day.jsonl`
 
@@ -179,6 +184,7 @@ To see exactly what Tibber sends, and to turn it into a test:
 
 ## More
 
+- [Homey Community topic](https://community.homey.app/t/162451): questions, ideas and test versions. Bugs are best reported as [GitHub issues](https://github.com/Marlark/tibbergridrewards/issues).
 - [CHANGELOG.md](CHANGELOG.md): what has changed.
 - [Docs/IDEBANK.md](Docs/IDEBANK.md): ideas for future features (in Swedish).
 

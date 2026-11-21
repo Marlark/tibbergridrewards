@@ -32,7 +32,9 @@
 
     <script type="text/javascript">
       // The plan is fetched from Tibber every 5 min; look for a new one every minute.
-      const INTERVAL_MS = 60 * 1000;
+      // The app sends an event when something changes; polling is only a fallback.
+      const INTERVAL_MS = 5 * 60 * 1000;
+      const EVENT = 'grid-rewards-changed';
 
       function esc(s) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({
@@ -98,6 +100,14 @@
         if (window.ResizeObserver) new ResizeObserver(resize).observe(root);
         load();
         setInterval(load, INTERVAL_MS);
+        // Several devices may change at once: reload once, shortly after.
+        let pending = null;
+        if (typeof Homey.on === 'function') {
+          Homey.on(EVENT, () => {
+            if (pending) return;
+            pending = setTimeout(() => { pending = null; load(); }, 500);
+          });
+        }
       }
     </script>
   </body>

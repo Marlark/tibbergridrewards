@@ -9,7 +9,9 @@
     "grid_reward_active",
     "grid_reward_reason",
     "grid_reward_session",
+    "grid_reward_session_estimate",
     "grid_reward_today",
+    "grid_reward_yesterday",
     "grid_reward_month",
     "grid_reward_all_time",
     "grid_reward_last_session",
@@ -141,6 +143,40 @@
             "nl": "Herverbindingen sinds app-start"
           },
           "value": "–"
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": {
+        "en": "Display",
+        "sv": "Visning",
+        "no": "Visning",
+        "da": "Visning",
+        "de": "Anzeige",
+        "nl": "Weergave"
+      },
+      "children": [
+        {
+          "id": "show_updated",
+          "type": "checkbox",
+          "value": false,
+          "label": {
+            "en": "Show \"Updated\" on the device",
+            "sv": "Visa ”Uppdaterad” på enheten",
+            "no": "Vis «Oppdatert» på enheten",
+            "da": "Vis »Opdateret« på enheden",
+            "de": "„Aktualisiert“ am Gerät anzeigen",
+            "nl": "‘Bijgewerkt’ op het apparaat tonen"
+          },
+          "hint": {
+            "en": "The time of the last update from Tibber, as a value on the device. It is always shown in the widget and under Connection status; as a value it is written on every update (about 150 times a day).",
+            "sv": "Tiden för senaste uppdateringen från Tibber, som ett värde på enheten. Den visas alltid i widgeten och under Anslutningsstatus; som värde skrivs den vid varje uppdatering (ungefär 150 gånger per dygn).",
+            "no": "Tidspunktet for siste oppdatering fra Tibber, som en verdi på enheten. Den vises alltid i widgeten og under Tilkoblingsstatus; som verdi skrives den ved hver oppdatering (omtrent 150 ganger i døgnet).",
+            "da": "Tidspunktet for seneste opdatering fra Tibber, som en værdi på enheden. Den vises altid i widgetten og under Forbindelsesstatus; som værdi skrives den ved hver opdatering (cirka 150 gange i døgnet).",
+            "de": "Der Zeitpunkt der letzten Aktualisierung von Tibber als Wert am Gerät. Er wird immer im Widget und unter Verbindungsstatus angezeigt; als Wert wird er bei jeder Aktualisierung geschrieben (etwa 150-mal am Tag).",
+            "nl": "Het tijdstip van de laatste update van Tibber, als waarde op het apparaat. Het staat altijd in de widget en onder Verbindingsstatus; als waarde wordt het bij elke update geschreven (ongeveer 150 keer per dag)."
+          }
         }
       ]
     }

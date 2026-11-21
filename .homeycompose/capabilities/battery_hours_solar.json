@@ -1,0 +1,25 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Solar today",
+    "sv": "Sol idag",
+    "no": "Sol i dag",
+    "da": "Sol i dag",
+    "de": "Solar heute",
+    "nl": "Zon vandaag"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 1,
+  "units": {
+    "en": "h",
+    "sv": "h",
+    "no": "h",
+    "da": "h",
+    "de": "h",
+    "nl": "h"
+  },
+  "insights": true,
+  "icon": "/assets/battery.svg"
+}

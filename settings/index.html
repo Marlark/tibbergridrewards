@@ -90,7 +90,7 @@
         const sessions = list.map((x) => `
           <tr>
             <td>${esc(x.when)}</td>
-            <td class="num">${kr(x.reward)}</td>
+            <td class="num">${kr(x.reward)}${x.settled ? `<div class="muted" title="${esc(L.settled)}">+${kr(x.settled)} · ${x.settledAfter} s</div>` : ''}</td>
             <td class="num">${x.minutes} ${esc(L.min)}</td>
             ${withDevices ? `<td>${esc(x.devices.join(' + ') || '–')}</td>` : ''}
             <td class="reason">${esc(x.reasonText || '–')}</td>
@@ -111,6 +111,19 @@
                 <td class="muted">${esc(x.when)}</td>
               </tr>`).join('')).join('')}
           </table>` : '';
+        const reasons = (home.reasons || []).map((m) => `
+          <h3>${esc(L.reasons_title)} – ${esc(m.label)}</h3>
+          <table>
+            <thead><tr><th>${esc(L.reason)}</th><th class="num">${esc(L.sessions)}</th>
+              <th class="num">${esc(L.reward)}</th><th class="num">${esc(L.duration)}</th></tr></thead>
+            <tbody>${m.rows.map((r) => `
+              <tr>
+                <td>${esc(r.text)}</td>
+                <td class="num">${r.sessions} (${r.sessionShare} %)</td>
+                <td class="num">${kr(r.reward)} (${r.rewardShare} %)</td>
+                <td class="num">${r.minutes} ${esc(L.min)}</td>
+              </tr>`).join('')}</tbody>
+          </table>`).join('');
         return `
           <h2>${esc(home.name)}</h2>
           ${picker}
@@ -127,6 +140,7 @@
               <th class="num">${esc(L.duration)}</th>${withDevices ? `<th>${esc(L.device)}</th>` : ''}<th>${esc(L.reason)}</th></tr></thead>
             <tbody>${sessions}</tbody>
           </table>
+          ${reasons}
           ${records}`;
       }
 
@@ -138,7 +152,33 @@
           <span><i style="background:#2bb673"></i>${esc(L.plan_charge)}</span>
           <span><i style="background:#f2994a"></i>${esc(L.plan_discharge)}</span></div>`;
         const note = `<p class="muted">${esc(L.plan_note)}${b.updated ? ` (${esc(b.updated)})` : ''}</p>`;
-        return `${head}<div class="plan">${b.svg}</div>${legend}${note}`;
+        return `${head}<div class="plan">${b.svg}</div>${legend}${note}${renderBatteryDays(b, L)}`;
+      }
+
+      // The battery's day (#29, #48): hours per reason, energy in and out, savings.
+      function renderBatteryDays(b, L) {
+        if (!b.days || !b.days.length) return '';
+        UNIT = b.unit || 'kr';
+        const h = (v) => (typeof v === 'number' ? v.toLocaleString(undefined, { maximumFractionDigits: 1 }) : '–');
+        const k = (v) => (typeof v === 'number' ? v.toLocaleString(undefined, { minimumFractionDigits: 1, maximumFractionDigits: 1 }) : '–');
+        const rows = b.days.map((d) => `
+          <tr>
+            <td>${esc(d.today ? L.today : d.date)}</td>
+            <td class="num">${h(d.hours && d.hours.gridRewards)} h</td>
+            <td class="num">${h(d.hours && d.hours.price)} h</td>
+            <td class="num">${h(d.hours && d.hours.solar)} h</td>
+            <td class="num">${k(d.kwh && d.kwh.charged)}</td>
+            <td class="num">${k(d.kwh && d.kwh.discharged)}</td>
+            <td class="num">${typeof d.savings === 'number' ? kr(d.savings) : '–'}</td>
+          </tr>`).join('');
+        return `
+          <h3>${esc(L.battery_days)}</h3>
+          <table>
+            <thead><tr><th></th><th class="num">${esc(L.bd_gr)}</th><th class="num">${esc(L.bd_price)}</th>
+              <th class="num">${esc(L.bd_solar)}</th><th class="num">${esc(L.bd_charged)} (kWh)</th>
+              <th class="num">${esc(L.bd_discharged)} (kWh)</th><th class="num">${esc(L.bd_savings)}</th></tr></thead>
+            <tbody>${rows}</tbody>
+          </table>`;
       }
 
       // Export (#10). Downloading does not work in every Homey app, so copying is offered too.

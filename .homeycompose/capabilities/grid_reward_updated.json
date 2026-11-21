@@ -1,0 +1,16 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Updated",
+    "sv": "Uppdaterad",
+    "no": "Oppdatert",
+    "da": "Opdateret",
+    "de": "Aktualisiert",
+    "nl": "Bijgewerkt"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "insights": false,
+  "icon": "/assets/reward.svg"
+}

@@ -2,6 +2,7 @@
 
 const Homey = require('homey');
 const { crossed } = require('../../lib/unavailable');
+const { homesOf } = require('../../lib/devices');
 
 // What the car/battery earned, its sessions and its share (shown on both kinds).
 const EARNED = [
@@ -14,9 +15,17 @@ const EARNED = [
  * the Grid Rewards home device receives them in its subscription and forwards
  * every update (see GridRewardDevice._updateFlexDevices).
  */
+// The battery's day (#29, #48).
+const BATTERY_DAY = [
+  'battery_hours_grid_rewards', 'battery_hours_price', 'battery_hours_solar',
+  'battery_charged_today', 'battery_discharged_today',
+];
+
 class FlexDeviceDriver extends Homey.Driver {
 
   async onInit() {
+    this.homey.flow.getActionCard('flex_charger_reported')
+      .registerRunListener(async ({ device, plugged }) => device.onChargerReported(plugged === 'yes'));
     this.homey.flow.getConditionCard('flex_plugged_in')
       .registerRunListener(async ({ device }) => device.getCapabilityValue('flex_plugged_in') === true);
     this.homey.flow.getConditionCard('flex_available')
@@ -31,7 +40,7 @@ class FlexDeviceDriver extends Homey.Driver {
   }
 
   async onPairListDevices() {
-    const homes = this.homey.drivers.getDriver('grid-reward').getDevices();
+    const homes = homesOf(this.homey);
     if (!homes.length) throw new Error(this.homey.__('error.no_home_device'));
 
     const list = [];
@@ -41,7 +50,7 @@ class FlexDeviceDriver extends Homey.Driver {
           ? ['grid_reward_state', 'grid_reward_reason', ...EARNED, 'flex_plugged_in', 'flex_smart_enabled']
           : ['grid_reward_state', 'grid_reward_reason', ...EARNED, 'flex_smart_enabled',
             'battery_savings_today', 'battery_savings_week', 'battery_savings_month',
-            'battery_activity', 'battery_next_activity'];
+            'battery_activity', 'battery_next_activity', ...BATTERY_DAY];
         list.push({
           name: f.name && f.make && f.name !== f.make ? `${f.name} (${f.make})` : (f.name || f.make || f.kind),
           data: { id: f.id, homeId: home.getData().id, kind: f.kind },

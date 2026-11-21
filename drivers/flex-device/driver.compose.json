@@ -25,7 +25,12 @@
     "battery_savings_week",
     "battery_savings_month",
     "battery_activity",
-    "battery_next_activity"
+    "battery_next_activity",
+    "battery_hours_grid_rewards",
+    "battery_hours_price",
+    "battery_hours_solar",
+    "battery_charged_today",
+    "battery_discharged_today"
   ],
   "platforms": [
     "local"
@@ -49,6 +54,355 @@
     {
       "id": "add_devices",
       "template": "add_devices"
+    }
+  ],
+  "settings": [
+    {
+      "type": "group",
+      "label": {
+        "en": "Plug-in reminder (car only)",
+        "sv": "Påminnelse om inkoppling (bara bil)",
+        "no": "Påminnelse om tilkobling (kun bil)",
+        "da": "Påmindelse om tilslutning (kun bil)",
+        "de": "Erinnerung zum Anschließen (nur Auto)",
+        "nl": "Herinnering om aan te sluiten (alleen auto)"
+      },
+      "children": [
+        {
+          "id": "reminder_enabled",
+          "type": "checkbox",
+          "value": false,
+          "label": {
+            "en": "Remind me",
+            "sv": "Påminn mig",
+            "no": "Påminn meg",
+            "da": "Påmind mig",
+            "de": "Erinnern",
+            "nl": "Herinner mij"
+          },
+          "hint": {
+            "en": "A notification once a day at the time below, if the car is not plugged in. The car only earns Grid Rewards when it is plugged in.",
+            "sv": "En notis en gång om dagen vid tiden nedan, om bilen inte är inkopplad. Bilen tjänar Grid Rewards bara när den är inkopplad.",
+            "no": "Et varsel én gang om dagen på tidspunktet nedenfor, hvis bilen ikke er tilkoblet. Bilen tjener Grid Rewards bare når den er tilkoblet.",
+            "da": "En notifikation én gang om dagen på tidspunktet nedenfor, hvis bilen ikke er tilsluttet. Bilen tjener kun Grid Rewards, når den er tilsluttet.",
+            "de": "Einmal täglich zur unten gewählten Zeit eine Benachrichtigung, wenn das Auto nicht angeschlossen ist. Das Auto verdient Grid Rewards nur, wenn es angeschlossen ist.",
+            "nl": "Eén keer per dag een melding op het tijdstip hieronder als de auto niet is aangesloten. De auto verdient alleen Grid Rewards als hij is aangesloten."
+          }
+        },
+        {
+          "id": "reminder_time",
+          "type": "dropdown",
+          "value": "20:00",
+          "label": {
+            "en": "Time",
+            "sv": "Tid",
+            "no": "Tidspunkt",
+            "da": "Tidspunkt",
+            "de": "Uhrzeit",
+            "nl": "Tijdstip"
+          },
+          "values": [
+            {
+              "id": "00:00",
+              "label": {
+                "en": "00:00",
+                "sv": "00:00",
+                "no": "00:00",
+                "da": "00:00",
+                "de": "00:00",
+                "nl": "00:00"
+              }
+            },
+            {
+              "id": "01:00",
+              "label": {
+                "en": "01:00",
+                "sv": "01:00",
+                "no": "01:00",
+                "da": "01:00",
+                "de": "01:00",
+                "nl": "01:00"
+              }
+            },
+            {
+              "id": "02:00",
+              "label": {
+                "en": "02:00",
+                "sv": "02:00",
+                "no": "02:00",
+                "da": "02:00",
+                "de": "02:00",
+                "nl": "02:00"
+              }
+            },
+            {
+              "id": "03:00",
+              "label": {
+                "en": "03:00",
+                "sv": "03:00",
+                "no": "03:00",
+                "da": "03:00",
+                "de": "03:00",
+                "nl": "03:00"
+              }
+            },
+            {
+              "id": "04:00",
+              "label": {
+                "en": "04:00",
+                "sv": "04:00",
+                "no": "04:00",
+                "da": "04:00",
+                "de": "04:00",
+                "nl": "04:00"
+              }
+            },
+            {
+              "id": "05:00",
+              "label": {
+                "en": "05:00",
+                "sv": "05:00",
+                "no": "05:00",
+                "da": "05:00",
+                "de": "05:00",
+                "nl": "05:00"
+              }
+            },
+            {
+              "id": "06:00",
+              "label": {
+                "en": "06:00",
+                "sv": "06:00",
+                "no": "06:00",
+                "da": "06:00",
+                "de": "06:00",
+                "nl": "06:00"
+              }
+            },
+            {
+              "id": "07:00",
+              "label": {
+                "en": "07:00",
+                "sv": "07:00",
+                "no": "07:00",
+                "da": "07:00",
+                "de": "07:00",
+                "nl": "07:00"
+              }
+            },
+            {
+              "id": "08:00",
+              "label": {
+                "en": "08:00",
+                "sv": "08:00",
+                "no": "08:00",
+                "da": "08:00",
+                "de": "08:00",
+                "nl": "08:00"
+              }
+            },
+            {
+              "id": "09:00",
+              "label": {
+                "en": "09:00",
+                "sv": "09:00",
+                "no": "09:00",
+                "da": "09:00",
+                "de": "09:00",
+                "nl": "09:00"
+              }
+            },
+            {
+              "id": "10:00",
+              "label": {
+                "en": "10:00",
+                "sv": "10:00",
+                "no": "10:00",
+                "da": "10:00",
+                "de": "10:00",
+                "nl": "10:00"
+              }
+            },
+            {
+              "id": "11:00",
+              "label": {
+                "en": "11:00",
+                "sv": "11:00",
+                "no": "11:00",
+                "da": "11:00",
+                "de": "11:00",
+                "nl": "11:00"
+              }
+            },
+            {
+              "id": "12:00",
+              "label": {
+                "en": "12:00",
+                "sv": "12:00",
+                "no": "12:00",
+                "da": "12:00",
+                "de": "12:00",
+                "nl": "12:00"
+              }
+            },
+            {
+              "id": "13:00",
+              "label": {
+                "en": "13:00",
+                "sv": "13:00",
+                "no": "13:00",
+                "da": "13:00",
+                "de": "13:00",
+                "nl": "13:00"
+              }
+            },
+            {
+              "id": "14:00",
+              "label": {
+                "en": "14:00",
+                "sv": "14:00",
+                "no": "14:00",
+                "da": "14:00",
+                "de": "14:00",
+                "nl": "14:00"
+              }
+            },
+            {
+              "id": "15:00",
+              "label": {
+                "en": "15:00",
+                "sv": "15:00",
+                "no": "15:00",
+                "da": "15:00",
+                "de": "15:00",
+                "nl": "15:00"
+              }
+            },
+            {
+              "id": "16:00",
+              "label": {
+                "en": "16:00",
+                "sv": "16:00",
+                "no": "16:00",
+                "da": "16:00",
+                "de": "16:00",
+                "nl": "16:00"
+              }
+            },
+            {
+              "id": "17:00",
+              "label": {
+                "en": "17:00",
+                "sv": "17:00",
+                "no": "17:00",
+                "da": "17:00",
+                "de": "17:00",
+                "nl": "17:00"
+              }
+            },
+            {
+              "id": "18:00",
+              "label": {
+                "en": "18:00",
+                "sv": "18:00",
+                "no": "18:00",
+                "da": "18:00",
+                "de": "18:00",
+                "nl": "18:00"
+              }
+            },
+            {
+              "id": "19:00",
+              "label": {
+                "en": "19:00",
+                "sv": "19:00",
+                "no": "19:00",
+                "da": "19:00",
+                "de": "19:00",
+                "nl": "19:00"
+              }
+            },
+            {
+              "id": "20:00",
+              "label": {
+                "en": "20:00",
+                "sv": "20:00",
+                "no": "20:00",
+                "da": "20:00",
+                "de": "20:00",
+                "nl": "20:00"
+              }
+            },
+            {
+              "id": "21:00",
+              "label": {
+                "en": "21:00",
+                "sv": "21:00",
+                "no": "21:00",
+                "da": "21:00",
+                "de": "21:00",
+                "nl": "21:00"
+              }
+            },
+            {
+              "id": "22:00",
+              "label": {
+                "en": "22:00",
+                "sv": "22:00",
+                "no": "22:00",
+                "da": "22:00",
+                "de": "22:00",
+                "nl": "22:00"
+              }
+            },
+            {
+              "id": "23:00",
+              "label": {
+                "en": "23:00",
+                "sv": "23:00",
+                "no": "23:00",
+                "da": "23:00",
+                "de": "23:00",
+                "nl": "23:00"
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "group",
+      "label": {
+        "en": "Charger check (car only)",
+        "sv": "Koll mot laddboxen (bara bil)",
+        "no": "Kontroll mot laderen (kun bil)",
+        "da": "Kontrol mod laderen (kun bil)",
+        "de": "Abgleich mit der Wallbox (nur Auto)",
+        "nl": "Controle met de laadpaal (alleen auto)"
+      },
+      "children": [
+        {
+          "id": "charger_state",
+          "type": "label",
+          "value": "–",
+          "label": {
+            "en": "The charger says",
+            "sv": "Laddboxen säger",
+            "no": "Laderen sier",
+            "da": "Laderen siger",
+            "de": "Die Wallbox meldet",
+            "nl": "De laadpaal meldt"
+          },
+          "hint": {
+            "en": "Report your charger’s state with the flow card “The charger says the car is …”. If the charger says plugged in but Tibber sees no car for 10 minutes, you get a warning.",
+            "sv": "Rapportera laddboxens läge med Flow-kortet ”Laddboxen säger att bilen är …”. Om laddboxen säger inkopplad men Tibber inte ser någon bil på 10 minuter får du en varning.",
+            "no": "Rapporter laderens tilstand med Flow-kortet «Laderen sier at bilen er …». Hvis laderen sier tilkoblet, men Tibber ikke ser noen bil på 10 minutter, får du en advarsel.",
+            "da": "Rapportér laderens tilstand med Flow-kortet »Laderen siger, at bilen er …«. Hvis laderen siger tilsluttet, men Tibber ikke ser nogen bil i 10 minutter, får du en advarsel.",
+            "de": "Melde den Zustand der Wallbox mit der Flow-Karte „Die Wallbox meldet, das Auto ist …“. Meldet die Wallbox angeschlossen, sieht Tibber aber 10 Minuten lang kein Auto, bekommst du eine Warnung.",
+            "nl": "Meld de status van de laadpaal met de Flow-kaart ‘De laadpaal meldt dat de auto … is’. Meldt de laadpaal aangesloten maar ziet Tibber 10 minuten geen auto, dan krijg je een waarschuwing."
+          }
+        }
+      ]
     }
   ]
 }

@@ -9,7 +9,7 @@ Samlade idéer på förbättringar. Fyll på fritt under "Nya idéer"; de sorter
 
 ## Prioriterat
 
-Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24 ersättning i går och #2 missad ersättning.
+Inget valt just nu. Förslag: #40 kopiera diagnostik, #2 missad ersättning, #1 prognos för månaden och #11 månadsmål.
 
 ---
 
@@ -22,9 +22,6 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 | 5 | **Jämförelse med förra månaden** | ★★ | S | "+12 % mot samma datum förra månaden" i widget och månadsrapport. Dagssummorna sparas redan i ca ett år (#20). |
 | 11 | **Månadsmål** | ★★ | S | Mål i inställningarna (t.ex. 600 kr), andel uppnått som värde med Insights, förloppsstapel i widgeten och flödeskort när målet nås. |
 | 12 | **Total nytta idag** | ★★ | S | Grid Rewards och batteriets besparing ihop: "Idag: 16,64 kr intjänat + 3,21 kr sparat". Ett värde på hemmet och i dagssammanfattningen. |
-| 17 | **Orsaksstatistik** | ★ | S | Andel sessioner och kronor per orsak (överskott, brist, annat) per månad. Datan finns i historiken. |
-| 24 | **Ersättning i går** | ★★ | S | Värde som sätts vid midnatt till gårdagens summa och står still hela dagen. I Insights blir det en trappa med ett steg per dag, så månadsvyn visar varje dags summa. "Ersättning idag" är en sågtand som faller till 0 vid midnatt, och Homey visar längre perioder som medelvärden, så där syns inte dagssumman. |
-| 44 | **Sessionens ersättning live** | ★ | M | Uppskattad ersättning under pågående session, räknad på snittet per minut från tidigare sessioner med samma orsak. Ersätts av den riktiga summan när Tibber räknat klart. |
 
 ## Historiksidan
 
@@ -33,7 +30,6 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 | 4 | **Bästa tiderna på dygnet** | ★★ | M | Mönster per timme ur historiken: när sessionerna kommer och vad de ger. Visar när bilen gör mest nytta inkopplad. |
 | 35 | **Månadsöversikt** | ★★ | S | Tabell per månad: summa, sessioner och tid. Räknas ur dagssummorna (ca ett år). |
 | 36 | **Kalendervy** | ★★ | M | Dagarna som rutor i ett rutnät, färgade efter ersättning. Mönster som helger, säsong och dagar utan inkopplad bil syns direkt. |
-| 56 | **Avräkningar synliga** | ★ | S | Tibbers efterjustering per session: "+0,19 kr avräknat efter 40 s". Visar att appen räknar rätt och fångar om Tibber ändrar avräkningen. |
 | 60 | **Valfri period** | ★ | S | Välj från- och till-datum och få summa, sessioner och tid, t.ex. för ett kvartal eller sommaren. Räknas ur dagssummorna. |
 
 ## Flow-kort och notiser
@@ -61,8 +57,6 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 | 49 | **Bilens batterinivå** | ★★ | M | Om Tibber skickar bilens laddnivå och räckvidd i flexDevices: visa dem på bilen, med kort som "bilen under 30 %". Måste verifieras mot en riktig inspelning (se #51). |
 | 65 | **Inkopplad sedan** | ★★ | S | Värden "Inkopplad sedan 18:42" och "Urkopplad sedan 07:09" på bilen. Visar hur länge bilen stått utan att öppna Insights. |
 | 70 | **Vilken enhet levererade** | ★ | S | Token med enhetens namn i hemmets sessionskort: "Grid Rewards: 1,73 kr från bilen". Sessionerna vet redan vilken enhet som levererade. |
-| 72 | **Koll mot laddboxen** | ★★ | M | Välj en laddbox eller bil från en annan Homey-app (Easee, Zaptec, bilens app). Om den säger "inkopplad" men Tibber säger "ingen bil inkopplad": varning, eftersom Tibbers koppling till bilen troligen har tappat. |
-| 74 | **Inbyggd inkopplingspåminnelse** | ★★ | S | Inställning på bilen: "Påminn om bilen inte är inkopplad kl. 20". Notis utan eget flöde. Kan senare använda tiderna från #4. |
 
 ## Batteriet
 
@@ -72,8 +66,6 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 | 25 | **Villkor för batteriets aktivitet** | ★★ | S | Villkor "Batteriets aktivitet är …" med rullgardin över de kända koderna, och ett kort "Batteriet började ladda ur för Grid Rewards". Idag finns bara det generella "aktiviteten ändrades". |
 | 26 | **Aktivitet uppdelad i typ och orsak** | ★★ | S | Koderna följer ett mönster: *Charging/Discharging/Idle* + *ForGridRewards/AtLowPrice/WithSolar…*. Två värden, "Laddar/Laddar ur/Vilar" och "Grid Rewards/Pris/Sol", förenklar flöden, och en ny okänd kod hamnar ändå rätt i typ. |
 | 28 | **Okända koder synliga för användaren** | ★ | S | Nya batterikoder syns idag bara i loggen. Visa dem i batteriets inställningar ("Okända koder: …") med tips om att rapportera dem. Kan ingå i #40. |
-| 29 | **Batteriets dygn** | ★★ | M | Ur aktivitetshistoriken: hur många timmar batteriet laddade för Grid Rewards, för pris och med sol. Sammanfattning per dag i dagskortet och på historiksidan. |
-| 48 | **Energi genom batteriet** | ★★ | S | kWh laddat och urladdat per dag ur tidslinjens ACTUAL-värden, totalt och för Grid Rewards. Visar hur mycket batteriet används och ger en bild av slitaget. |
 | 50 | **Inställbart uppdateringsintervall** | ★ | S | Batteriets intervall i inställningarna (2, 5 eller 10 min) i stället för fasta 5 minuter. Kortare ger färskare värden, längre ger färre anrop till Tibber. |
 | 55 | **Besparingen uppdelad** | ★★ | S | `batteryValueItems` har fler typer än TOTAL (t.ex. OTHER). Visa hur mycket som kommer från Grid Rewards, prisstyrning och sol. Datan finns redan i svaret. |
 
@@ -83,7 +75,6 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 |---|---|---|---|---|
 | 42 | **Kompakt widget** | ★ | S | Enradsvariant: "● Levererar · 12,40 kr idag". För små dashboards och telefonens startskärm. |
 | 53 | **Alla hem i en widget** | ★ | S | Ett läge i statuswidgeten som summerar alla hem, för den som har t.ex. villa och stuga. |
-| 57 | **Senast uppdaterad** | ★★ | S | Värde på hemmet, "Data från 10:07", och samma tid i widgeten. Visar direkt om siffrorna är färska eller om anslutningen hänger. |
 
 ## Data och integrationer
 
@@ -100,6 +91,16 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 | 32 | **Stängningskod i inställningarna** | ★ | S | Senaste anledningen till att anslutningen stängdes (t.ex. *1001 Going away, efter 11 min*) under "Anslutningsstatus", så att felsökning inte kräver loggar. |
 | 33 | **Larm vid instabil anslutning** | ★ | S | Flödeskort när anslutningen brutits fler än *X* gånger på en timme, eller när koden är något annat än 1000/1001. Fångar problem innan data saknas. |
 | 40 | **Kopiera diagnostik** | ★★ | S | Knapp på inställningssidan som kopierar appversion, anslutningsstatus, senaste stängningskoder, okända batterikoder och senaste fel, utan ID:n eller e-post. Gör buggrapporter på GitHub enkla. Kan ta upp #28 och #32. |
+| 75 | **Senaste fel i inställningarna** | ★★ | S | "Senaste fel: Circuit breaker open (10:42)" under anslutningsstatus, för hemmet och batteriet. Visar direkt om något gått fel nyligen, utan loggar. Hänger ihop med #40. |
+| 76 | **HTTP som reserv** | ★★ | M | Om WebSocketen inte går att få upp på länge (t.ex. brandvägg eller proxy som stoppar WebSocket): hämta statusen via vanlig HTTP var 5:e minut. Sämre upplösning, men siffrorna fortsätter komma. |
+| 77 | **Slumpad väntetid vid återanslutning** | ★ | S | Jitter på återanslutningen, så att inte alla Homeys ansluter exakt samtidigt när Tibber startar om sin server. Snällt mot Tibber och minskar risken att bli strypt. |
+| 78 | **Varning för okända typer i svaren** | ★★ | S | Logga och samla allt okänt Tibber skickar, inte bara batterikoder: nya statustyper (`GridReward…`), orsakskoder och fält. Tidig varning om att API:t håller på att ändras. Utvidgar #28. |
+| 79 | **Kontroll av tidszon** | ★ | S | Varning om Homeys tidszon skiljer sig från hemmets i Tibber. Fel tidszon byter dygn vid fel tid, så idag, dagssummor och rekord förskjuts. Om Tibbers API anger hemmets tidszon måste kollas. |
+| 80 | **Inspelning från inställningssidan** | ★★ | M | Knapp "Spela in i 24 timmar" som sparar rådata i appen, anonymiserar den och gör den möjlig att kopiera. Användare utan `homey app run` kan då bidra med riktiga data, t.ex. andra bilar och batterier. Hänger ihop med #64. |
+| 81 | **Anslutningsstatistik per dag** | ★ | S | Återanslutningar, längsta avbrott och tid utan anslutning per dag på historiksidan. Visar om ett problem är nytt eller funnits länge, och ger underlag till #33. |
+| 82 | **Nollställ räknare** | ★ | S | Åtgärdskort eller inställning som nollställer dagens och månadens räknare om de blivit fel, t.ex. efter en ovanlig korrigering från Tibber. Historik och rekord lämnas orörda. |
+| 83 | **Bevakning av minnet** | ★ | S | Logga appens minnesanvändning en gång i timmen och varna om den växer över tid. Homey Pro begränsar appars minne, och historik, rekord och dagssummor växer långsamt. |
+| 84 | **Tester för nätverksstrul** | ★★ | M | Tester för det som är svårt att se i vardagen: anslutningen bryts mitt i en session, token går ut under avräkningen, Tibber skickar samma meddelande två gånger eller i fel ordning, Homey startas om mellan sessionens slut och avräkningen. |
 
 ## Kom igång och publicering
 
@@ -120,7 +121,7 @@ Inget valt just nu. Förslag: #57 senast uppdaterad, #40 kopiera diagnostik, #24
 
 | # | Idé | Värde | Insats | Anteckning |
 |---|---|---|---|---|
-| 65 | | | | |
+| 85 | | | | |
 
 ---
 
@@ -160,3 +161,11 @@ Byggt 2026-11-20:
 - **Statistik:** tillgänglig idag i procent, för hemmet (#30) och för bilen och batteriet (#68)
 - **Historiksidan:** kolumn och filter för vilken bil eller vilket batteri som levererade, också i CSV-exporten (#69); rekord för hemmet och varje enhet
 - **Flow-kort:** nytt rekord för bästa dag, bästa session och längsta session, på hemmet (#31) och på bilen och batteriet (#73)
+
+Byggt 2026-11-21:
+
+- **Bilen:** påminnelse om inkoppling vid vald tid, med notis och Flow-kort (#74)
+- **Bilen:** koll mot laddboxen via åtgärdskortet "Laddboxen säger att bilen är …"; varning och Flow-kort när laddboxen säger inkopplad men Tibber inte ser bilen på 10 min (#72). Byggt med ett Flow-kort i stället för att läsa andra appars enheter, som kräver behörigheten `homey:manager:api`.
+- **Batteriet:** timmar som batteriet laddat/laddat ur för Grid Rewards, prisstyrning och sol idag (#29), och kWh laddat och urladdat idag (#48); kortet "Batteriets dag" efter midnatt; tabell på historiksidan. kWh bygger på att Tibber anger effekt (W) per kvart, vilket inte är verifierat; batterisvaret spelas in som `[REC-BATTERY]` under `homey app run` för att kunna kontrollera det.
+- **Siffror:** ersättning igår som eget värde, en trappa per dag i Insights (#24); uppskattad ersättning under pågående session, från snittet per minut för samma orsak (#44); tid för senaste uppdateringen på hemmet och i widgeten (#57)
+- **Historiksidan:** sessioner och ersättning per orsak för den här och förra månaden (#17); Tibbers avräkning per session, t.ex. "+0,10 kr · 40 s", också i CSV-exporten (#56)

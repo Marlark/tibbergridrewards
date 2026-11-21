@@ -1,0 +1,20 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Reward yesterday",
+    "sv": "Ersättning igår",
+    "no": "Godtgjørelse i går",
+    "da": "Godtgørelse i går",
+    "de": "Vergütung gestern",
+    "nl": "Vergoeding gisteren"
+  },
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "decimals": 2,
+  "units": {
+    "en": "kr"
+  },
+  "insights": true,
+  "icon": "/assets/reward.svg"
+}

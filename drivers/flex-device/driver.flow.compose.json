@@ -403,6 +403,156 @@
           "example": 21.35
         }
       ]
+    },
+    {
+      "id": "flex_plug_reminder",
+      "title": {
+        "en": "Reminder: the car is not plugged in",
+        "sv": "Påminnelse: bilen är inte inkopplad",
+        "no": "Påminnelse: bilen er ikke tilkoblet",
+        "da": "Påmindelse: bilen er ikke tilsluttet",
+        "de": "Erinnerung: Das Auto ist nicht angeschlossen",
+        "nl": "Herinnering: de auto is niet aangesloten"
+      },
+      "hint": {
+        "en": "At the time in the car’s settings, if the reminder is on and the car is not plugged in.",
+        "sv": "Vid tiden i bilens inställningar, om påminnelsen är på och bilen inte är inkopplad.",
+        "no": "På tidspunktet i bilens innstillinger, hvis påminnelsen er på og bilen ikke er tilkoblet.",
+        "da": "På tidspunktet i bilens indstillinger, hvis påmindelsen er slået til og bilen ikke er tilsluttet.",
+        "de": "Zur Uhrzeit in den Einstellungen des Autos, wenn die Erinnerung an ist und das Auto nicht angeschlossen ist.",
+        "nl": "Op het tijdstip in de instellingen van de auto, als de herinnering aan staat en de auto niet is aangesloten."
+      }
+    },
+    {
+      "id": "flex_plug_mismatch",
+      "title": {
+        "en": "The charger and Tibber disagree",
+        "sv": "Laddboxen och Tibber är oense",
+        "no": "Laderen og Tibber er uenige",
+        "da": "Laderen og Tibber er uenige",
+        "de": "Wallbox und Tibber sind sich uneinig",
+        "nl": "Laadpaal en Tibber zijn het oneens"
+      },
+      "hint": {
+        "en": "The charger says the car is plugged in, but Tibber has seen no car for 10 minutes. Tibber’s link to the car has probably dropped.",
+        "sv": "Laddboxen säger att bilen är inkopplad, men Tibber har inte sett någon bil på 10 minuter. Tibbers koppling till bilen har troligen tappat.",
+        "no": "Laderen sier at bilen er tilkoblet, men Tibber har ikke sett noen bil på 10 minutter. Tibbers kobling til bilen har trolig falt ut.",
+        "da": "Laderen siger, at bilen er tilsluttet, men Tibber har ikke set nogen bil i 10 minutter. Tibbers forbindelse til bilen er sandsynligvis faldet ud.",
+        "de": "Die Wallbox meldet, das Auto ist angeschlossen, aber Tibber sieht seit 10 Minuten kein Auto. Die Verbindung von Tibber zum Auto ist wahrscheinlich abgebrochen.",
+        "nl": "De laadpaal meldt dat de auto is aangesloten, maar Tibber ziet al 10 minuten geen auto. De koppeling van Tibber met de auto is waarschijnlijk weggevallen."
+      }
+    },
+    {
+      "id": "battery_daily_summary",
+      "title": {
+        "en": "The battery’s day",
+        "sv": "Batteriets dag",
+        "no": "Batteriets dag",
+        "da": "Batteriets dag",
+        "de": "Der Tag der Batterie",
+        "nl": "De dag van de batterij"
+      },
+      "hint": {
+        "en": "Runs after midnight with the day that ended: hours charging or discharging for Grid Rewards, price control and solar, energy charged and discharged, and savings.",
+        "sv": "Körs efter midnatt med dagen som tog slut: timmar som batteriet laddade eller laddade ur för Grid Rewards, prisstyrning och sol, energi in och ut, och besparing.",
+        "no": "Kjøres etter midnatt med dagen som ble avsluttet: timer batteriet ladet eller ladet ut for Grid Rewards, prisstyring og sol, energi inn og ut, og besparelse.",
+        "da": "Køres efter midnat med den dag, der sluttede: timer batteriet oplades eller aflades for Grid Rewards, prisstyring og sol, energi ind og ud, og besparelse.",
+        "de": "Läuft nach Mitternacht mit dem vergangenen Tag: Stunden, in denen die Batterie für Grid Rewards, Preissteuerung und Solar geladen oder entladen hat, Energie rein und raus und die Ersparnis.",
+        "nl": "Draait na middernacht met de afgelopen dag: uren dat de batterij laadde of ontlaadde voor Grid Rewards, prijssturing en zon, energie in en uit, en besparing."
+      },
+      "tokens": [
+        {
+          "name": "date",
+          "type": "string",
+          "title": {
+            "en": "Date",
+            "sv": "Datum",
+            "no": "Dato",
+            "da": "Dato",
+            "de": "Datum",
+            "nl": "Datum"
+          },
+          "example": "2026-11-20"
+        },
+        {
+          "name": "hours_grid_rewards",
+          "type": "number",
+          "title": {
+            "en": "Grid Rewards (h)",
+            "sv": "Grid Rewards (h)",
+            "no": "Grid Rewards (t)",
+            "da": "Grid Rewards (t)",
+            "de": "Grid Rewards (Std.)",
+            "nl": "Grid Rewards (u)"
+          },
+          "example": 3.5
+        },
+        {
+          "name": "hours_price",
+          "type": "number",
+          "title": {
+            "en": "Price control (h)",
+            "sv": "Prisstyrning (h)",
+            "no": "Prisstyring (t)",
+            "da": "Prisstyring (t)",
+            "de": "Preissteuerung (h)",
+            "nl": "Prijssturing (u)"
+          },
+          "example": 2
+        },
+        {
+          "name": "hours_solar",
+          "type": "number",
+          "title": {
+            "en": "Solar (h)",
+            "sv": "Sol (h)",
+            "no": "Sol (t)",
+            "da": "Sol (t)",
+            "de": "Solar (Std.)",
+            "nl": "Zon (u)"
+          },
+          "example": 0.5
+        },
+        {
+          "name": "charged_kwh",
+          "type": "number",
+          "title": {
+            "en": "Charged (kWh)",
+            "sv": "Laddat (kWh)",
+            "no": "Ladet (kWh)",
+            "da": "Opladet (kWh)",
+            "de": "Geladen (kWh)",
+            "nl": "Geladen (kWh)"
+          },
+          "example": 8.4
+        },
+        {
+          "name": "discharged_kwh",
+          "type": "number",
+          "title": {
+            "en": "Discharged (kWh)",
+            "sv": "Urladdat (kWh)",
+            "no": "Utladet (kWh)",
+            "da": "Afladet (kWh)",
+            "de": "Entladen (kWh)",
+            "nl": "Ontladen (kWh)"
+          },
+          "example": 7.1
+        },
+        {
+          "name": "savings",
+          "type": "number",
+          "title": {
+            "en": "Savings",
+            "sv": "Besparing",
+            "no": "Besparelse",
+            "da": "Besparelse",
+            "de": "Ersparnis",
+            "nl": "Besparing"
+          },
+          "example": 3.21
+        }
+      ]
     }
   ],
   "conditions": [
@@ -522,6 +672,65 @@
         "de": "Smarte Steuerung !{{ist|ist nicht}} an",
         "nl": "Slimme sturing !{{staat|staat niet}} aan"
       }
+    }
+  ],
+  "actions": [
+    {
+      "id": "flex_charger_reported",
+      "title": {
+        "en": "The charger says the car is …",
+        "sv": "Laddboxen säger att bilen är …",
+        "no": "Laderen sier at bilen er …",
+        "da": "Laderen siger, at bilen er …",
+        "de": "Die Wallbox meldet, das Auto ist …",
+        "nl": "De laadpaal meldt dat de auto … is"
+      },
+      "titleFormatted": {
+        "en": "The charger says the car is [[plugged]]",
+        "sv": "Laddboxen säger att bilen är [[plugged]]",
+        "no": "Laderen sier at bilen er [[plugged]]",
+        "da": "Laderen siger, at bilen er [[plugged]]",
+        "de": "Die Wallbox meldet, das Auto ist [[plugged]]",
+        "nl": "De laadpaal meldt dat de auto [[plugged]] is"
+      },
+      "hint": {
+        "en": "Use it in a flow with your charger’s or car’s own cards. The app compares it with what Tibber sees.",
+        "sv": "Använd det i ett flöde med laddboxens eller bilens egna kort. Appen jämför med vad Tibber ser.",
+        "no": "Bruk det i en flyt med laderens eller bilens egne kort. Appen sammenligner med det Tibber ser.",
+        "da": "Brug det i et flow med laderens eller bilens egne kort. Appen sammenligner med det, Tibber ser.",
+        "de": "Verwende sie in einem Flow mit den Karten deiner Wallbox oder deines Autos. Die App vergleicht mit dem, was Tibber sieht.",
+        "nl": "Gebruik het in een flow met de eigen kaarten van je laadpaal of auto. De app vergelijkt het met wat Tibber ziet."
+      },
+      "args": [
+        {
+          "type": "dropdown",
+          "name": "plugged",
+          "values": [
+            {
+              "id": "yes",
+              "label": {
+                "en": "plugged in",
+                "sv": "inkopplad",
+                "no": "tilkoblet",
+                "da": "tilsluttet",
+                "de": "angeschlossen",
+                "nl": "aangesloten"
+              }
+            },
+            {
+              "id": "no",
+              "label": {
+                "en": "unplugged",
+                "sv": "urkopplad",
+                "no": "frakoblet",
+                "da": "frakoblet",
+                "de": "abgesteckt",
+                "nl": "losgekoppeld"
+              }
+            }
+          ]
+        }
+      ]
     }
   ]
 }

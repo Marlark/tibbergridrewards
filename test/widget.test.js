@@ -145,3 +145,35 @@ test('plan chart escapes text and draws nothing without points', () => {
   assert.ok(!svg.includes('<b>'));
   assert.match(svg, /aria-label="&quot;t&quot;"/);
 });
+
+// --- Live updates: the app tells the widgets when something changed ---
+
+test('every widget reloads on the app event and only polls as a fallback', () => {
+  const fs = require('fs');
+  const path = require('path');
+  const { WIDGET_EVENT } = require('../lib/deviceUtils');
+  for (const w of ['grid-rewards', 'grid-rewards-week', 'grid-rewards-battery-plan']) {
+    const html = fs.readFileSync(path.join(__dirname, '..', 'widgets', w, 'public', 'index.html'), 'utf8');
+    assert.ok(html.includes(`const EVENT = '${WIDGET_EVENT}'`), w);
+    assert.ok(html.includes('Homey.on(EVENT'), w);
+    assert.ok(html.includes('INTERVAL_MS = 5 * 60 * 1000'), w);
+  }
+});
+
+test('the home device sends the widget event on an update', async (t) => {
+  require('./helpers/setup');
+  const GridRewardSubscription = require('../lib/GridRewardSubscription');
+  const subs = [];
+  t.mock.method(GridRewardSubscription.prototype, 'start', function start() { this._stopped = false; subs.push(this); });
+  const GridRewardDevice = require('../drivers/grid-reward/device');
+  const homey = makeHomey();
+  const home = new GridRewardDevice({ homey, data: { id: 'h1' }, store: { email: 'a@example.com', password: 'pw' } });
+  homey.drivers.registry['grid-reward'] = { getDevices: () => [home] };
+  await home.onInit();
+  subs[0].emit('data', {
+    homeId: 'h1', state: { __typename: 'GridRewardAvailable' }, rewardCurrentMonth: 1, rewardAllTime: 2,
+  }, 'h1');
+  await home._queue;
+  assert.deepStrictEqual(homey.api.events.map((e) => e.event), ['grid-rewards-changed']);
+  await home.onUninit();
+});

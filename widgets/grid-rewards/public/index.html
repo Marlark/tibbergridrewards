@@ -30,7 +30,9 @@
     <div id="root" class="homey-text-regular"></div>
 
     <script type="text/javascript">
-      const INTERVAL_MS = 30 * 1000;
+      // The app sends an event when something changes; polling is only a fallback.
+      const INTERVAL_MS = 5 * 60 * 1000;
+      const EVENT = 'grid-rewards-changed';
 
       let UNIT = 'kr';
 
@@ -54,8 +56,10 @@
         }
         const L = d.labels;
         UNIT = d.unit || 'kr';
+        const estimate = typeof d.estimate === 'number' && d.estimate > (d.session || 0)
+          ? ` <span class="homey-text-small" style="opacity:.7">(${esc(L.estimate)} ${kr(d.estimate)})</span>` : '';
         const second = d.active
-          ? `<div><div class="label homey-text-small">${esc(L.session)}</div><div class="value">${kr(d.session)}</div></div>`
+          ? `<div><div class="label homey-text-small">${esc(L.session)}</div><div class="value">${kr(d.session)}${estimate}</div></div>`
           : `<div><div class="label homey-text-small">${esc(L.lastSession)}</div><div class="value">${kr(d.lastSession)}</div></div>`;
         const sessions = typeof d.sessionsToday === 'number'
           ? `<div style="text-align:right"><div class="label homey-text-small">${esc(L.today)}</div>
@@ -75,7 +79,8 @@
           <div class="big">${kr(d.today)}</div>
           <div class="label homey-text-small">${esc(L.today)} · ${esc(L.month)} ${kr(d.month)}</div>
           <div class="row">${second}${sessions}</div>
-          ${battery}`;
+          ${battery}
+          ${d.updated ? `<div class="label homey-text-small" style="margin-top:6px">${esc(L.updated)} ${esc(d.updated)}</div>` : ''}`;
       }
 
       function onHomeyReady(Homey) {
@@ -118,6 +123,14 @@
 
         load();
         setInterval(load, INTERVAL_MS);
+        // Several devices may change at once: reload once, shortly after.
+        let pending = null;
+        if (typeof Homey.on === 'function') {
+          Homey.on(EVENT, () => {
+            if (pending) return;
+            pending = setTimeout(() => { pending = null; load(); }, 500);
+          });
+        }
       }
     </script>
   </body>

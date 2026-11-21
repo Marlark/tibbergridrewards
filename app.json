@@ -38,6 +38,7 @@
     "url": "https://github.com/Marlark/tibbergridrewards/issues"
   },
   "source": "https://github.com/Marlark/tibbergridrewards",
+  "homeyCommunityTopicId": 162451,
   "brandColor": "#0F2742",
   "api": {
     "getHistory": {
@@ -499,6 +500,177 @@
               "nl": "Vorig record"
             },
             "example": 21.35
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_plug_reminder",
+        "title": {
+          "en": "Reminder: the car is not plugged in",
+          "sv": "Påminnelse: bilen är inte inkopplad",
+          "no": "Påminnelse: bilen er ikke tilkoblet",
+          "da": "Påmindelse: bilen er ikke tilsluttet",
+          "de": "Erinnerung: Das Auto ist nicht angeschlossen",
+          "nl": "Herinnering: de auto is niet aangesloten"
+        },
+        "hint": {
+          "en": "At the time in the car’s settings, if the reminder is on and the car is not plugged in.",
+          "sv": "Vid tiden i bilens inställningar, om påminnelsen är på och bilen inte är inkopplad.",
+          "no": "På tidspunktet i bilens innstillinger, hvis påminnelsen er på og bilen ikke er tilkoblet.",
+          "da": "På tidspunktet i bilens indstillinger, hvis påmindelsen er slået til og bilen ikke er tilsluttet.",
+          "de": "Zur Uhrzeit in den Einstellungen des Autos, wenn die Erinnerung an ist und das Auto nicht angeschlossen ist.",
+          "nl": "Op het tijdstip in de instellingen van de auto, als de herinnering aan staat en de auto niet is aangesloten."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "flex_plug_mismatch",
+        "title": {
+          "en": "The charger and Tibber disagree",
+          "sv": "Laddboxen och Tibber är oense",
+          "no": "Laderen og Tibber er uenige",
+          "da": "Laderen og Tibber er uenige",
+          "de": "Wallbox und Tibber sind sich uneinig",
+          "nl": "Laadpaal en Tibber zijn het oneens"
+        },
+        "hint": {
+          "en": "The charger says the car is plugged in, but Tibber has seen no car for 10 minutes. Tibber’s link to the car has probably dropped.",
+          "sv": "Laddboxen säger att bilen är inkopplad, men Tibber har inte sett någon bil på 10 minuter. Tibbers koppling till bilen har troligen tappat.",
+          "no": "Laderen sier at bilen er tilkoblet, men Tibber har ikke sett noen bil på 10 minutter. Tibbers kobling til bilen har trolig falt ut.",
+          "da": "Laderen siger, at bilen er tilsluttet, men Tibber har ikke set nogen bil i 10 minutter. Tibbers forbindelse til bilen er sandsynligvis faldet ud.",
+          "de": "Die Wallbox meldet, das Auto ist angeschlossen, aber Tibber sieht seit 10 Minuten kein Auto. Die Verbindung von Tibber zum Auto ist wahrscheinlich abgebrochen.",
+          "nl": "De laadpaal meldt dat de auto is aangesloten, maar Tibber ziet al 10 minuten geen auto. De koppeling van Tibber met de auto is waarschijnlijk weggevallen."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          }
+        ]
+      },
+      {
+        "id": "battery_daily_summary",
+        "title": {
+          "en": "The battery’s day",
+          "sv": "Batteriets dag",
+          "no": "Batteriets dag",
+          "da": "Batteriets dag",
+          "de": "Der Tag der Batterie",
+          "nl": "De dag van de batterij"
+        },
+        "hint": {
+          "en": "Runs after midnight with the day that ended: hours charging or discharging for Grid Rewards, price control and solar, energy charged and discharged, and savings.",
+          "sv": "Körs efter midnatt med dagen som tog slut: timmar som batteriet laddade eller laddade ur för Grid Rewards, prisstyrning och sol, energi in och ut, och besparing.",
+          "no": "Kjøres etter midnatt med dagen som ble avsluttet: timer batteriet ladet eller ladet ut for Grid Rewards, prisstyring og sol, energi inn og ut, og besparelse.",
+          "da": "Køres efter midnat med den dag, der sluttede: timer batteriet oplades eller aflades for Grid Rewards, prisstyring og sol, energi ind og ud, og besparelse.",
+          "de": "Läuft nach Mitternacht mit dem vergangenen Tag: Stunden, in denen die Batterie für Grid Rewards, Preissteuerung und Solar geladen oder entladen hat, Energie rein und raus und die Ersparnis.",
+          "nl": "Draait na middernacht met de afgelopen dag: uren dat de batterij laadde of ontlaadde voor Grid Rewards, prijssturing en zon, energie in en uit, en besparing."
+        },
+        "tokens": [
+          {
+            "name": "date",
+            "type": "string",
+            "title": {
+              "en": "Date",
+              "sv": "Datum",
+              "no": "Dato",
+              "da": "Dato",
+              "de": "Datum",
+              "nl": "Datum"
+            },
+            "example": "2026-11-20"
+          },
+          {
+            "name": "hours_grid_rewards",
+            "type": "number",
+            "title": {
+              "en": "Grid Rewards (h)",
+              "sv": "Grid Rewards (h)",
+              "no": "Grid Rewards (t)",
+              "da": "Grid Rewards (t)",
+              "de": "Grid Rewards (Std.)",
+              "nl": "Grid Rewards (u)"
+            },
+            "example": 3.5
+          },
+          {
+            "name": "hours_price",
+            "type": "number",
+            "title": {
+              "en": "Price control (h)",
+              "sv": "Prisstyrning (h)",
+              "no": "Prisstyring (t)",
+              "da": "Prisstyring (t)",
+              "de": "Preissteuerung (h)",
+              "nl": "Prijssturing (u)"
+            },
+            "example": 2
+          },
+          {
+            "name": "hours_solar",
+            "type": "number",
+            "title": {
+              "en": "Solar (h)",
+              "sv": "Sol (h)",
+              "no": "Sol (t)",
+              "da": "Sol (t)",
+              "de": "Solar (Std.)",
+              "nl": "Zon (u)"
+            },
+            "example": 0.5
+          },
+          {
+            "name": "charged_kwh",
+            "type": "number",
+            "title": {
+              "en": "Charged (kWh)",
+              "sv": "Laddat (kWh)",
+              "no": "Ladet (kWh)",
+              "da": "Opladet (kWh)",
+              "de": "Geladen (kWh)",
+              "nl": "Geladen (kWh)"
+            },
+            "example": 8.4
+          },
+          {
+            "name": "discharged_kwh",
+            "type": "number",
+            "title": {
+              "en": "Discharged (kWh)",
+              "sv": "Urladdat (kWh)",
+              "no": "Utladet (kWh)",
+              "da": "Afladet (kWh)",
+              "de": "Entladen (kWh)",
+              "nl": "Ontladen (kWh)"
+            },
+            "example": 7.1
+          },
+          {
+            "name": "savings",
+            "type": "number",
+            "title": {
+              "en": "Savings",
+              "sv": "Besparing",
+              "no": "Besparelse",
+              "da": "Besparelse",
+              "de": "Ersparnis",
+              "nl": "Besparing"
+            },
+            "example": 3.21
           }
         ],
         "args": [
@@ -1428,6 +1600,70 @@
           }
         ]
       }
+    ],
+    "actions": [
+      {
+        "id": "flex_charger_reported",
+        "title": {
+          "en": "The charger says the car is …",
+          "sv": "Laddboxen säger att bilen är …",
+          "no": "Laderen sier at bilen er …",
+          "da": "Laderen siger, at bilen er …",
+          "de": "Die Wallbox meldet, das Auto ist …",
+          "nl": "De laadpaal meldt dat de auto … is"
+        },
+        "titleFormatted": {
+          "en": "The charger says the car is [[plugged]]",
+          "sv": "Laddboxen säger att bilen är [[plugged]]",
+          "no": "Laderen sier at bilen er [[plugged]]",
+          "da": "Laderen siger, at bilen er [[plugged]]",
+          "de": "Die Wallbox meldet, das Auto ist [[plugged]]",
+          "nl": "De laadpaal meldt dat de auto [[plugged]] is"
+        },
+        "hint": {
+          "en": "Use it in a flow with your charger’s or car’s own cards. The app compares it with what Tibber sees.",
+          "sv": "Använd det i ett flöde med laddboxens eller bilens egna kort. Appen jämför med vad Tibber ser.",
+          "no": "Bruk det i en flyt med laderens eller bilens egne kort. Appen sammenligner med det Tibber ser.",
+          "da": "Brug det i et flow med laderens eller bilens egne kort. Appen sammenligner med det, Tibber ser.",
+          "de": "Verwende sie in einem Flow mit den Karten deiner Wallbox oder deines Autos. Die App vergleicht mit dem, was Tibber sieht.",
+          "nl": "Gebruik het in een flow met de eigen kaarten van je laadpaal of auto. De app vergelijkt het met wat Tibber ziet."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=flex-device"
+          },
+          {
+            "type": "dropdown",
+            "name": "plugged",
+            "values": [
+              {
+                "id": "yes",
+                "label": {
+                  "en": "plugged in",
+                  "sv": "inkopplad",
+                  "no": "tilkoblet",
+                  "da": "tilsluttet",
+                  "de": "angeschlossen",
+                  "nl": "aangesloten"
+                }
+              },
+              {
+                "id": "no",
+                "label": {
+                  "en": "unplugged",
+                  "sv": "urkopplad",
+                  "no": "frakoblet",
+                  "da": "frakoblet",
+                  "de": "abgesteckt",
+                  "nl": "losgekoppeld"
+                }
+              }
+            ]
+          }
+        ]
+      }
     ]
   },
   "drivers": [
@@ -1458,7 +1694,12 @@
         "battery_savings_week",
         "battery_savings_month",
         "battery_activity",
-        "battery_next_activity"
+        "battery_next_activity",
+        "battery_hours_grid_rewards",
+        "battery_hours_price",
+        "battery_hours_solar",
+        "battery_charged_today",
+        "battery_discharged_today"
       ],
       "platforms": [
         "local"
@@ -1484,6 +1725,355 @@
           "template": "add_devices"
         }
       ],
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Plug-in reminder (car only)",
+            "sv": "Påminnelse om inkoppling (bara bil)",
+            "no": "Påminnelse om tilkobling (kun bil)",
+            "da": "Påmindelse om tilslutning (kun bil)",
+            "de": "Erinnerung zum Anschließen (nur Auto)",
+            "nl": "Herinnering om aan te sluiten (alleen auto)"
+          },
+          "children": [
+            {
+              "id": "reminder_enabled",
+              "type": "checkbox",
+              "value": false,
+              "label": {
+                "en": "Remind me",
+                "sv": "Påminn mig",
+                "no": "Påminn meg",
+                "da": "Påmind mig",
+                "de": "Erinnern",
+                "nl": "Herinner mij"
+              },
+              "hint": {
+                "en": "A notification once a day at the time below, if the car is not plugged in. The car only earns Grid Rewards when it is plugged in.",
+                "sv": "En notis en gång om dagen vid tiden nedan, om bilen inte är inkopplad. Bilen tjänar Grid Rewards bara när den är inkopplad.",
+                "no": "Et varsel én gang om dagen på tidspunktet nedenfor, hvis bilen ikke er tilkoblet. Bilen tjener Grid Rewards bare når den er tilkoblet.",
+                "da": "En notifikation én gang om dagen på tidspunktet nedenfor, hvis bilen ikke er tilsluttet. Bilen tjener kun Grid Rewards, når den er tilsluttet.",
+                "de": "Einmal täglich zur unten gewählten Zeit eine Benachrichtigung, wenn das Auto nicht angeschlossen ist. Das Auto verdient Grid Rewards nur, wenn es angeschlossen ist.",
+                "nl": "Eén keer per dag een melding op het tijdstip hieronder als de auto niet is aangesloten. De auto verdient alleen Grid Rewards als hij is aangesloten."
+              }
+            },
+            {
+              "id": "reminder_time",
+              "type": "dropdown",
+              "value": "20:00",
+              "label": {
+                "en": "Time",
+                "sv": "Tid",
+                "no": "Tidspunkt",
+                "da": "Tidspunkt",
+                "de": "Uhrzeit",
+                "nl": "Tijdstip"
+              },
+              "values": [
+                {
+                  "id": "00:00",
+                  "label": {
+                    "en": "00:00",
+                    "sv": "00:00",
+                    "no": "00:00",
+                    "da": "00:00",
+                    "de": "00:00",
+                    "nl": "00:00"
+                  }
+                },
+                {
+                  "id": "01:00",
+                  "label": {
+                    "en": "01:00",
+                    "sv": "01:00",
+                    "no": "01:00",
+                    "da": "01:00",
+                    "de": "01:00",
+                    "nl": "01:00"
+                  }
+                },
+                {
+                  "id": "02:00",
+                  "label": {
+                    "en": "02:00",
+                    "sv": "02:00",
+                    "no": "02:00",
+                    "da": "02:00",
+                    "de": "02:00",
+                    "nl": "02:00"
+                  }
+                },
+                {
+                  "id": "03:00",
+                  "label": {
+                    "en": "03:00",
+                    "sv": "03:00",
+                    "no": "03:00",
+                    "da": "03:00",
+                    "de": "03:00",
+                    "nl": "03:00"
+                  }
+                },
+                {
+                  "id": "04:00",
+                  "label": {
+                    "en": "04:00",
+                    "sv": "04:00",
+                    "no": "04:00",
+                    "da": "04:00",
+                    "de": "04:00",
+                    "nl": "04:00"
+                  }
+                },
+                {
+                  "id": "05:00",
+                  "label": {
+                    "en": "05:00",
+                    "sv": "05:00",
+                    "no": "05:00",
+                    "da": "05:00",
+                    "de": "05:00",
+                    "nl": "05:00"
+                  }
+                },
+                {
+                  "id": "06:00",
+                  "label": {
+                    "en": "06:00",
+                    "sv": "06:00",
+                    "no": "06:00",
+                    "da": "06:00",
+                    "de": "06:00",
+                    "nl": "06:00"
+                  }
+                },
+                {
+                  "id": "07:00",
+                  "label": {
+                    "en": "07:00",
+                    "sv": "07:00",
+                    "no": "07:00",
+                    "da": "07:00",
+                    "de": "07:00",
+                    "nl": "07:00"
+                  }
+                },
+                {
+                  "id": "08:00",
+                  "label": {
+                    "en": "08:00",
+                    "sv": "08:00",
+                    "no": "08:00",
+                    "da": "08:00",
+                    "de": "08:00",
+                    "nl": "08:00"
+                  }
+                },
+                {
+                  "id": "09:00",
+                  "label": {
+                    "en": "09:00",
+                    "sv": "09:00",
+                    "no": "09:00",
+                    "da": "09:00",
+                    "de": "09:00",
+                    "nl": "09:00"
+                  }
+                },
+                {
+                  "id": "10:00",
+                  "label": {
+                    "en": "10:00",
+                    "sv": "10:00",
+                    "no": "10:00",
+                    "da": "10:00",
+                    "de": "10:00",
+                    "nl": "10:00"
+                  }
+                },
+                {
+                  "id": "11:00",
+                  "label": {
+                    "en": "11:00",
+                    "sv": "11:00",
+                    "no": "11:00",
+                    "da": "11:00",
+                    "de": "11:00",
+                    "nl": "11:00"
+                  }
+                },
+                {
+                  "id": "12:00",
+                  "label": {
+                    "en": "12:00",
+                    "sv": "12:00",
+                    "no": "12:00",
+                    "da": "12:00",
+                    "de": "12:00",
+                    "nl": "12:00"
+                  }
+                },
+                {
+                  "id": "13:00",
+                  "label": {
+                    "en": "13:00",
+                    "sv": "13:00",
+                    "no": "13:00",
+                    "da": "13:00",
+                    "de": "13:00",
+                    "nl": "13:00"
+                  }
+                },
+                {
+                  "id": "14:00",
+                  "label": {
+                    "en": "14:00",
+                    "sv": "14:00",
+                    "no": "14:00",
+                    "da": "14:00",
+                    "de": "14:00",
+                    "nl": "14:00"
+                  }
+                },
+                {
+                  "id": "15:00",
+                  "label": {
+                    "en": "15:00",
+                    "sv": "15:00",
+                    "no": "15:00",
+                    "da": "15:00",
+                    "de": "15:00",
+                    "nl": "15:00"
+                  }
+                },
+                {
+                  "id": "16:00",
+                  "label": {
+                    "en": "16:00",
+                    "sv": "16:00",
+                    "no": "16:00",
+                    "da": "16:00",
+                    "de": "16:00",
+                    "nl": "16:00"
+                  }
+                },
+                {
+                  "id": "17:00",
+                  "label": {
+                    "en": "17:00",
+                    "sv": "17:00",
+                    "no": "17:00",
+                    "da": "17:00",
+                    "de": "17:00",
+                    "nl": "17:00"
+                  }
+                },
+                {
+                  "id": "18:00",
+                  "label": {
+                    "en": "18:00",
+                    "sv": "18:00",
+                    "no": "18:00",
+                    "da": "18:00",
+                    "de": "18:00",
+                    "nl": "18:00"
+                  }
+                },
+                {
+                  "id": "19:00",
+                  "label": {
+                    "en": "19:00",
+                    "sv": "19:00",
+                    "no": "19:00",
+                    "da": "19:00",
+                    "de": "19:00",
+                    "nl": "19:00"
+                  }
+                },
+                {
+                  "id": "20:00",
+                  "label": {
+                    "en": "20:00",
+                    "sv": "20:00",
+                    "no": "20:00",
+                    "da": "20:00",
+                    "de": "20:00",
+                    "nl": "20:00"
+                  }
+                },
+                {
+                  "id": "21:00",
+                  "label": {
+                    "en": "21:00",
+                    "sv": "21:00",
+                    "no": "21:00",
+                    "da": "21:00",
+                    "de": "21:00",
+                    "nl": "21:00"
+                  }
+                },
+                {
+                  "id": "22:00",
+                  "label": {
+                    "en": "22:00",
+                    "sv": "22:00",
+                    "no": "22:00",
+                    "da": "22:00",
+                    "de": "22:00",
+                    "nl": "22:00"
+                  }
+                },
+                {
+                  "id": "23:00",
+                  "label": {
+                    "en": "23:00",
+                    "sv": "23:00",
+                    "no": "23:00",
+                    "da": "23:00",
+                    "de": "23:00",
+                    "nl": "23:00"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Charger check (car only)",
+            "sv": "Koll mot laddboxen (bara bil)",
+            "no": "Kontroll mot laderen (kun bil)",
+            "da": "Kontrol mod laderen (kun bil)",
+            "de": "Abgleich mit der Wallbox (nur Auto)",
+            "nl": "Controle met de laadpaal (alleen auto)"
+          },
+          "children": [
+            {
+              "id": "charger_state",
+              "type": "label",
+              "value": "–",
+              "label": {
+                "en": "The charger says",
+                "sv": "Laddboxen säger",
+                "no": "Laderen sier",
+                "da": "Laderen siger",
+                "de": "Die Wallbox meldet",
+                "nl": "De laadpaal meldt"
+              },
+              "hint": {
+                "en": "Report your charger’s state with the flow card “The charger says the car is …”. If the charger says plugged in but Tibber sees no car for 10 minutes, you get a warning.",
+                "sv": "Rapportera laddboxens läge med Flow-kortet ”Laddboxen säger att bilen är …”. Om laddboxen säger inkopplad men Tibber inte ser någon bil på 10 minuter får du en varning.",
+                "no": "Rapporter laderens tilstand med Flow-kortet «Laderen sier at bilen er …». Hvis laderen sier tilkoblet, men Tibber ikke ser noen bil på 10 minutter, får du en advarsel.",
+                "da": "Rapportér laderens tilstand med Flow-kortet »Laderen siger, at bilen er …«. Hvis laderen siger tilsluttet, men Tibber ikke ser nogen bil i 10 minutter, får du en advarsel.",
+                "de": "Melde den Zustand der Wallbox mit der Flow-Karte „Die Wallbox meldet, das Auto ist …“. Meldet die Wallbox angeschlossen, sieht Tibber aber 10 Minuten lang kein Auto, bekommst du eine Warnung.",
+                "nl": "Meld de status van de laadpaal met de Flow-kaart ‘De laadpaal meldt dat de auto … is’. Meldt de laadpaal aangesloten maar ziet Tibber 10 minuten geen auto, dan krijg je een waarschuwing."
+              }
+            }
+          ]
+        }
+      ],
       "id": "flex-device"
     },
     {
@@ -1497,7 +2087,9 @@
         "grid_reward_active",
         "grid_reward_reason",
         "grid_reward_session",
+        "grid_reward_session_estimate",
         "grid_reward_today",
+        "grid_reward_yesterday",
         "grid_reward_month",
         "grid_reward_all_time",
         "grid_reward_last_session",
@@ -1631,6 +2223,40 @@
               "value": "–"
             }
           ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Display",
+            "sv": "Visning",
+            "no": "Visning",
+            "da": "Visning",
+            "de": "Anzeige",
+            "nl": "Weergave"
+          },
+          "children": [
+            {
+              "id": "show_updated",
+              "type": "checkbox",
+              "value": false,
+              "label": {
+                "en": "Show \"Updated\" on the device",
+                "sv": "Visa ”Uppdaterad” på enheten",
+                "no": "Vis «Oppdatert» på enheten",
+                "da": "Vis »Opdateret« på enheden",
+                "de": "„Aktualisiert“ am Gerät anzeigen",
+                "nl": "‘Bijgewerkt’ op het apparaat tonen"
+              },
+              "hint": {
+                "en": "The time of the last update from Tibber, as a value on the device. It is always shown in the widget and under Connection status; as a value it is written on every update (about 150 times a day).",
+                "sv": "Tiden för senaste uppdateringen från Tibber, som ett värde på enheten. Den visas alltid i widgeten och under Anslutningsstatus; som värde skrivs den vid varje uppdatering (ungefär 150 gånger per dygn).",
+                "no": "Tidspunktet for siste oppdatering fra Tibber, som en verdi på enheten. Den vises alltid i widgeten og under Tilkoblingsstatus; som verdi skrives den ved hver oppdatering (omtrent 150 ganger i døgnet).",
+                "da": "Tidspunktet for seneste opdatering fra Tibber, som en værdi på enheden. Den vises altid i widgetten og under Forbindelsesstatus; som værdi skrives den ved hver opdatering (cirka 150 gange i døgnet).",
+                "de": "Der Zeitpunkt der letzten Aktualisierung von Tibber als Wert am Gerät. Er wird immer im Widget und unter Verbindungsstatus angezeigt; als Wert wird er bei jeder Aktualisierung geschrieben (etwa 150-mal am Tag).",
+                "nl": "Het tijdstip van de laatste update van Tibber, als waarde op het apparaat. Het staat altijd in de widget en onder Verbindingsstatus; als waarde wordt het bij elke update geschreven (ongeveer 150 keer per dag)."
+              }
+            }
+          ]
         }
       ],
       "id": "grid-reward"
@@ -1723,6 +2349,131 @@
       "getable": true,
       "setable": false,
       "uiComponent": "sensor",
+      "icon": "/assets/battery.svg"
+    },
+    "battery_charged_today": {
+      "type": "number",
+      "title": {
+        "en": "Charged today",
+        "sv": "Laddat idag",
+        "no": "Ladet i dag",
+        "da": "Opladet i dag",
+        "de": "Heute geladen",
+        "nl": "Vandaag geladen"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kWh",
+        "sv": "kWh",
+        "no": "kWh",
+        "da": "kWh",
+        "de": "kWh",
+        "nl": "kWh"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "battery_discharged_today": {
+      "type": "number",
+      "title": {
+        "en": "Discharged today",
+        "sv": "Urladdat idag",
+        "no": "Utladet i dag",
+        "da": "Afladet i dag",
+        "de": "Heute entladen",
+        "nl": "Vandaag ontladen"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kWh",
+        "sv": "kWh",
+        "no": "kWh",
+        "da": "kWh",
+        "de": "kWh",
+        "nl": "kWh"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "battery_hours_grid_rewards": {
+      "type": "number",
+      "title": {
+        "en": "Grid Rewards today",
+        "sv": "Grid Rewards idag",
+        "no": "Grid Rewards i dag",
+        "da": "Grid Rewards i dag",
+        "de": "Grid Rewards heute",
+        "nl": "Grid Rewards vandaag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 1,
+      "units": {
+        "en": "h",
+        "sv": "h",
+        "no": "h",
+        "da": "h",
+        "de": "h",
+        "nl": "h"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "battery_hours_price": {
+      "type": "number",
+      "title": {
+        "en": "Price control today",
+        "sv": "Prisstyrning idag",
+        "no": "Prisstyring i dag",
+        "da": "Prisstyring i dag",
+        "de": "Preissteuerung heute",
+        "nl": "Prijssturing vandaag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 1,
+      "units": {
+        "en": "h",
+        "sv": "h",
+        "no": "h",
+        "da": "h",
+        "de": "h",
+        "nl": "h"
+      },
+      "insights": true,
+      "icon": "/assets/battery.svg"
+    },
+    "battery_hours_solar": {
+      "type": "number",
+      "title": {
+        "en": "Solar today",
+        "sv": "Sol idag",
+        "no": "Sol i dag",
+        "da": "Sol i dag",
+        "de": "Solar heute",
+        "nl": "Zon vandaag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 1,
+      "units": {
+        "en": "h",
+        "sv": "h",
+        "no": "h",
+        "da": "h",
+        "de": "h",
+        "nl": "h"
+      },
+      "insights": true,
       "icon": "/assets/battery.svg"
     },
     "battery_next_activity": {
@@ -2121,6 +2872,26 @@
       "insights": true,
       "icon": "/assets/reward.svg"
     },
+    "grid_reward_session_estimate": {
+      "type": "number",
+      "title": {
+        "en": "Session (estimate)",
+        "sv": "Session (uppskattning)",
+        "no": "Økt (anslag)",
+        "da": "Session (skøn)",
+        "de": "Session (Schätzung)",
+        "nl": "Sessie (schatting)"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
     "grid_reward_sessions_month": {
       "type": "number",
       "title": {
@@ -2225,6 +2996,42 @@
         "da": "Godtgørelse i dag",
         "de": "Vergütung heute",
         "nl": "Vergoeding vandaag"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "decimals": 2,
+      "units": {
+        "en": "kr"
+      },
+      "insights": true,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_updated": {
+      "type": "string",
+      "title": {
+        "en": "Updated",
+        "sv": "Uppdaterad",
+        "no": "Oppdatert",
+        "da": "Opdateret",
+        "de": "Aktualisiert",
+        "nl": "Bijgewerkt"
+      },
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "insights": false,
+      "icon": "/assets/reward.svg"
+    },
+    "grid_reward_yesterday": {
+      "type": "number",
+      "title": {
+        "en": "Reward yesterday",
+        "sv": "Ersättning igår",
+        "no": "Godtgjørelse i går",
+        "da": "Godtgørelse i går",
+        "de": "Vergütung gestern",
+        "nl": "Vergoeding gisteren"
       },
       "getable": true,
       "setable": false,

@@ -83,13 +83,18 @@ test('parseBattery: savings, current activity, next planned', () => {
       { time: '2026-11-17T10:15:00Z', soc: null, powerW: 40, forecast: true },
       { time: '2026-11-17T13:30:00Z', soc: 81.3, powerW: -2500, forecast: true },
     ],
+    intervals: [
+      { from: '2026-11-17T08:00:00Z', to: '2026-11-17T09:00:00Z', code: 'Idle' },
+      { from: '2026-11-17T09:00:00Z', to: null, code: 'ChargingForGridRewards' },
+    ],
+    actual: [{ time: '2026-11-17T10:00:00Z', charged: 3000, discharged: 0 }],
   });
 });
 
 test('parseBattery: tolerates missing parts', () => {
   assert.strictEqual(parseBattery({}), null);
   assert.deepStrictEqual(parseBattery({ me: { home: {} } }), {
-    savingsToday: null, savingsWeek: null, savingsMonth: null, unit: '', activity: null, nextPlanned: null, plan: [],
+    savingsToday: null, savingsWeek: null, savingsMonth: null, unit: '', activity: null, nextPlanned: null, plan: [], intervals: [], actual: [],
   });
 });
 

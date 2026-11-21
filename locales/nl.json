@@ -52,7 +52,9 @@
     "saved_today": "vandaag bespaard",
     "unavailable": "Geen verbinding met Tibber",
     "week_title": "Laatste 7 dagen",
-    "no_battery": "Voeg een thuisbatterij van Tibber toe om het plan te zien."
+    "no_battery": "Voeg een thuisbatterij van Tibber toe om het plan te zien.",
+    "updated": "Bijgewerkt",
+    "estimate": "schatting"
   },
   "conn": {
     "connecting": "Verbinden…",
@@ -91,7 +93,18 @@
     "export_copy_failed": "Kopiëren lukt niet. Probeer Downloaden.",
     "device": "Apparaat",
     "all_devices": "Alle auto’s en batterijen",
-    "records": "Persoonlijke records"
+    "records": "Persoonlijke records",
+    "battery_days": "De dagen van de batterij",
+    "bd_gr": "Grid Rewards",
+    "bd_price": "Prijs",
+    "bd_solar": "Zon",
+    "bd_charged": "Geladen",
+    "bd_discharged": "Ontladen",
+    "bd_savings": "Bespaard",
+    "today": "Vandaag",
+    "settled": "Toegevoegd door de verrekening van Tibber na het einde van de sessie",
+    "reasons_title": "Per reden",
+    "share": "Aandeel"
   },
   "export": {
     "home": "Huis",
@@ -103,11 +116,18 @@
     "reward": "Vergoeding",
     "currency": "Valuta",
     "reason": "Reden",
-    "device": "Apparaat"
+    "device": "Apparaat",
+    "settled": "Verrekening"
   },
   "records": {
     "bestDay": "Beste dag",
     "bestSession": "Beste sessie",
     "longestSession": "Langste sessie"
+  },
+  "car": {
+    "notify": "Sluit __name__ aan: hij is niet aangesloten en verdient alleen Grid Rewards als hij dat wel is.",
+    "warn": "De laadpaal meldt dat de auto is aangesloten, maar Tibber ziet geen auto. Controleer de auto in de Tibber-app.",
+    "plugged": "Aangesloten (__time__)",
+    "unplugged": "Losgekoppeld (__time__)"
   }
 }

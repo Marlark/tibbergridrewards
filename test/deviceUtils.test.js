@@ -83,8 +83,9 @@ test('real day through the home device: writes only what changed', async (t) => 
     await device._queue;
   }
   // Measured on the previous version: 1 502 capability writes and 209 tracker writes.
-  // Now: 404 and 95.
-  assert.ok(count.caps < 500, `capability writes: ${count.caps}`);
+  // Then 404 and 95. Version 0.3 adds about 90, mostly the session estimate (#44).
+  // "Updated" (#57) would add about 150 but is off unless the user turns it on.
+  assert.ok(count.caps < 550, `capability writes: ${count.caps}`);
   assert.ok(count.tracker <= 100, `tracker writes: ${count.tracker}`);
   assert.strictEqual(device.getCapabilityValue('grid_reward_sessions_month'), 9);
   t.diagnostic(`capability writes ${count.caps}, tracker writes ${count.tracker}`);
